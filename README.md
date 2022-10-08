@@ -1,2 +1,0 @@
-# OwaranaiEngine
-Owaranai Engine
