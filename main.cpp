@@ -1,6 +1,7 @@
-#include"lib/TensorCore/Tensor.h"
+#include "TensorCore/Tensor.h"
+
 
 int main()
 {
-    std::cout<<1;
+    Tensor q = Tensor(std::vector<size_t>{1,2,3}, 1);
 }
