@@ -8,7 +8,7 @@ add_subdirectory(TensorCore)
 #set (EXTRA_LIBS ${EXTRA_LIBS} TensorCore)
 
 
-ADD_EXECUTABLE(OwaranaiEngine main.cpp)
+cuda_ADD_EXECUTABLE(OwaranaiEngine main.cpp)
 
 
 target_link_libraries (OwaranaiEngine TensorCore)
