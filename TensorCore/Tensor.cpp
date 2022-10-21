@@ -1,10 +1,19 @@
 #include "Tensor.h"
-Tensor::Tensor(std::vector<size_t>shape, std::string Device)
+
+Tensor::Tensor(std::vector<size_t>shape)
+{
+    this->shape = shape;
+    for(int a=0;a<shape.size();a++)ShapeCount*=shape[a];
+    this->DataCPU = (float*)malloc(sizeof(float)*ShapeCount);
+}
+
+Tensor::Tensor(std::vector<size_t>shape, std::string Device, size_t DeviceNum)
 {
     this->shape = shape;
     this->Device = Device;
+    this->DeviceNum = DeviceNum;
     for(int a=0;a<shape.size();a++)ShapeCount*=shape[a];
-    if(Device == "GPU")cudaMallocInCPP(&(this->DataGPU), ShapeCount);
+    if(Device == "GPU")cudaMallocInCPP(&(this->DataGPU), ShapeCount, DeviceNum);
     else this->DataCPU = (float*)malloc(sizeof(float)*ShapeCount);
 }
 
@@ -35,20 +44,21 @@ void Tensor::ToCPU()
 void Tensor::ToGPU()
 {
     if(Device == "GPU")return;
-    cudaMallocInCPP(&DataGPU, ShapeCount);
+    cudaMallocInCPP(&DataGPU, ShapeCount, DeviceNum);
     DataToGPU(DataCPU, DataGPU, ShapeCount);
     free(DataCPU);
 }
 
 void Tensor::FillArray(float Scalar)
 {
-    FillArrayInCPP(DataGPU, Scalar, ShapeCount);
+    if(Device == "GPU")FillArrayInCPP(DataGPU, Scalar, ShapeCount);
+    else for(int a=0;a<ShapeCount;a++)DataCPU[a] = Scalar;
 }
-
 
 Tensor* Tensor::AddArray(Tensor* Input)
 {
-    Tensor* Output = new Tensor(shape, Device);
-    AddArrayInCPP(Output->DataGPU, DataGPU, Input->DataGPU, ShapeCount);
+    Tensor* Output = new Tensor(shape, Device, DeviceNum);
+    if(Device == "GPU")AddArrayInCPP(Output->DataGPU, DataGPU, Input->DataGPU, ShapeCount);
+    else for(int a=0;a<ShapeCount;a++)Output->DataCPU[a] = DataCPU[a] + Input->DataCPU[a];
     return Output;
 }
