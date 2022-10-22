@@ -1,4 +1,4 @@
-#include "TensorCore/Tensor.h"
+#include "AIMoudle/MoudleInclude.h"
 
 
 int main()
