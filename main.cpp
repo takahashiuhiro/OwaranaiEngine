@@ -13,12 +13,14 @@ int main()
     Tensor* r = e->AddArray(e);
     r->PrintData();
     std::cout<<"cpu test"<<std::endl;
-    Tensor* qq =new Tensor(std::vector<size_t>{1,2,3});
+    Tensor* qq =new Tensor(std::vector<size_t>{3,2,2,3});
     qq->FillArray(1.);
-    Tensor* ww =new Tensor(std::vector<size_t>{1,2,3});
-    ww->FillArray(2.);
-    Tensor* ee = qq->AddArray(ww);
+    Tensor* ww =new Tensor(std::vector<size_t>{2,2,3});
+    ww->FillArray(0.);
+    ww->SetV(std::vector<size_t>{0,0,0}, 5);
+    //std::cout<<ww->GetV(std::vector<size_t>{0,0,0})<<std::endl;
+    Tensor* ee = qq->Add(ww);
     ee->PrintData();
-    Tensor* rr = ee->AddArray(ee);
-    rr->PrintData();
+    //Tensor* rr = ee->AddArray(ee);
+    //rr->PrintData();
 }

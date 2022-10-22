@@ -27,9 +27,20 @@ public:
     void ToGPU();
     /**move data to cpu*/
     void ToCPU();
+    /**print the data of this tensor*/
     void PrintData();
     /**make a scalar fill array of the tensor*/
     void FillArray(float Scalar);
-    /**make two tensor add this array and they must be same shapecount*/
+    /**get the index of a vector like std::vector<size_t>{a,b,..}*/
+    size_t GetIndex(std::vector<size_t> FindIndex);
+    /**get the vector from data index*/
+    std::vector<size_t> GetDim(size_t DataIndex);
+    /**get the value tensor[a][b][..]..  and you should input an vector like std::vector<size_t>{a,b,..}*/
+    float GetV(std::vector<size_t> FindIndex);
+    /**set the value tensor[a][b][..]..  and you should input an vector like std::vector<size_t>{a,b,..}*/
+    void SetV(std::vector<size_t> FindIndex, float Value);
+    /**make two tensor add their array and they must be same shapecount*/
     Tensor* AddArray(Tensor* Input);
+    /**add two tensor*/
+    Tensor* Add(Tensor* Input);
 };

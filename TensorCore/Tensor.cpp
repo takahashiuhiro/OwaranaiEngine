@@ -17,20 +17,47 @@ Tensor::Tensor(std::vector<size_t>shape, std::string Device, size_t DeviceNum)
     else this->DataCPU = (float*)malloc(sizeof(float)*ShapeCount);
 }
 
+std::vector<size_t> Tensor::GetDim(size_t DataIndex)
+{
+    std::vector<size_t>ReturnVector;
+    for(int a=0;a<shape.size();a++)ReturnVector.push_back(0);
+    for(int a=shape.size()-1;a>=0;a--)
+    {
+        ReturnVector[a] = DataIndex%(shape[a]);
+        DataIndex /= shape[a];
+    }
+    return ReturnVector;
+}
+
 void Tensor::PrintData()
 {
+    bool GPUflag = 0;
     if(Device == "GPU")
     {
+        GPUflag = 1;
         ToCPU();
-        for(int a=0;a<ShapeCount;a++)std::cout<<DataCPU[a]<<" ";
-        std::cout<<std::endl;
-        ToGPU();
     }
-    else
+    for(int a=0;a<ShapeCount;a++)
     {
-        for(int a=0;a<ShapeCount;a++)std::cout<<DataCPU[a]<<" ";
-        std::cout<<std::endl;
+        std::cout<<DataCPU[a]<<" ";
+        std::vector<size_t>DimIndex = GetDim(a);
+        for(int b=shape.size() - 1;b>=0;b--)
+        {
+            if(DimIndex[b] == shape[b] - 1)
+            {
+                if(b == shape.size() - 2)
+                {
+                    std::cout<<"DimIndex:(";
+                    for(int c =0 ; c<shape.size()-2;c++)std::cout<<DimIndex[c]<<",";
+                    std::cout<<")\n";
+                }
+                if(b > shape.size() - 2)std::cout<<std::endl;
+            }
+            else break;
+        }
     }
+    std::cout<<std::endl;
+    if(GPUflag)ToGPU();
 }
 
 void Tensor::ToCPU()
@@ -61,4 +88,72 @@ Tensor* Tensor::AddArray(Tensor* Input)
     if(Device == "GPU")AddArrayInCPP(Output->DataGPU, DataGPU, Input->DataGPU, ShapeCount);
     else for(int a=0;a<ShapeCount;a++)Output->DataCPU[a] = DataCPU[a] + Input->DataCPU[a];
     return Output;
+}
+
+Tensor* Tensor::Add(Tensor* Input)
+{
+    Tensor *Output, *HighDimTensor, *LowDimTensor;
+    if(shape.size() > Input->shape.size())
+    {
+        HighDimTensor = this;
+        LowDimTensor = Input;
+    }
+    else
+    {
+        HighDimTensor = Input;
+        LowDimTensor = this;
+    }
+    Output = new Tensor(HighDimTensor->shape, HighDimTensor->Device, HighDimTensor->DeviceNum);
+    if(Device == "GPU")
+    {
+        //Todo
+    }
+    else
+    {
+        for(int a=0; a<HighDimTensor->ShapeCount;a++)
+        {
+            int ResIndex = a%LowDimTensor->ShapeCount;
+            int BlockIndex = int(a/LowDimTensor->ShapeCount);
+            Output->DataCPU[a] = HighDimTensor->DataCPU[a] + LowDimTensor->DataCPU[ResIndex];
+        }
+    }
+    return Output;
+}
+
+size_t Tensor::GetIndex(std::vector<size_t> FindIndex)
+{
+    size_t GetIndex = 0;
+    size_t ShapeCountTMP = 1;
+    for(int a = shape.size() - 1;a>=0;a--)
+    {
+        GetIndex += FindIndex[a]*ShapeCountTMP;
+        ShapeCountTMP *= shape[a];
+    }
+    return GetIndex;
+}
+
+float Tensor::GetV(std::vector<size_t> FindIndex)
+{
+    float ReturnValue;
+    bool GPUflag = 0;
+    if(Device == "GPU")
+    {
+        GPUflag = 1;
+        ToCPU();
+    }
+    ReturnValue = DataCPU[GetIndex(FindIndex)];
+    if(GPUflag)ToGPU();
+    return ReturnValue;
+}
+
+void Tensor::SetV(std::vector<size_t> FindIndex, float Value)
+{
+    bool GPUflag = 0;
+    if(Device == "GPU")
+    {
+        GPUflag = 1;
+        ToCPU();
+    }
+    DataCPU[GetIndex(FindIndex)] = Value;
+    if(GPUflag)ToGPU();
 }
