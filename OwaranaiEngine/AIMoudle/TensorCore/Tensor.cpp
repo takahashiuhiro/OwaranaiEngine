@@ -66,6 +66,7 @@ void Tensor::ToCPU()
     this->DataCPU = (float*)malloc(sizeof(float)*ShapeCount);
     DataToCPU(DataCPU, DataGPU, ShapeCount);
     cudaFreeInCPP(DataGPU);
+    Device = "CPU";
 }
 
 void Tensor::ToGPU()
@@ -74,6 +75,7 @@ void Tensor::ToGPU()
     cudaMallocInCPP(&DataGPU, ShapeCount, DeviceNum);
     DataToGPU(DataCPU, DataGPU, ShapeCount);
     free(DataCPU);
+    Device = "GPU";
 }
 
 void Tensor::FillArray(float Scalar)
@@ -106,7 +108,7 @@ Tensor* Tensor::Add(Tensor* Input)
     Output = new Tensor(HighDimTensor->shape, HighDimTensor->Device, HighDimTensor->DeviceNum);
     if(Device == "GPU")
     {
-        //Todo
+        AddInCPP(Output->DataGPU, HighDimTensor->DataGPU, HighDimTensor->ShapeCount, LowDimTensor->DataGPU, LowDimTensor->ShapeCount);
     }
     else
     {
@@ -126,7 +128,7 @@ size_t Tensor::GetIndex(std::vector<size_t> FindIndex)
     size_t ShapeCountTMP = 1;
     for(int a = shape.size() - 1;a>=0;a--)
     {
-        GetIndex += FindIndex[a]*ShapeCountTMP;
+        GetIndex += (FindIndex[a])*ShapeCountTMP;
         ShapeCountTMP *= shape[a];
     }
     return GetIndex;

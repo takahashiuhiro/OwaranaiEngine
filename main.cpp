@@ -4,23 +4,28 @@
 int main()
 {
     std::cout<<"gpu test"<<std::endl;
-    Tensor* q =new Tensor(std::vector<size_t>{1,2,3}, "GPU", 0);
+    Tensor* q =new Tensor(std::vector<size_t>{2,2,3}, "GPU", 0);
     q->FillArray(1.);
-    Tensor* w =new Tensor(std::vector<size_t>{1,2,3}, "GPU", 0);
+    Tensor* w =new Tensor(std::vector<size_t>{2,3}, "GPU", 0);
     w->FillArray(2.);
-    Tensor* e = q->AddArray(w);
+    w->SetV(std::vector<size_t>{1,2}, 99.);
+    w->SetV(std::vector<size_t>{0,1}, 899.);
+    Tensor* e = q->Add(w);
+    q->PrintData();
+    w->PrintData();
     e->PrintData();
-    Tensor* r = e->AddArray(e);
-    r->PrintData();
+    
     std::cout<<"cpu test"<<std::endl;
-    Tensor* qq =new Tensor(std::vector<size_t>{3,2,2,3});
+    Tensor* qq =new Tensor(std::vector<size_t>{2,2,3});
     qq->FillArray(1.);
-    Tensor* ww =new Tensor(std::vector<size_t>{2,2,3});
-    ww->FillArray(0.);
-    ww->SetV(std::vector<size_t>{0,0,0}, 5);
-    //std::cout<<ww->GetV(std::vector<size_t>{0,0,0})<<std::endl;
-    Tensor* ee = qq->Add(ww);
-    ee->PrintData();
+    Tensor* wq =new Tensor(std::vector<size_t>{2,3});
+    wq->FillArray(2.);
+    wq->SetV(std::vector<size_t>{1,2}, 99.);
+    wq->SetV(std::vector<size_t>{0,1}, 899.);
+    Tensor* eq = qq->Add(wq);
+    qq->PrintData();
+    wq->PrintData();
+    eq->PrintData();
     //Tensor* rr = ee->AddArray(ee);
     //rr->PrintData();
 
