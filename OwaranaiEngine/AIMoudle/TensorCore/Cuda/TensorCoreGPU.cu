@@ -35,6 +35,12 @@ __global__ void AddKernel(float* Output, float* HighDimInput, size_t HighDimSize
   if (Index < HighDimSize)Output[Index] = HighDimInput[Index] + LowDimInput[Index%LowDimSize];
 }
 
+__global__ void EleMulKernel(float* Output, float* HighDimInput, size_t HighDimSize, float* LowDimInput, size_t LowDimSize) 
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if (Index < HighDimSize)Output[Index] = HighDimInput[Index] * LowDimInput[Index%LowDimSize];
+}
+
 void FillArrayInCPP(float* Input, float Scalar,size_t Size)
 {
   CudaPair CudaPairInput = GetCudaPair(Size);
@@ -49,6 +55,12 @@ void AddInCPP(float* Output, float* HighDimInput, size_t HighDimSize, float* Low
 {
   CudaPair CudaPairInput = GetCudaPair(HighDimSize);
   AddKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(Output, HighDimInput, HighDimSize, LowDimInput, LowDimSize);
+}
+
+void EleMulInCPP(float* Output, float* HighDimInput, size_t HighDimSize, float* LowDimInput, size_t LowDimSize) 
+{
+  CudaPair CudaPairInput = GetCudaPair(HighDimSize);
+  EleMulKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(Output, HighDimInput, HighDimSize, LowDimInput, LowDimSize);
 }
 
 void DataToCPU(float* CPUPointer, float* GPUPointer, size_t Size){cudaMemcpy(CPUPointer,GPUPointer,sizeof(float)*Size,cudaMemcpyDeviceToHost);}

@@ -122,6 +122,36 @@ Tensor* Tensor::Add(Tensor* Input)
     return Output;
 }
 
+Tensor* Tensor::EleMul(Tensor* Input)
+{
+    Tensor *Output, *HighDimTensor, *LowDimTensor;
+    if(shape.size() > Input->shape.size())
+    {
+        HighDimTensor = this;
+        LowDimTensor = Input;
+    }
+    else
+    {
+        HighDimTensor = Input;
+        LowDimTensor = this;
+    }
+    Output = new Tensor(HighDimTensor->shape, HighDimTensor->Device, HighDimTensor->DeviceNum);
+    if(Device == "GPU")
+    {
+        EleMulInCPP(Output->DataGPU, HighDimTensor->DataGPU, HighDimTensor->ShapeCount, LowDimTensor->DataGPU, LowDimTensor->ShapeCount);
+    }
+    else
+    {
+        for(int a=0; a<HighDimTensor->ShapeCount;a++)
+        {
+            int ResIndex = a%LowDimTensor->ShapeCount;
+            int BlockIndex = int(a/LowDimTensor->ShapeCount);
+            Output->DataCPU[a] = HighDimTensor->DataCPU[a] * LowDimTensor->DataCPU[ResIndex];
+        }
+    }
+    return Output;
+}
+
 size_t Tensor::GetIndex(std::vector<size_t> FindIndex)
 {
     size_t GetIndex = 0;

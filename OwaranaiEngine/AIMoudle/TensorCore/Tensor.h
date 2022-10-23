@@ -8,6 +8,7 @@ extern "C" void cudaFreeInCPP(float* Input);
 extern "C" void AddArrayInCPP(float* Output, float* InputFirst, float* InputSecond, size_t Size);
 extern "C" void FillArrayInCPP(float* Input, float Scalar,size_t Size);
 extern "C" void AddInCPP(float* Output, float* HighDimInput, size_t HighDimSize, float* LowDimInput, size_t LowDimSize);
+extern "C" void EleMulInCPP(float* Output, float* HighDimInput, size_t HighDimSize, float* LowDimInput, size_t LowDimSize);
 
 struct Tensor
 {
@@ -28,20 +29,22 @@ public:
     void ToGPU();
     /**move data to cpu*/
     void ToCPU();
-    /**print the data of this tensor*/
+    /**print data of this tensor*/
     void PrintData();
     /**make a scalar fill array of the tensor*/
     void FillArray(float Scalar);
-    /**get the index of a vector like std::vector<size_t>{a,b,..}*/
+    /**get index of a vector like std::vector<size_t>{a,b,..}*/
     size_t GetIndex(std::vector<size_t> FindIndex);
-    /**get the vector from data index*/
+    /**get vector from data index*/
     std::vector<size_t> GetDim(size_t DataIndex);
-    /**get the value tensor[a][b][..]..  and you should input an vector like std::vector<size_t>{a,b,..}*/
+    /**get value tensor[a][b][..]..  and you should input an vector like std::vector<size_t>{a,b,..}*/
     float GetV(std::vector<size_t> FindIndex);
-    /**set the value tensor[a][b][..]..  and you should input an vector like std::vector<size_t>{a,b,..}*/
+    /**set value tensor[a][b][..]..  and you should input an vector like std::vector<size_t>{a,b,..}*/
     void SetV(std::vector<size_t> FindIndex, float Value);
     /**make two tensor add their array and they must be same shapecount*/
     Tensor* AddArray(Tensor* Input);
     /**add two tensor*/
     Tensor* Add(Tensor* Input);
+    /**mul two tensor across elements*/
+    Tensor* EleMul(Tensor* Input);
 };
