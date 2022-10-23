@@ -23,4 +23,25 @@ int main()
     ee->PrintData();
     //Tensor* rr = ee->AddArray(ee);
     //rr->PrintData();
+
+    //std::vector<int>h = {1,2,3};
+    //std::vector<int>hh = std::move(h);
+    //for(int a=0;a<h.size();a++)std::cout<<h[a]<<std::endl;
+    //for(int a=0;a<hh.size();a++)std::cout<<hh[a]<<std::endl;
+    //h = {4,5,6};
+    //for(int a=0;a<h.size();a++)std::cout<<h[a]<<std::endl;
+
+    //std::vector<vector> qyy;
+	//qyy.push_back(vector(0, 0, 0));
+	//qyy.push_back(vector(5, 0, 0));
+	//qyy.push_back(vector(5, 5, 0));
+	//qyy.push_back(vector(0, 5, 0));
+	//qyy.push_back(vector(3, 8, 0));
+	//qyy.push_back(vector(3, 3, 0));
+	//std::vector<vector>ert;
+	//convex_polygon_2d p = convex_polygon_2d(&ert);
+	//plane().get_convex_polygon_2d(&qyy, &p);
+	//for (int a = 0; a < p.vector_list->size(); a++)(*(p.vector_list))[a].print();
+	//vector t = vector(1, 2, 3);
+	//t.print();
 }
