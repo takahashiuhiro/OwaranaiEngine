@@ -84,6 +84,22 @@ void Tensor::FillArray(float Scalar)
     else for(int a=0;a<ShapeCount;a++)DataCPU[a] = Scalar;
 }
 
+Tensor* Tensor::AddScalar(float Scalar)
+{
+    Tensor* Output = new Tensor(shape, Device, DeviceNum);
+    if(Device == "GPU")AddScalarInCPP(Output->DataGPU, DataGPU, Scalar, ShapeCount);
+    else for(int a=0;a<ShapeCount;a++)Output->DataCPU[a] = DataCPU[a]+ Scalar;
+    return Output;
+}
+
+Tensor* Tensor::MulScalar(float Scalar)
+{
+    Tensor* Output = new Tensor(shape, Device, DeviceNum);
+    if(Device == "GPU")MulScalarInCPP(Output->DataGPU, DataGPU, Scalar, ShapeCount);
+    else for(int a=0;a<ShapeCount;a++)Output->DataCPU[a] = DataCPU[a] *Scalar;
+    return Output;
+}
+
 Tensor* Tensor::AddArray(Tensor* Input)
 {
     Tensor* Output = new Tensor(shape, Device, DeviceNum);

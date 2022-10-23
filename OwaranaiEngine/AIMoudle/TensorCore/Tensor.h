@@ -1,6 +1,5 @@
 #include "TensorInclude.h"
 
-/**test*/
 extern "C" void cudaMallocInCPP(float** Input, size_t Size, size_t DeviceNum);
 extern "C" void DataToGPU(float* CPUPointer, float* GPUPointer, size_t Size);
 extern "C" void DataToCPU(float* CPUPointer, float* GPUPointer, size_t Size);
@@ -9,6 +8,8 @@ extern "C" void AddArrayInCPP(float* Output, float* InputFirst, float* InputSeco
 extern "C" void FillArrayInCPP(float* Input, float Scalar,size_t Size);
 extern "C" void AddInCPP(float* Output, float* HighDimInput, size_t HighDimSize, float* LowDimInput, size_t LowDimSize);
 extern "C" void EleMulInCPP(float* Output, float* HighDimInput, size_t HighDimSize, float* LowDimInput, size_t LowDimSize);
+extern "C" void MulScalarInCPP(float* Output,float* Input, float Scalar,size_t Size);
+extern "C" void AddScalarInCPP(float* Output,float* Input, float Scalar,size_t Size);
 
 struct Tensor
 {
@@ -47,4 +48,8 @@ public:
     Tensor* Add(Tensor* Input);
     /**mul two tensor across elements*/
     Tensor* EleMul(Tensor* Input);
+    /**add a scalar*/
+    Tensor* AddScalar(float Scalar);
+    /**mul a scalar*/
+    Tensor* MulScalar(float Scalar);
 };

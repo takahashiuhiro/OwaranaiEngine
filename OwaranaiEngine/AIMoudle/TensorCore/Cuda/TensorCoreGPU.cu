@@ -1,21 +1,4 @@
 #include "TensorCoreCudaHead.cuh"
-#define THREAD_NUM 256
-
-struct CudaPair 
-{
-  CudaPair(dim3 block, dim3 grid)
-  {
-    this->block = block;
-    this->grid = grid;
-  }
-  dim3 block, grid;
-};
-
-CudaPair GetCudaPair(size_t Size) 
-{
-  size_t NumBlocks = (Size + THREAD_NUM - 1) / THREAD_NUM;
-  return CudaPair(dim3(THREAD_NUM, 1, 1), dim3(NumBlocks, 1, 1));
-}
 
 __global__ void AddArrayKernel(float* Output, float* InputFirst, float* InputSecond,size_t Size) 
 {
@@ -27,6 +10,18 @@ __global__ void FillArrayKernel(float* Input, float Scalar,size_t Size)
 {
   size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
   if (Index < Size) Input[Index] = Scalar;
+}
+
+__global__ void AddScalarKernel(float* Output,float* Input, float Scalar,size_t Size) 
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if (Index < Size) Output[Index] = Input[Index] + Scalar;
+}
+
+__global__ void MulScalarKernel(float* Output,float* Input, float Scalar,size_t Size) 
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if (Index < Size) Output[Index] = Input[Index] * Scalar;
 }
 
 __global__ void AddKernel(float* Output, float* HighDimInput, size_t HighDimSize, float* LowDimInput, size_t LowDimSize) 
@@ -46,6 +41,19 @@ void FillArrayInCPP(float* Input, float Scalar,size_t Size)
   CudaPair CudaPairInput = GetCudaPair(Size);
   FillArrayKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(Input, Scalar, Size);
 }
+
+void AddScalarInCPP(float* Output,float* Input, float Scalar,size_t Size) 
+{
+  CudaPair CudaPairInput = GetCudaPair(Size);
+  AddScalarKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(Output,Input, Scalar, Size);
+}
+
+void MulScalarInCPP(float* Output,float* Input, float Scalar,size_t Size) 
+{
+  CudaPair CudaPairInput = GetCudaPair(Size);
+  MulScalarKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(Output,Input, Scalar, Size);
+}
+
 void AddArrayInCPP(float* Output, float* InputFirst, float* InputSecond, size_t Size) 
 {
   CudaPair CudaPairInput = GetCudaPair(Size);
