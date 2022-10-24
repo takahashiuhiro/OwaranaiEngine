@@ -170,14 +170,14 @@ Tensor* Tensor::EleMul(Tensor* Input)
 
 size_t Tensor::GetIndex(std::vector<size_t> FindIndex)
 {
-    size_t GetIndex = 0;
+    size_t _GetIndex = 0;
     size_t ShapeCountTMP = 1;
     for(int a = shape.size() - 1;a>=0;a--)
     {
-        GetIndex += (FindIndex[a])*ShapeCountTMP;
+        _GetIndex += (FindIndex[a])*ShapeCountTMP;
         ShapeCountTMP *= shape[a];
     }
-    return GetIndex;
+    return _GetIndex;
 }
 
 float Tensor::GetV(std::vector<size_t> FindIndex)
