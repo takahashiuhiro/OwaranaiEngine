@@ -52,4 +52,6 @@ public:
     Tensor* AddScalar(float Scalar);
     /**mul a scalar*/
     Tensor* MulScalar(float Scalar);
+    /**tensor matmul*/
+    Tensor* Matmul(Tensor* Input);
 };

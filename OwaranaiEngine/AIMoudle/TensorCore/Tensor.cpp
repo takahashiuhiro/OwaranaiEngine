@@ -205,3 +205,41 @@ void Tensor::SetV(std::vector<size_t> FindIndex, float Value)
     DataCPU[GetIndex(FindIndex)] = Value;
     if(GPUflag)ToGPU();
 }
+
+Tensor* Tensor::Matmul(Tensor* Input)
+{
+    Tensor* Output;
+    if(shape.size() == 1)
+    {
+        if(Input->shape.size() == 1)
+        {
+            Output = new Tensor(std::vector<size_t>{}, Device, DeviceNum);
+            float *DotResult;
+            if(Device == "GPU")
+            {
+
+            }
+            else
+            {
+                Output->DataCPU[0] = 0;
+                for(int a=0;a<ShapeCount;a++)Output->DataCPU[0] += DataCPU[a]*Input->DataCPU[a];
+            }
+        }
+        else
+        {
+            
+        }
+    }
+    else
+    {
+        if(Input->shape.size() == 1)
+        {
+
+        }
+        else
+        {
+            
+        }
+    }
+    return Output;
+}
