@@ -12,6 +12,7 @@ extern "C" void AddInCPP(float* Output, float* HighDimInput, size_t HighDimSize,
 extern "C" void EleMulInCPP(float* Output, float* HighDimInput, size_t HighDimSize, float* LowDimInput, size_t LowDimSize);
 extern "C" void MulScalarInCPP(float* Output,float* Input, float Scalar,size_t Size);
 extern "C" void AddScalarInCPP(float* Output,float* Input, float Scalar,size_t Size);
+extern "C" void DotArrayInCPP(float* Output, float* InputFirst, float* InputSecond, size_t Size);
 
 struct CudaPair 
 {

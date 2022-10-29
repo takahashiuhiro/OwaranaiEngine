@@ -213,17 +213,15 @@ Tensor* Tensor::Matmul(Tensor* Input)
     {
         if(Input->shape.size() == 1)
         {
-            Output = new Tensor(std::vector<size_t>{}, Device, DeviceNum);
-            float *DotResult;
+            Output = new Tensor(std::vector<size_t>{});
+            Output->DataCPU[0] = 0;
             if(Device == "GPU")
             {
-
+                Output->ToGPU();
+                std::cout<<Output->Device<<std::endl;
+                DotArrayInCPP(Output->DataGPU, DataGPU, Input->DataGPU, ShapeCount);
             }
-            else
-            {
-                Output->DataCPU[0] = 0;
-                for(int a=0;a<ShapeCount;a++)Output->DataCPU[0] += DataCPU[a]*Input->DataCPU[a];
-            }
+            else for(int a=0;a<ShapeCount;a++)Output->DataCPU[0] += DataCPU[a]*Input->DataCPU[a];
         }
         else
         {

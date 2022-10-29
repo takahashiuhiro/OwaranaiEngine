@@ -12,6 +12,13 @@ __global__ void FillArrayKernel(float* Input, float Scalar,size_t Size)
   if (Index < Size) Input[Index] = Scalar;
 }
 
+__global__ void DotArrayKernel(float* Output, size_t OutSize, size_t InSize) 
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if (Index < InSize && Index + InSize < OutSize)Output[Index] += Output[Index + InSize];
+  __syncthreads();
+}
+
 __global__ void AddScalarKernel(float* Output,float* Input, float Scalar,size_t Size) 
 {
   size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
@@ -59,6 +66,23 @@ void AddArrayInCPP(float* Output, float* InputFirst, float* InputSecond, size_t 
   CudaPair CudaPairInput = GetCudaPair(Size);
   AddArrayKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(Output, InputFirst, InputSecond, Size);
 }
+
+void DotArrayInCPP(float* Output, float* InputFirst, float* InputSecond, size_t Size) 
+{
+  CudaPair CudaPairInput = GetCudaPair(Size);
+  float *OutTMP;
+  cudaMalloc((void**)&OutTMP, Size*sizeof(float));
+  EleMulKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutTMP, InputFirst, Size, InputSecond, Size);
+  size_t SizeTMP = Size;
+  while(SizeTMP > 1)
+  {
+    CudaPairInput = GetCudaPair(SizeTMP);
+    DotArrayKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutTMP, SizeTMP, (SizeTMP + 1)/2);
+    SizeTMP = (SizeTMP + 1)/2;
+  }
+  cudaMemcpy(Output,OutTMP,sizeof(float),cudaMemcpyDeviceToDevice);
+}
+
 void AddInCPP(float* Output, float* HighDimInput, size_t HighDimSize, float* LowDimInput, size_t LowDimSize) 
 {
   CudaPair CudaPairInput = GetCudaPair(HighDimSize);
