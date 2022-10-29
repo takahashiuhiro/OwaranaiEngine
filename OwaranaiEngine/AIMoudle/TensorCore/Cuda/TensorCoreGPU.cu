@@ -81,6 +81,7 @@ void DotArrayInCPP(float* Output, float* InputFirst, float* InputSecond, size_t 
     SizeTMP = (SizeTMP + 1)/2;
   }
   cudaMemcpy(Output,OutTMP,sizeof(float),cudaMemcpyDeviceToDevice);
+  cudaFree(OutTMP);
 }
 
 void AddInCPP(float* Output, float* HighDimInput, size_t HighDimSize, float* LowDimInput, size_t LowDimSize) 
