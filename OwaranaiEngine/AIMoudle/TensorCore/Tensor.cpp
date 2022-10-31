@@ -218,7 +218,6 @@ Tensor* Tensor::Matmul(Tensor* Input)
             if(Device == "GPU")
             {
                 Output->ToGPU();
-                std::cout<<Output->Device<<std::endl;
                 DotArrayInCPP(Output->DataGPU, DataGPU, Input->DataGPU, ShapeCount);
             }
             else for(int a=0;a<ShapeCount;a++)Output->DataCPU[0] += DataCPU[a]*Input->DataCPU[a];
@@ -230,13 +229,18 @@ Tensor* Tensor::Matmul(Tensor* Input)
     }
     else
     {
-        if(Input->shape.size() == 1)
+        if(Input->shape.size() == 1) 
         {
 
         }
         else
         {
+            std::vector<size_t> OutputShape;
             
+            if(Device == "GPU")
+            {
+
+            }
         }
     }
     return Output;

@@ -8,7 +8,7 @@ int main()
     Tensor* w =new Tensor(std::vector<size_t>{17}, "GPU", 0);
     w->FillArray(2.);
     //w->SetV(std::vector<size_t>{}, 99.);
-    //w->SetV(std::vector<size_t>{0}, 899.);
+    w->SetV(std::vector<size_t>{8}, 899.);
     Tensor* e = q->Matmul(w);
     q->PrintData();
     w->PrintData();
@@ -19,7 +19,7 @@ int main()
     Tensor* wq =new Tensor(std::vector<size_t>{17});
     wq->FillArray(2.);
     //wq->SetV(std::vector<size_t>{}, 99.);
-    //wq->SetV(std::vector<size_t>{0}, 899.);
+    wq->SetV(std::vector<size_t>{8}, 899.);
     Tensor* eq = qq->Matmul(wq);
     qq->PrintData();
     wq->PrintData();

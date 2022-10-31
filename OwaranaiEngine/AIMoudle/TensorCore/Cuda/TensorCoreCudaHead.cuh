@@ -13,6 +13,20 @@ extern "C" void EleMulInCPP(float* Output, float* HighDimInput, size_t HighDimSi
 extern "C" void MulScalarInCPP(float* Output,float* Input, float Scalar,size_t Size);
 extern "C" void AddScalarInCPP(float* Output,float* Input, float Scalar,size_t Size);
 extern "C" void DotArrayInCPP(float* Output, float* InputFirst, float* InputSecond, size_t Size);
+extern "C" void MatmulInCPP
+(
+  float* Output, 
+  size_t OutputBatchShape[8], 
+  size_t OutputMatrixShape[2],
+  float* InputFirst, 
+  size_t InputFirstBatchShape[8], 
+  size_t InputFirstMatrixShape[2],
+  float* InputSecond, 
+  size_t InputSecondBatchShape[8], 
+  size_t InputSecondMatrixShape[2],
+  size_t BatchShapeLen,
+  size_t OutputShapeCount
+);
 
 struct CudaPair 
 {

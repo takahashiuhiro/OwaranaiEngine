@@ -43,6 +43,61 @@ __global__ void EleMulKernel(float* Output, float* HighDimInput, size_t HighDimS
   if (Index < HighDimSize)Output[Index] = HighDimInput[Index] * LowDimInput[Index%LowDimSize];
 }
 
+__global__ void MatmulKernel
+(
+  float* Output, 
+  size_t OutputBatchShape[8], 
+  size_t OutputMatrixShape[2],
+  float* InputFirst, 
+  size_t InputFirstBatchShape[8], 
+  size_t InputFirstMatrixShape[2],
+  float* InputSecond, 
+  size_t InputSecondBatchShape[8], 
+  size_t InputSecondMatrixShape[2],
+  size_t BatchShapeLen,
+  size_t OutputShapeCount
+)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if (Index < OutputShapeCount)
+  {
+    size_t OutputBatchIndex[8];
+    size_t OutputMatrixShapeCount = OutputMatrixShape[0]*OutputMatrixShape[1];
+  }
+}
+
+void MatmulInCPP
+(
+  float* Output, 
+  float OutputBatchShape[8], 
+  float OutputMatrixShape[2],
+  float* InputFirst, 
+  float InputFirstBatchShape[8], 
+  float InputFirstMatrixShape[2],
+  float* InputSecond, 
+  float InputSecondBatchShape[8], 
+  float InputSecondMatrixShape[2],
+  float BatchShapeLen,
+  size_t OutputShapeCount
+)
+{
+  CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
+  MatmulKernel<<<CudaPairInput.block, CudaPairInput.grid>>>
+  (
+    Output, 
+    OutputBatchShape, 
+    OutputMatrixShape, 
+    InputFirst,
+    InputFirstBatchShape, 
+    InputFirstMatrixShape,
+    InputSecond, 
+    InputSecondBatchShape,
+    InputSecondMatrixShape,
+    BatchShapeLen,
+    OutputShapeCount
+  );
+}
+
 void FillArrayInCPP(float* Input, float Scalar,size_t Size)
 {
   CudaPair CudaPairInput = GetCudaPair(Size);
