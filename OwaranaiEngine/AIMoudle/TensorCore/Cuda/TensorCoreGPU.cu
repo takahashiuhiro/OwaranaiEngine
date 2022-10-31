@@ -63,21 +63,73 @@ __global__ void MatmulKernel
   {
     size_t OutputBatchIndex[8];
     size_t OutputMatrixShapeCount = OutputMatrixShape[0]*OutputMatrixShape[1];
+    size_t OutSizeTMP = Index/OutputMatrixShapeCount;
+    bool MatZero = OutSizeTMP;
+    for(int a=OutputShapeCount-1;a>=0;a--)
+    {
+      if(!MatZero)OutputBatchIndex[a] = 0;
+      else
+      {
+        OutputBatchIndex[a] = OutSizeTMP%OutputBatchShape[a];
+        OutSizeTMP /= OutputBatchShape[a];
+      }
+    }
+    //填充输出矩阵的batch维度
+    size_t InputFirstBatchIndex[8];
+    for(int a=OutputShapeCount-1;a>=0;a--)
+    {
+      if(OutputBatchIndex[a] < InputFirstBatchShape[a])InputFirstBatchIndex[a] = OutputBatchIndex[a];
+      else InputFirstBatchIndex[a] = 0;
+    }
+    size_t InputFirstMatrixShapeCount = InputFirstMatrixShape[0]*InputFirstMatrixShape[1];
+    size_t InputSecondBatchIndex[8];
+    for(int a=OutputShapeCount-1;a>=0;a--)
+    {
+      if(OutputBatchIndex[a] < InputSecondBatchShape[a])InputSecondBatchIndex[a] = OutputBatchIndex[a];
+      else InputSecondBatchIndex[a] = 0;
+    }
+    size_t InputSecondMatrixShapeCount = InputSecondMatrixShape[0]*InputSecondMatrixShape[1];
+    //填充输入矩阵的batch维度
+
+    size_t InputFirstBase = 0;
+    size_t InFirstTMP = InputFirstMatrixShapeCount;
+    for(int a=OutputShapeCount-1;a>=0;a--)
+    {
+      InputFirstBase += InFirstTMP*InputFirstBatchIndex[a];
+      InFirstTMP*=InputFirstBatchShape[a];
+    }
+
+    size_t InputSecondBase = 0;
+    size_t InSecondTMP = InputSecondMatrixShapeCount;
+    for(int a=OutputShapeCount-1;a>=0;a--)
+    {
+      InputSecondBase += InSecondTMP*InputSecondBatchIndex[a];
+      InSecondTMP*=InputSecondBatchShape[a];
+    }
+    //计算batch维度
+
+    size_t OutputMatrixIndex = Index%OutputMatrixShapeCount;
+    size_t MatIndex[2] = {OutputMatrixIndex/OutputMatrixShape[1], OutputMatrixIndex%OutputMatrixShape[1]};
+    for(int a=0;a<InputFirstMatrixShape[1];a++)
+    {
+      Output[Index] += InputFirst[InputFirstBase + MatIndex[0]*InputFirstMatrixShape[1] + a]*InputSecond[InputSecondBase + a*InputSecondMatrixShape[1] + MatIndex[1]];
+    }
+
   }
 }
 
 void MatmulInCPP
 (
   float* Output, 
-  float OutputBatchShape[8], 
-  float OutputMatrixShape[2],
+  size_t OutputBatchShape[8], 
+  size_t OutputMatrixShape[2],
   float* InputFirst, 
-  float InputFirstBatchShape[8], 
-  float InputFirstMatrixShape[2],
+  size_t InputFirstBatchShape[8], 
+  size_t InputFirstMatrixShape[2],
   float* InputSecond, 
-  float InputSecondBatchShape[8], 
-  float InputSecondMatrixShape[2],
-  float BatchShapeLen,
+  size_t InputSecondBatchShape[8], 
+  size_t InputSecondMatrixShape[2],
+  size_t BatchShapeLen,
   size_t OutputShapeCount
 )
 {

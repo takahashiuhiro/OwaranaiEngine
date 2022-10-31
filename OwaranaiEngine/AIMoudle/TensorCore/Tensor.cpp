@@ -236,10 +236,25 @@ Tensor* Tensor::Matmul(Tensor* Input)
         else
         {
             std::vector<size_t> OutputShape;
-            
+            for(int a=0;a<std::max(shape.size(), Input->shape.size());a++)
+            {
+                if(shape.size() > Input->shape.size())
+                {
+                    size_t MinusSize = shape.size() - Input->shape.size();
+                    if(a - MinusSize < 0)OutputShape.push_back(shape[a]);
+                    else OutputShape.push_back(std::max(shape[a], Input->shape[a - MinusSize]));
+                }
+                else
+                {
+                    size_t MinusSize = -shape.size() + Input->shape.size();
+                    if(a - MinusSize < 0)OutputShape.push_back(Input->shape[a]);
+                    else OutputShape.push_back(std::max(shape[a- MinusSize], Input->shape[a]));
+                }
+            }
+            Output = new Tensor(OutputShape, Device, DeviceNum);
             if(Device == "GPU")
             {
-
+                
             }
         }
     }
