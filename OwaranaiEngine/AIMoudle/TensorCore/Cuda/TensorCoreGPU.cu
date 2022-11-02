@@ -58,6 +58,7 @@ __global__ void MatmulKernel
   size_t OutputShapeCount
 )
 {
+  //todo::段错误应该在这个函数里，写的不对仔细查
   size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
   if (Index < OutputShapeCount)
   {
@@ -133,6 +134,19 @@ void MatmulInCPP
   size_t OutputShapeCount
 )
 {
+  printf("打印一下矩阵信息,准备开始cuda\n");
+  printf("打印矩阵batch\n");
+  for(int a=0;a<BatchShapeLen;a++)
+  {
+    printf("%lu, %lu, %lu\n",OutputBatchShape[a],InputFirstBatchShape[a], InputSecondBatchShape[a]);
+  }
+  printf("打印矩阵shape\n");
+  for(int a=0;a<2;a++)
+  {
+    printf("%lu, %lu, %lu\n",OutputMatrixShape[a],InputFirstMatrixShape[a], InputSecondMatrixShape[a]);
+  }
+  printf("看看输出长度 %lu\n", OutputShapeCount);
+  printf("打印信息结束\n\n");
   CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
   MatmulKernel<<<CudaPairInput.block, CudaPairInput.grid>>>
   (

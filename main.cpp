@@ -3,16 +3,16 @@
 int main()
 {
     std::cout<<"------------------------GPU test---------------------------------"<<std::endl;
-    Tensor* q =new Tensor(std::vector<size_t>{8,11}, "GPU", 0);
+    Tensor* q =new Tensor(std::vector<size_t>{1,2,3}, "GPU", 0);
     q->FillArray(18.);
-    Tensor* w =new Tensor(std::vector<size_t>{11,9}, "GPU", 0);
+    Tensor* w =new Tensor(std::vector<size_t>{1,3,4}, "GPU", 0);
     w->FillArray(2.);
     //w->SetV(std::vector<size_t>{}, 99.);
     //w->SetV(std::vector<size_t>{8}, 899.);
     Tensor* e = q->Matmul(w);
-    //q->PrintData();
-    //w->PrintData();
-    //e->PrintData();
+    q->PrintData();
+    w->PrintData();
+    e->PrintData();
     std::cout<<"------------------------CPU test---------------------------------"<<std::endl;
     Tensor* qq =new Tensor(std::vector<size_t>{17});
     qq->FillArray(18.);

@@ -206,6 +206,14 @@ void Tensor::SetV(std::vector<size_t> FindIndex, float Value)
     if(GPUflag)ToGPU();
 }
 
+CudaDimVec Tensor::TransformFromStdVector(std::vector<size_t> InputVector)
+{
+    CudaDimVec ReturenV;
+    memset(ReturenV.Shape,0,sizeof(CudaDimVec));
+    for(int a=0;a<InputVector.size();a++)ReturenV.Shape[a] = InputVector[a];
+    return ReturenV;
+}
+
 Tensor* Tensor::Matmul(Tensor* Input)
 {
     Tensor* Output;
@@ -251,17 +259,30 @@ Tensor* Tensor::Matmul(Tensor* Input)
                     else OutputShape.push_back(std::max(shape[a- MinusSize], Input->shape[a]));
                 }
             }
+            size_t OutputMatrixShape[2] = {shape[shape.size()-2], Input->shape[Input->shape.size()-1]};
             OutputShape.push_back(shape[shape.size()-2]);
             OutputShape.push_back(Input->shape[Input->shape.size()-1]);
-            Output = new Tensor(OutputShape, Device, DeviceNum);
+            Output = new Tensor(OutputShape, Device, DeviceNum);//OutputShape is all shape of the mat but we only use first 6 elems as the cuda shape params
             if(Device == "GPU")
             {
-                std::cout<<"Shape Test"<<std::endl;
-                for(int a=0;a<OutputShape.size();a++)
-                {
-                    std::cout<<OutputShape[a]<<" ";
-                }
-                std::cout<<std::endl;
+                CudaDimVec OutputShapeArray = TransformFromStdVector(OutputShape);
+                CudaDimVec InputFirstArray = TransformFromStdVector(shape);
+                CudaDimVec InputSecondArray = TransformFromStdVector(Input->shape);
+                size_t InputFirstMatrixShape[2] = {shape[shape.size()-2], shape[shape.size()-1]};
+                size_t InputSecondMatrixShape[2] = {Input->shape[Input->shape.size()-2], Input->shape[Input->shape.size()-1]};
+                MatmulInCPP
+                (
+                    Output->DataGPU,
+                    OutputShapeArray.Shape, 
+                    OutputMatrixShape,DataGPU, 
+                    InputFirstArray.Shape,
+                    InputFirstMatrixShape,
+                    Input->DataGPU,
+                    InputSecondArray.Shape,
+                    InputSecondMatrixShape,
+                    Output->shape.size()-2,
+                    Output->ShapeCount
+                );
             }
         }
     }
