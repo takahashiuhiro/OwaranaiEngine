@@ -236,25 +236,32 @@ Tensor* Tensor::Matmul(Tensor* Input)
         else
         {
             std::vector<size_t> OutputShape;
-            for(int a=0;a<std::max(shape.size(), Input->shape.size());a++)
+            for(int a=0;a<std::max(shape.size(), Input->shape.size())-2;a++)
             {
                 if(shape.size() > Input->shape.size())
                 {
                     size_t MinusSize = shape.size() - Input->shape.size();
-                    if(a - MinusSize < 0)OutputShape.push_back(shape[a]);
+                    if(a < MinusSize)OutputShape.push_back(shape[a]);
                     else OutputShape.push_back(std::max(shape[a], Input->shape[a - MinusSize]));
                 }
                 else
                 {
                     size_t MinusSize = -shape.size() + Input->shape.size();
-                    if(a - MinusSize < 0)OutputShape.push_back(Input->shape[a]);
+                    if(a < MinusSize)OutputShape.push_back(Input->shape[a]);
                     else OutputShape.push_back(std::max(shape[a- MinusSize], Input->shape[a]));
                 }
             }
+            OutputShape.push_back(shape[shape.size()-2]);
+            OutputShape.push_back(Input->shape[Input->shape.size()-1]);
             Output = new Tensor(OutputShape, Device, DeviceNum);
             if(Device == "GPU")
             {
-                
+                std::cout<<"Shape Test"<<std::endl;
+                for(int a=0;a<OutputShape.size();a++)
+                {
+                    std::cout<<OutputShape[a]<<" ";
+                }
+                std::cout<<std::endl;
             }
         }
     }
