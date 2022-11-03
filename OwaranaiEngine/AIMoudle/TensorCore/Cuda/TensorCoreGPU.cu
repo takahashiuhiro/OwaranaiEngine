@@ -162,6 +162,12 @@ void MatmulInCPP
     BatchShapeLen,
     OutputShapeCount
   );
+  cudaFree(OutputBatchShapeCuda);
+  cudaFree(OutputMatrixShapeCuda);
+  cudaFree(InputFirstBatchShapeCuda);
+  cudaFree(InputFirstMatrixShapeCuda);
+  cudaFree(InputSecondBatchShapeCuda);
+  cudaFree(InputSecondMatrixShapeCuda);
 }
 
 void FillArrayInCPP(float* Input, float Scalar,size_t Size)
