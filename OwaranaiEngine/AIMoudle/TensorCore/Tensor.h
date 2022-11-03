@@ -64,7 +64,7 @@ public:
     /**set value tensor[a][b][..]..  and you should input an vector like std::vector<size_t>{a,b,..}*/
     void SetV(std::vector<size_t> FindIndex, float Value);
     /**return a array from shape vector*/
-    CudaDimVec TransformFromStdVector(std::vector<size_t> InputVector);
+    CudaDimVec TransformFromStdVector(std::vector<size_t> InputVector, size_t ShapeLen);
     /**make two tensor add their array and they must be same shapecount*/
     Tensor* AddArray(Tensor* Input);
     /**add two tensor*/

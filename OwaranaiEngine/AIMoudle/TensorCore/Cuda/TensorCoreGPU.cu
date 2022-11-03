@@ -58,7 +58,6 @@ __global__ void MatmulKernel
   size_t OutputShapeCount
 )
 {
-  //todo::段错误应该在这个函数里，写的不对仔细查，反正数据不多，你直接把输入拿来手动检查吧，脑测很麻烦也很烦，能跑一个就能跑一大堆
   size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
   if (Index < OutputShapeCount)
   {
@@ -66,7 +65,7 @@ __global__ void MatmulKernel
     size_t OutputMatrixShapeCount = OutputMatrixShape[0]*OutputMatrixShape[1];
     size_t OutSizeTMP = Index/OutputMatrixShapeCount;
     bool MatZero = OutSizeTMP;
-    for(int a=OutputShapeCount-1;a>=0;a--)
+    for(int a=BatchShapeLen-1;a>=0;a--)
     {
       if(!MatZero)OutputBatchIndex[a] = 0;
       else
@@ -75,40 +74,34 @@ __global__ void MatmulKernel
         OutSizeTMP /= OutputBatchShape[a];
       }
     }
-    //填充输出矩阵的batch维度
     size_t InputFirstBatchIndex[8];
-    for(int a=OutputShapeCount-1;a>=0;a--)
+    for(int a=BatchShapeLen-1;a>=0;a--)
     {
       if(OutputBatchIndex[a] < InputFirstBatchShape[a])InputFirstBatchIndex[a] = OutputBatchIndex[a];
       else InputFirstBatchIndex[a] = 0;
     }
     size_t InputFirstMatrixShapeCount = InputFirstMatrixShape[0]*InputFirstMatrixShape[1];
     size_t InputSecondBatchIndex[8];
-    for(int a=OutputShapeCount-1;a>=0;a--)
+    for(int a=BatchShapeLen-1;a>=0;a--)
     {
       if(OutputBatchIndex[a] < InputSecondBatchShape[a])InputSecondBatchIndex[a] = OutputBatchIndex[a];
       else InputSecondBatchIndex[a] = 0;
     }
     size_t InputSecondMatrixShapeCount = InputSecondMatrixShape[0]*InputSecondMatrixShape[1];
-    //填充输入矩阵的batch维度
-
     size_t InputFirstBase = 0;
     size_t InFirstTMP = InputFirstMatrixShapeCount;
-    for(int a=OutputShapeCount-1;a>=0;a--)
+    for(int a=BatchShapeLen-1;a>=0;a--)
     {
       InputFirstBase += InFirstTMP*InputFirstBatchIndex[a];
       InFirstTMP*=InputFirstBatchShape[a];
     }
-
     size_t InputSecondBase = 0;
     size_t InSecondTMP = InputSecondMatrixShapeCount;
-    for(int a=OutputShapeCount-1;a>=0;a--)
+    for(int a=BatchShapeLen-1;a>=0;a--)
     {
       InputSecondBase += InSecondTMP*InputSecondBatchIndex[a];
       InSecondTMP*=InputSecondBatchShape[a];
     }
-    //计算batch维度
-
     size_t OutputMatrixIndex = Index%OutputMatrixShapeCount;
     size_t MatIndex[2] = {OutputMatrixIndex/OutputMatrixShape[1], OutputMatrixIndex%OutputMatrixShape[1]};
     Output[Index] = 0;
@@ -116,7 +109,6 @@ __global__ void MatmulKernel
     {
       Output[Index] += InputFirst[InputFirstBase + MatIndex[0]*InputFirstMatrixShape[1] + a]*InputSecond[InputSecondBase + a*InputSecondMatrixShape[1] + MatIndex[1]];
     }
-    //__syncthreads();
   }
 }
 
@@ -137,20 +129,6 @@ void MatmulInCPP
 )
 {
   cudaSetDevice(DeviceNum);
-  printf("打印一下矩阵信息,准备开始cuda\n");
-  printf("打印矩阵batch\n");
-  for(int a=0;a<BatchShapeLen;a++)
-  {
-    printf("%lu, %lu, %lu\n",OutputBatchShape[a],InputFirstBatchShape[a], InputSecondBatchShape[a]);
-  }
-  printf("打印矩阵shape\n");
-  for(int a=0;a<2;a++)
-  {
-    printf("%lu, %lu, %lu\n",OutputMatrixShape[a],InputFirstMatrixShape[a], InputSecondMatrixShape[a]);
-  }
-  printf("看看输出长度 %lu\n", OutputShapeCount);
-  printf("打印信息结束\n\n");
-
   size_t *OutputBatchShapeCuda;
   cudaMalloc((void**)&OutputBatchShapeCuda, 8*sizeof(size_t));
   cudaMemcpy(OutputBatchShapeCuda,OutputBatchShape,sizeof(size_t)*8,cudaMemcpyHostToDevice);
@@ -169,8 +147,6 @@ void MatmulInCPP
   size_t *InputSecondMatrixShapeCuda;
   cudaMalloc((void**)&InputSecondMatrixShapeCuda, 2*sizeof(size_t));
   cudaMemcpy(InputSecondMatrixShapeCuda,InputSecondMatrixShape,sizeof(size_t)*2,cudaMemcpyHostToDevice);
-
-
   CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
   MatmulKernel<<<CudaPairInput.block, CudaPairInput.grid>>>
   (
