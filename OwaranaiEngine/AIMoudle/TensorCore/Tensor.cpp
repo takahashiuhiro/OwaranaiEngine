@@ -233,14 +233,34 @@ Tensor* Tensor::Matmul(Tensor* Input)
         }
         else
         {
-            
+            if(Device == "GPU")
+            {
+                shape = std::vector<size_t>{1,shape[0]};
+                Output = Matmul(Input);
+                shape = std::vector<size_t>{shape[1]};
+                Output->shape = std::vector<size_t>{Output->shape[1]};
+            }
+            else
+            {
+                
+            }
         }
     }
     else
     {
         if(Input->shape.size() == 1) 
         {
-
+            if(Device == "GPU")
+            {
+                Input->shape = std::vector<size_t>{Input->shape[0],1};
+                Output = Matmul(Input);
+                Input->shape = std::vector<size_t>{Input->shape[0]};
+                Output->shape = std::vector<size_t>{Output->shape[0]};
+            }
+            else
+            {
+                
+            }
         }
         else
         {
