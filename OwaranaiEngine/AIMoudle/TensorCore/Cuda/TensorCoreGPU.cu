@@ -46,19 +46,19 @@ __global__ void EleMulKernel(float* Output, float* HighDimInput, size_t HighDimS
 __global__ void MatmulKernel
 (
   float* Output, 
-  size_t OutputBatchShape[8], 
-  size_t OutputMatrixShape[2],
+  size_t *OutputBatchShape, 
+  size_t *OutputMatrixShape,
   float* InputFirst, 
-  size_t InputFirstBatchShape[8], 
-  size_t InputFirstMatrixShape[2],
+  size_t *InputFirstBatchShape, 
+  size_t *InputFirstMatrixShape,
   float* InputSecond, 
-  size_t InputSecondBatchShape[8], 
-  size_t InputSecondMatrixShape[2],
+  size_t *InputSecondBatchShape, 
+  size_t *InputSecondMatrixShape,
   size_t BatchShapeLen,
   size_t OutputShapeCount
 )
 {
-  //todo::段错误应该在这个函数里，写的不对仔细查
+  //todo::段错误应该在这个函数里，写的不对仔细查，反正数据不多，你直接把输入拿来手动检查吧，脑测很麻烦也很烦，能跑一个就能跑一大堆
   size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
   if (Index < OutputShapeCount)
   {
@@ -111,11 +111,12 @@ __global__ void MatmulKernel
 
     size_t OutputMatrixIndex = Index%OutputMatrixShapeCount;
     size_t MatIndex[2] = {OutputMatrixIndex/OutputMatrixShape[1], OutputMatrixIndex%OutputMatrixShape[1]};
+    Output[Index] = 0;
     for(int a=0;a<InputFirstMatrixShape[1];a++)
     {
       Output[Index] += InputFirst[InputFirstBase + MatIndex[0]*InputFirstMatrixShape[1] + a]*InputSecond[InputSecondBase + a*InputSecondMatrixShape[1] + MatIndex[1]];
     }
-
+    //__syncthreads();
   }
 }
 
@@ -131,9 +132,11 @@ void MatmulInCPP
   size_t InputSecondBatchShape[8], 
   size_t InputSecondMatrixShape[2],
   size_t BatchShapeLen,
-  size_t OutputShapeCount
+  size_t OutputShapeCount,
+  size_t DeviceNum
 )
 {
+  cudaSetDevice(DeviceNum);
   printf("打印一下矩阵信息,准备开始cuda\n");
   printf("打印矩阵batch\n");
   for(int a=0;a<BatchShapeLen;a++)
@@ -147,18 +150,39 @@ void MatmulInCPP
   }
   printf("看看输出长度 %lu\n", OutputShapeCount);
   printf("打印信息结束\n\n");
+
+  size_t *OutputBatchShapeCuda;
+  cudaMalloc((void**)&OutputBatchShapeCuda, 8*sizeof(size_t));
+  cudaMemcpy(OutputBatchShapeCuda,OutputBatchShape,sizeof(size_t)*8,cudaMemcpyHostToDevice);
+  size_t *OutputMatrixShapeCuda;
+  cudaMalloc((void**)&OutputMatrixShapeCuda, 2*sizeof(size_t));
+  cudaMemcpy(OutputMatrixShapeCuda,OutputMatrixShape,sizeof(size_t)*2,cudaMemcpyHostToDevice);
+  size_t *InputFirstBatchShapeCuda;
+  cudaMalloc((void**)&InputFirstBatchShapeCuda, 8*sizeof(size_t));
+  cudaMemcpy(InputFirstBatchShapeCuda,InputFirstBatchShape,sizeof(size_t)*8,cudaMemcpyHostToDevice);
+  size_t *InputFirstMatrixShapeCuda;
+  cudaMalloc((void**)&InputFirstMatrixShapeCuda, 2*sizeof(size_t));
+  cudaMemcpy(InputFirstMatrixShapeCuda,InputFirstMatrixShape,sizeof(size_t)*2,cudaMemcpyHostToDevice);
+  size_t *InputSecondBatchShapeCuda;
+  cudaMalloc((void**)&InputSecondBatchShapeCuda, 8*sizeof(size_t));
+  cudaMemcpy(InputSecondBatchShapeCuda,InputSecondBatchShape,sizeof(size_t)*8,cudaMemcpyHostToDevice);
+  size_t *InputSecondMatrixShapeCuda;
+  cudaMalloc((void**)&InputSecondMatrixShapeCuda, 2*sizeof(size_t));
+  cudaMemcpy(InputSecondMatrixShapeCuda,InputSecondMatrixShape,sizeof(size_t)*2,cudaMemcpyHostToDevice);
+
+
   CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
   MatmulKernel<<<CudaPairInput.block, CudaPairInput.grid>>>
   (
     Output, 
-    OutputBatchShape, 
-    OutputMatrixShape, 
+    OutputBatchShapeCuda, 
+    OutputMatrixShapeCuda, 
     InputFirst,
-    InputFirstBatchShape, 
-    InputFirstMatrixShape,
+    InputFirstBatchShapeCuda, 
+    InputFirstMatrixShapeCuda,
     InputSecond, 
-    InputSecondBatchShape,
-    InputSecondMatrixShape,
+    InputSecondBatchShapeCuda,
+    InputSecondMatrixShapeCuda,
     BatchShapeLen,
     OutputShapeCount
   );

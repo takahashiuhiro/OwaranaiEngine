@@ -265,6 +265,7 @@ Tensor* Tensor::Matmul(Tensor* Input)
             Output = new Tensor(OutputShape, Device, DeviceNum);//OutputShape is all shape of the mat but we only use first 6 elems as the cuda shape params
             if(Device == "GPU")
             {
+                Output->FillArray(0.);
                 CudaDimVec OutputShapeArray = TransformFromStdVector(OutputShape);
                 CudaDimVec InputFirstArray = TransformFromStdVector(shape);
                 CudaDimVec InputSecondArray = TransformFromStdVector(Input->shape);
@@ -281,7 +282,8 @@ Tensor* Tensor::Matmul(Tensor* Input)
                     InputSecondArray.Shape,
                     InputSecondMatrixShape,
                     Output->shape.size()-2,
-                    Output->ShapeCount
+                    Output->ShapeCount,
+                    DeviceNum
                 );
             }
         }

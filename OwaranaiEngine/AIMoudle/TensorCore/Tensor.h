@@ -23,7 +23,8 @@ extern "C" void MatmulInCPP
   size_t InputSecondBatchShape[8], 
   size_t InputSecondMatrixShape[2],
   size_t BatchShapeLen,
-  size_t OutputShapeCount
+  size_t OutputShapeCount,
+  size_t DeviceNum
 );
 
 struct CudaDimVec
