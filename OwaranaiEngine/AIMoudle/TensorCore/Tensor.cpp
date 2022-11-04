@@ -282,7 +282,8 @@ Tensor* Tensor::Matmul(Tensor* Input)
                 (
                     Output->DataGPU,
                     OutputShapeArray.Shape, 
-                    OutputMatrixShape,DataGPU, 
+                    OutputMatrixShape,
+                    DataGPU, 
                     InputFirstArray.Shape,
                     InputFirstMatrixShape,
                     Input->DataGPU,
