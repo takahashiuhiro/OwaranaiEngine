@@ -3,7 +3,6 @@
 int main()
 {
     std::cout<<"------------------------GPU test---------------------------------"<<std::endl;
-    //todo 这种情况下不知道为什么只有batch为0的那一个矩阵生效了
     Tensor* q =new Tensor(std::vector<size_t>{3,4}, "GPU", 0);
     q->FillArray(18.);
     Tensor* w =new Tensor(std::vector<size_t>{4}, "GPU", 0);
