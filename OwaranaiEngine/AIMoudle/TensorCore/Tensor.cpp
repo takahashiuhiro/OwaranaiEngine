@@ -233,34 +233,20 @@ Tensor* Tensor::Matmul(Tensor* Input)
         }
         else
         {
-            if(Device == "GPU")
-            {
-                shape = std::vector<size_t>{1,shape[0]};
-                Output = Matmul(Input);
-                shape = std::vector<size_t>{shape[1]};
-                Output->shape = std::vector<size_t>{Output->shape[1]};
-            }
-            else
-            {
-                
-            }
+            shape = std::vector<size_t>{1,shape[0]};
+            Output = Matmul(Input);
+            shape = std::vector<size_t>{shape[1]};
+            Output->shape = std::vector<size_t>{Output->shape[1]};
         }
     }
     else
     {
         if(Input->shape.size() == 1) 
         {
-            if(Device == "GPU")
-            {
-                Input->shape = std::vector<size_t>{Input->shape[0],1};
-                Output = Matmul(Input);
-                Input->shape = std::vector<size_t>{Input->shape[0]};
-                Output->shape = std::vector<size_t>{Output->shape[0]};
-            }
-            else
-            {
-                
-            }
+            Input->shape = std::vector<size_t>{Input->shape[0],1};
+            Output = Matmul(Input);
+            Input->shape = std::vector<size_t>{Input->shape[0]};
+            Output->shape = std::vector<size_t>{Output->shape[0]};
         }
         else
         {
@@ -306,6 +292,66 @@ Tensor* Tensor::Matmul(Tensor* Input)
                     Output->ShapeCount,
                     DeviceNum
                 );
+            }
+            else
+            {
+                size_t BatchShapeLen = Output->shape.size()-2;
+                size_t *OutputBatchShape = OutputShapeArray.Shape;
+                size_t *InputFirstBatchShape = InputFirstArray.Shape;
+                size_t *InputSecondBatchShape = InputSecondArray.Shape;
+                float *InputFirst = DataCPU;
+                float *InputSecond = Input->DataCPU;
+                for(int Index = 0;Index < Output->ShapeCount;Index++)
+                {
+                    size_t OutputBatchIndex[8];
+                    size_t OutputMatrixShapeCount = OutputMatrixShape[0]*OutputMatrixShape[1];
+                    size_t OutSizeTMP = Index/OutputMatrixShapeCount;
+                    bool MatZero = OutSizeTMP;
+                    for(int a=BatchShapeLen-1;a>=0;a--)
+                    {
+                      if(!MatZero)OutputBatchIndex[a] = 0;
+                      else
+                      {
+                        OutputBatchIndex[a] = OutSizeTMP%OutputBatchShape[a];
+                        OutSizeTMP /= OutputBatchShape[a];
+                      }
+                    }
+                    size_t InputFirstBatchIndex[8];
+                    for(int a=BatchShapeLen-1;a>=0;a--)
+                    {
+                      if(OutputBatchIndex[a] < InputFirstBatchShape[a])InputFirstBatchIndex[a] = OutputBatchIndex[a];
+                      else InputFirstBatchIndex[a] = 0;
+                    }
+                    size_t InputFirstMatrixShapeCount = InputFirstMatrixShape[0]*InputFirstMatrixShape[1];
+                    size_t InputSecondBatchIndex[8];
+                    for(int a=BatchShapeLen-1;a>=0;a--)
+                    {
+                      if(OutputBatchIndex[a] < InputSecondBatchShape[a])InputSecondBatchIndex[a] = OutputBatchIndex[a];
+                      else InputSecondBatchIndex[a] = 0;
+                    }
+                    size_t InputSecondMatrixShapeCount = InputSecondMatrixShape[0]*InputSecondMatrixShape[1];
+                    size_t InputFirstBase = 0;
+                    size_t InFirstTMP = InputFirstMatrixShapeCount;
+                    for(int a=BatchShapeLen-1;a>=0;a--)
+                    {
+                      InputFirstBase += InFirstTMP*InputFirstBatchIndex[a];
+                      InFirstTMP*=InputFirstBatchShape[a];
+                    }
+                    size_t InputSecondBase = 0;
+                    size_t InSecondTMP = InputSecondMatrixShapeCount;
+                    for(int a=BatchShapeLen-1;a>=0;a--)
+                    {
+                      InputSecondBase += InSecondTMP*InputSecondBatchIndex[a];
+                      InSecondTMP*=InputSecondBatchShape[a];
+                    }
+                    size_t OutputMatrixIndex = Index%OutputMatrixShapeCount;
+                    size_t MatIndex[2] = {OutputMatrixIndex/OutputMatrixShape[1], OutputMatrixIndex%OutputMatrixShape[1]};
+                    Output->DataCPU[Index] = 0;
+                    for(int a=0;a<InputFirstMatrixShape[1];a++)
+                    {
+                      Output->DataCPU[Index] += InputFirst[InputFirstBase + MatIndex[0]*InputFirstMatrixShape[1] + a]*InputSecond[InputSecondBase + a*InputSecondMatrixShape[1] + MatIndex[1]];
+                    }
+                }
             }
         }
     }
