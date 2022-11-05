@@ -28,6 +28,7 @@ extern "C" void MatmulInCPP
   size_t OutputShapeCount,
   size_t DeviceNum
 );
+extern "C" void TInCPP(float* Output, float* Input, size_t *MatrixShape, size_t ShapeCount);
 
 struct CudaPair 
 {

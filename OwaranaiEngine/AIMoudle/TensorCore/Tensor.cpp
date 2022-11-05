@@ -358,3 +358,30 @@ Tensor* Tensor::Matmul(Tensor* Input)
     }
     return Output;
 }
+
+Tensor* Tensor::T()
+{
+    Tensor* Output = new Tensor(shape,Device, DeviceNum);
+    size_t TMP = Output->shape[Output->shape.size() - 1];
+    Output->shape[Output->shape.size() - 1] = Output->shape[Output->shape.size() - 2];
+    Output->shape[Output->shape.size() - 2] = TMP;
+    size_t InputFirstMatrixShape[2] = {shape[shape.size()-2], shape[shape.size()-1]};
+    if(Device == "GPU")
+    {
+        TInCPP(Output->DataGPU, DataGPU, InputFirstMatrixShape,ShapeCount);
+    }
+    else
+    {
+        size_t *MatrixShape = InputFirstMatrixShape;
+        for(int Index = 0 ;Index < ShapeCount;Index++)
+        {
+            size_t MatrixShapeCount = MatrixShape[0]*MatrixShape[1];
+            size_t InputMatIndex = Index%MatrixShapeCount;
+            size_t BaseCount = Index - InputMatIndex;
+            size_t InputMatIndexFirst = InputMatIndex/MatrixShape[1];
+            size_t InputMatIndexSecond = InputMatIndex%MatrixShape[1];
+            Output->DataCPU[BaseCount + InputMatIndexSecond*MatrixShape[0] + InputMatIndexFirst] = DataCPU[Index];
+        }
+    }
+    return Output;
+}

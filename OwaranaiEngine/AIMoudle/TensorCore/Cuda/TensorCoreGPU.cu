@@ -43,6 +43,20 @@ __global__ void EleMulKernel(float* Output, float* HighDimInput, size_t HighDimS
   if (Index < HighDimSize)Output[Index] = HighDimInput[Index] * LowDimInput[Index%LowDimSize];
 }
 
+__global__ void TKernel(float* Output, float* Input, size_t *MatrixShape, size_t ShapeCount)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index < ShapeCount)
+  {
+    size_t MatrixShapeCount = MatrixShape[0]*MatrixShape[1];
+    size_t InputMatIndex = Index%MatrixShapeCount;
+    size_t BaseCount = Index - InputMatIndex;
+    size_t InputMatIndexFirst = InputMatIndex/MatrixShape[1];
+    size_t InputMatIndexSecond = InputMatIndex%MatrixShape[1];
+    Output[BaseCount + InputMatIndexSecond*MatrixShape[0] + InputMatIndexFirst] = Input[Index];
+  }
+}
+
 __global__ void MatmulKernel
 (
   float* Output, 
@@ -110,6 +124,16 @@ __global__ void MatmulKernel
       Output[Index] += InputFirst[InputFirstBase + MatIndex[0]*InputFirstMatrixShape[1] + a]*InputSecond[InputSecondBase + a*InputSecondMatrixShape[1] + MatIndex[1]];
     }
   }
+}
+
+void TInCPP(float* Output, float* Input, size_t *MatrixShape, size_t ShapeCount)
+{
+  size_t *MatrixShapeCuda;
+  cudaMalloc((void**)&MatrixShapeCuda, 2*sizeof(size_t));
+  cudaMemcpy(MatrixShapeCuda,MatrixShape,sizeof(size_t)*2,cudaMemcpyHostToDevice);
+  CudaPair CudaPairInput = GetCudaPair(ShapeCount);
+  TKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(Output, Input, MatrixShapeCuda, ShapeCount);
+  cudaFree(MatrixShapeCuda);
 }
 
 void MatmulInCPP
