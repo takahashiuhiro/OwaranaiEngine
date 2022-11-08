@@ -27,6 +27,7 @@ extern "C" void MatmulInCPP
   size_t DeviceNum
 );
 extern "C" void TInCPP(float* Output, float* Input, size_t *MatrixShape, size_t ShapeCount);
+extern "C" void SumTensorDimInCPP(float* OutputData, float* InputData, size_t *InputShape, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount);
 
 struct CudaDimVec
 {
@@ -80,4 +81,6 @@ public:
     Tensor* Matmul(Tensor* Input);
     /**make the tensor Transpose*/
     Tensor* T();
+    /**Get a sum tensor by specifying dimensions*/
+    Tensor* SumTensorDim(size_t InputDim);
 };

@@ -126,6 +126,54 @@ __global__ void MatmulKernel
   }
 }
 
+
+__global__ void SumTensorDimKernel(float* OutputData, float* InputData, size_t *InputShape, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index < OutputShapeCount)
+  {
+    size_t OutputIndex[8];
+    size_t OutputSizeTMP = Index;
+    for(int a=InputShapeLen-1;a>=0;a--)
+    {
+      if(a != InputDim) 
+      {
+        OutputIndex[a] = OutputSizeTMP%InputShape[a];
+        OutputSizeTMP /= InputShape[a];
+      }
+      else
+      {
+        OutputIndex[a] = 0;
+      }
+    }
+    //todo::上面那个只确定了输入的维度，我写的时候很困，写后面的时候一定要再检查一下,下面这个也不太对
+    OutputData[Index] = 0;
+    for(int a =0;a<InputShape[InputDim];a++)
+    {
+      size_t InputDimIndex = 0;
+      size_t InputSizeTMP = 1;
+      for(int b = InputShapeLen - 1;b>=0;b--)
+      {
+        if(b!=InputDim)InputDimIndex += InputSizeTMP*OutputIndex[b];
+        else InputDimIndex += InputSizeTMP*a;
+        InputSizeTMP*=InputShape[b];
+      }
+      OutputData[Index] += InputData[InputDimIndex];
+    }
+  }
+}
+
+void SumTensorDimInCPP(float* OutputData, float* InputData, size_t *InputShape, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount)
+{
+  size_t *InputShapeCuda;
+  cudaMalloc((void**)&InputShapeCuda, InputShapeLen*sizeof(size_t));
+  cudaMemcpy(InputShapeCuda,InputShape,sizeof(size_t)*InputShapeLen,cudaMemcpyHostToDevice);
+  CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
+  SumTensorDimKernel<<<CudaPairInput.block, CudaPairInput.grid>>>( OutputData, InputData, InputShapeCuda, InputShapeLen, InputDim, OutputShapeCount);
+  cudaFree(InputShapeCuda);
+}
+
+
 void TInCPP(float* Output, float* Input, size_t *MatrixShape, size_t ShapeCount)
 {
   size_t *MatrixShapeCuda;

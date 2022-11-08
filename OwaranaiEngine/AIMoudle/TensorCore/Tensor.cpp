@@ -385,3 +385,57 @@ Tensor* Tensor::T()
     }
     return Output;
 }
+
+Tensor* Tensor::SumTensorDim(size_t InputDim)
+{
+    std::vector<size_t>OutputShape;
+    for(int a=0;a<shape.size();a++)
+    {
+        if(a!=InputDim)OutputShape.push_back(shape[a]);
+        else OutputShape.push_back(1);
+    }
+    Tensor *Output = new Tensor(OutputShape, Device, DeviceNum);
+    CudaDimVec ShapeArray = TransformFromStdVector(shape, shape.size());
+    if(Device == "GPU")
+    {
+        SumTensorDimInCPP(Output->DataGPU, DataGPU, ShapeArray.Shape,OutputShape.size(),InputDim, Output->ShapeCount);
+    }
+    else
+    {
+        size_t InputShapeLen = OutputShape.size();
+        size_t *InputShape = ShapeArray.Shape;
+        for(int Index = 0 ;Index < Output->ShapeCount;Index++)
+        {
+            size_t OutputIndex[8];
+            size_t OutputSizeTMP = Index;
+            for(int a=InputShapeLen-1;a>=0;a--)
+            {
+              if(a != InputDim) 
+              {
+                OutputIndex[a] = OutputSizeTMP%InputShape[a];
+                OutputSizeTMP /= InputShape[a];
+              }
+              else
+              {
+                OutputIndex[a] = 0;
+              }
+            }
+            //todo::上面那个只确定了输入的维度，我写的时候很困，写后面的时候一定要再检查一下,下面这个也不太对
+            Output->DataCPU[Index] = 0;
+            for(int a =0;a<InputShape[InputDim];a++)
+            {
+              size_t InputDimIndex = 0;
+              size_t InputSizeTMP = 1;
+              for(int b = InputShapeLen - 1;b>=0;b--)
+              {
+                if(b!=InputDim)InputDimIndex += InputSizeTMP*OutputIndex[b];
+                else InputDimIndex += InputSizeTMP*a;
+                InputSizeTMP*=InputShape[b];
+              }
+              Output->DataCPU[Index] += DataCPU[InputDimIndex];
+            }
+        }
+    }
+
+    return Output;
+}
