@@ -420,7 +420,6 @@ Tensor* Tensor::SumTensorDim(size_t InputDim)
                 OutputIndex[a] = 0;
               }
             }
-            //todo::上面那个只确定了输入的维度，我写的时候很困，写后面的时候一定要再检查一下,下面这个也不太对
             Output->DataCPU[Index] = 0;
             for(int a =0;a<InputShape[InputDim];a++)
             {
