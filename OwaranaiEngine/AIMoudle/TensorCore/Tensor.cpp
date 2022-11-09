@@ -438,3 +438,8 @@ Tensor* Tensor::SumTensorDim(size_t InputDim)
 
     return Output;
 }
+
+Tensor* Tensor::AverageTensorDim(size_t InputDim)
+{
+    return SumTensorDim(InputDim)->MulScalar(1./(shape[InputDim]));
+}

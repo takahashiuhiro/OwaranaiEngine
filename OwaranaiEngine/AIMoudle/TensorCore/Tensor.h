@@ -83,4 +83,6 @@ public:
     Tensor* T();
     /**Get a sum tensor by specifying dimensions*/
     Tensor* SumTensorDim(size_t InputDim);
+    /**Get a average tensor by specifying dimensions*/
+    Tensor* AverageTensorDim(size_t InputDim);
 };

@@ -10,8 +10,8 @@ int main()
     q->SetV(std::vector<size_t>{1,0,2}, 99.);
     q->SetV(std::vector<size_t>{0,0,1}, 77.);
     w->SetV(std::vector<size_t>{2}, 899.);
-    Tensor* e = q->SumTensorDim(2);
-    //q->PrintData();
+    Tensor* e = q->AverageTensorDim(0);
+    q->PrintData();
     e->PrintData();
     //w->PrintData();
     //e->PrintData();
@@ -23,8 +23,8 @@ int main()
     qq->SetV(std::vector<size_t>{1,0,2}, 99.);
     qq->SetV(std::vector<size_t>{0,0,1}, 77.);
     wq->SetV(std::vector<size_t>{2}, 899.);
-    Tensor* eq = qq->SumTensorDim(2);
-    //qq->PrintData();
+    Tensor* eq = qq->AverageTensorDim(0);
+    qq->PrintData();
     eq->PrintData();
     //wq->PrintData();
     //eq->PrintData();
