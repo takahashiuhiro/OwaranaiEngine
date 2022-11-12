@@ -26,6 +26,6 @@ int main()
     Tensor* eq = qq->AverageTensorDim(0);
     qq->PrintData();
     eq->PrintData();
-    //wq->PrintData();
+    wq->PrintData();
     //eq->PrintData();
 }
