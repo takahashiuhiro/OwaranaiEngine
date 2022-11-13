@@ -1,3 +1,4 @@
+#pragma once
 #include"geometry_include.h"
 #include"vector.h"
 #include"segment.h"

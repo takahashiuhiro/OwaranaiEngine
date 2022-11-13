@@ -1,4 +1,6 @@
-#include "TensorInclude.h"
+#pragma once
+
+#include "StdInclude.h"
 
 extern "C" void cudaMallocInCPP(float** Input, size_t Size, size_t DeviceNum);
 extern "C" void DataToGPU(float* CPUPointer, float* GPUPointer, size_t Size);
