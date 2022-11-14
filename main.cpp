@@ -10,6 +10,9 @@ int main()
     q->SetV(std::vector<size_t>{1,0,2}, 99.);
     q->SetV(std::vector<size_t>{0,0,1}, 77.);
     w->SetV(std::vector<size_t>{1,2,2}, 899.);
+    Tensor* l =new Tensor(std::vector<size_t>{2,1}, "GPU", 0);
+    l->SetV(std::vector<size_t>{0,0}, 159159.);
+    l->SetV(std::vector<size_t>{1,0}, 951951.);
     //Tensor* e = q->AverageTensorDim(0);
     //q->PrintData();
     //e->PrintData();
@@ -23,7 +26,8 @@ int main()
     rq->NodeContent->PrintData();
     rw->NodeContent->PrintData();
     re->NodeContent->PrintData();
-    re->Gradient->PrintData();
+    re->Backward("Output",l);
+    re->DerivativeNode->NodeContent->PrintData();
     //rf->Gradient->PrintData();
 
     std::cout<<"------------------------CPU test---------------------------------"<<std::endl;
@@ -34,6 +38,9 @@ int main()
     qq->SetV(std::vector<size_t>{1,0,2}, 99.);
     qq->SetV(std::vector<size_t>{0,0,1}, 77.);
     wq->SetV(std::vector<size_t>{1,2,2}, 899.);
+    Tensor* lq =new Tensor(std::vector<size_t>{2,1});
+    lq->SetV(std::vector<size_t>{0,0}, 159159.);
+    lq->SetV(std::vector<size_t>{1,0}, 951951.);
     //Tensor* eq = qq->AverageTensorDim(0);
     //qq->PrintData();
     //eq->PrintData();
@@ -47,6 +54,7 @@ int main()
     rqq->NodeContent->PrintData();
     rwq->NodeContent->PrintData();
     req->NodeContent->PrintData();
-    req->Gradient->PrintData();
+    req->Backward("Output",lq);
+    req->DerivativeNode->NodeContent->PrintData();
     //rf->Gradient->PrintData();
 }

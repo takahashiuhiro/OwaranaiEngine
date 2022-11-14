@@ -14,14 +14,12 @@ public:
     /**result of the input node computing by ops */
     Tensor* NodeContent;
     bool NeedGradient;
-    /**using by backward and save the gtadient data*/
-    Tensor* Gradient;
     /**Input list*/
     std::vector<CGNode*>InputNode;
     /**node Derivative*/
     CGNode* DerivativeNode = nullptr;
     /**Ops*/
-    BaseOps<CGNode>* FunOps;
+    BaseOps<CGNode,Tensor>* FunOps;
     /**Ops Type*/
     std::string OpsType;
     /**Get ops pointer*/
@@ -29,5 +27,5 @@ public:
     /**start computing From Input*/
     void Forward();
     /**start Gradient computing from this node to Input*/
-    void Backward(std::string BackType, float Loss);
+    void Backward(std::string BackType, Tensor* Loss);
 };

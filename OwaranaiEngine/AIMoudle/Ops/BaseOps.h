@@ -1,7 +1,7 @@
 #pragma once
 #include "StdInclude.h"
 
-template<typename T>
+template<typename T, typename TS>
 struct BaseOps
 {
     T* SelfCGNode;
