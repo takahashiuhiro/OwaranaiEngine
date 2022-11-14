@@ -19,7 +19,7 @@ public:
     /**Input list*/
     std::vector<CGNode*>InputNode;
     /**node Derivative*/
-    std::vector<CGNode*>Derivative;
+    CGNode* DerivativeNode = nullptr;
     /**Ops*/
     BaseOps<CGNode>* FunOps;
     /**Ops Type*/
@@ -29,5 +29,5 @@ public:
     /**start computing From Input*/
     void Forward();
     /**start Gradient computing from this node to Input*/
-    void Backward();
+    void Backward(std::string BackType, float Loss);
 };
