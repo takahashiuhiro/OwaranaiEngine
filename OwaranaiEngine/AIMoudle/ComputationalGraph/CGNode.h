@@ -9,11 +9,12 @@ public:
     CGNode(){}
     /**Init by tensor*/
     CGNode(Tensor* NodeContent, bool NeedGradient);
+    CGNode(bool NeedGradient);
     /**Init by input node, Only use Input Node*/
     CGNode(std::vector<CGNode*>InputNode, std::string OpsType, bool NeedGradient);
     /**result of the input node computing by ops */
-    Tensor* NodeContent;
-    bool NeedGradient;
+    Tensor* NodeContent= nullptr;
+    bool NeedGradient = 0;
     /**Input list*/
     std::vector<CGNode*>InputNode;
     /**node Derivative*/

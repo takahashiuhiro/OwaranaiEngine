@@ -7,6 +7,11 @@ CGNode::CGNode(Tensor* NodeContent, bool NeedGradient)
     this->NeedGradient = NeedGradient;
 }
 
+CGNode::CGNode(bool NeedGradient)
+{
+    this->NeedGradient = NeedGradient;
+}
+
 CGNode::CGNode(std::vector<CGNode*>InputNode, std::string OpsType, bool NeedGradient)
 {
     this->InputNode = InputNode;
@@ -38,7 +43,17 @@ void CGNode::Backward(std::string BackType, Tensor* Loss)
         DerivativeContent->shape = NodeContent->shape;
         DerivativeNode = new CGNode(DerivativeContent, 1);
     }
+    for(int a=0;a<InputNode.size();a++)
+    {
+        if(InputNode[a]->DerivativeNode != nullptr || InputNode[a]->NeedGradient == 0 )continue;
+        InputNode[a]->DerivativeNode = new CGNode(1);
+    }
     FunOps->Backward();
+    for(int a=0;a<InputNode.size();a++)
+    {
+        if(InputNode[a]->OpsType == "Input")continue;
+        InputNode[a]->Backward("Normal", nullptr);
+    }
 }
 
 

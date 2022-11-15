@@ -21,8 +21,7 @@ struct AddOps:BaseOps<T, TS>
             TS* NewTensor = new TS(this->SelfCGNode->DerivativeNode->NodeContent->shape, this->SelfCGNode->DerivativeNode->NodeContent->Device, this->SelfCGNode->DerivativeNode->NodeContent->DeviceNum);
             NewTensor->FillArray(0.);
             NewTensor = NewTensor->Add(this->SelfCGNode->DerivativeNode->NodeContent);
-            T* NewCGNode = new T(NewTensor, 1);
-            this->SelfCGNode->InputNode[a]->DerivativeNode = NewCGNode;
+            this->SumInput(this->SelfCGNode->InputNode[a], NewTensor);
         }
     }
 };
