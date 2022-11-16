@@ -63,5 +63,9 @@ void CGNode::SetOps(std::string OpsType)
     {
         this->FunOps = new AddOps<CGNode, Tensor>(this);
     }
+    else if(OpsType == "Matmul")
+    {
+        this->FunOps = new MatmulOps<CGNode, Tensor>(this);
+    }
 }
 
