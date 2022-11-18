@@ -3,30 +3,35 @@
 int main()
 {
     std::cout<<"------------------------GPU test---------------------------------"<<std::endl;
-    Tensor* q =new Tensor(std::vector<size_t>{2,3,2}, "GPU", 0);
-    q->FillArray(5.);
-    Tensor* w =new Tensor(std::vector<size_t>{2,3}, "GPU", 0);
-    w->FillArray(3.);
-    q->SetV(std::vector<size_t>{1,2,1}, 11.);
-    q->SetV(std::vector<size_t>{0,1,1}, 7.);
-    w->SetV(std::vector<size_t>{1,2}, 8.);
     Tensor* loss =new Tensor(std::vector<size_t>{2,1}, "GPU", 0);
-    loss->SetV(std::vector<size_t>{0,0}, 10000.);
-    loss->SetV(std::vector<size_t>{1,0}, 100.);
+    loss->SetV(std::vector<size_t>{0,0}, 100.);
+    loss->SetV(std::vector<size_t>{1,0}, 10000.);
+    Tensor* q =new Tensor(std::vector<size_t>{2,3}, "GPU", 0);
+    q->FillArray(3.);
+    Tensor* w =new Tensor(std::vector<size_t>{2,3}, "GPU", 0);
+    w->FillArray(5.);
+    Tensor* e =new Tensor(std::vector<size_t>{2,3}, "GPU", 0);
+    e->FillArray(7.);
     CGNode *rq = new CGNode(q, 1);
     CGNode *rw = new CGNode(w, 1);
-    CGNode *re = new CGNode(std::vector<CGNode*>{rq,rw},"Matmul", 1);
-    //re->Forward();
-    //CGNode *rh = new CGNode(std::vector<CGNode*>{rq,re},"Matmul", 1);
-    re->Forward();
-    re->Backward("Output",loss);
-    re->NodeContent->PrintData();
-    //rh->DerivativeNode->NodeContent->PrintData();
-    re->DerivativeNode->NodeContent->PrintData();
-    rq->DerivativeNode->NodeContent->PrintData();
+    CGNode *re = new CGNode(e, 1);
+    CGNode *rf = new CGNode(std::vector<CGNode*>{rq,rw},"Add", 1);
+    CGNode *rg = new CGNode(std::vector<CGNode*>{re,rw},"Add", 1);
+    CGNode *rh = new CGNode(std::vector<CGNode*>{rf,rw, rg},"Add", 1);
+    rh->Forward();
+    rh->NodeContent->PrintData();
+    rh->Backward(loss);
+    rw->DerivativeNode->Forward();
     rw->DerivativeNode->NodeContent->PrintData();
 
+    std::cout<<rq<<" q原型\n";
+    std::cout<<rw<<" w原型\n";
+    std::cout<<re<<" e原型\n";
+    std::cout<<rf<<" r原型\n";
+    std::cout<<rg<<" g原型\n";
+    std::cout<<rh<<" h原型\n";
 
+    std::cout<<rw->DerivativeNode->InputNode.size()<<" 节点数\n";
     //std::cout<<"------------------------CPU test---------------------------------"<<std::endl;
     //Tensor* qq =new Tensor(std::vector<size_t>{2,3,4});
     //qq->FillArray(18.);

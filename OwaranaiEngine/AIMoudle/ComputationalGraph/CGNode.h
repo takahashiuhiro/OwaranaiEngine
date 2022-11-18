@@ -7,13 +7,17 @@ struct CGNode
 {
 public:
     CGNode(){}
+    /**Init by NeedGradient*/
+    CGNode(bool NeedGradient);
     /**Init by tensor*/
     CGNode(Tensor* NodeContent, bool NeedGradient);
-    CGNode(bool NeedGradient);
-    /**Init by input node, Only use Input Node*/
+    /**Init by Ops*/
+    CGNode(std::string OpsType, bool NeedGradient);
+    /**Init by Input list and Ops*/
     CGNode(std::vector<CGNode*>InputNode, std::string OpsType, bool NeedGradient);
     /**result of the input node computing by ops */
     Tensor* NodeContent= nullptr;
+    /**require backward*/
     bool NeedGradient = 0;
     /**Input list*/
     std::vector<CGNode*>InputNode;
@@ -23,10 +27,20 @@ public:
     BaseOps<CGNode,Tensor>* FunOps;
     /**Ops Type*/
     std::string OpsType;
+    /**
+     * Params
+     * Input Data
+     * Forward Data
+    */
+    std::string NodeType;
+    /**backward build flag, if true return dfs*/
+    bool BackwardBuildFlag = 0;
     /**Get ops pointer*/
     void SetOps(std::string OpsType);
     /**start computing From Input*/
     void Forward();
+    /**build backward node*/
+    void BackwardBuild(bool IsOutput);
     /**start Gradient computing from this node to Input*/
-    void Backward(std::string BackType, Tensor* Loss);
+    void Backward(Tensor* Loss);
 };

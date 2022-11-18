@@ -16,9 +16,6 @@ struct MatmulOps:BaseOps<T, TS>
 
     virtual void Backward()
     {
-        TS* NewTensorFirst = this->SelfCGNode->DerivativeNode->NodeContent->Matmul(this->SelfCGNode->InputNode[1]->NodeContent->T());
-        this->SumInput(this->SelfCGNode->InputNode[0], NewTensorFirst);
-        TS* NewTensorSecond = this->SelfCGNode->InputNode[0]->NodeContent->T()->Matmul(this->SelfCGNode->DerivativeNode->NodeContent);
-        this->SumInput(this->SelfCGNode->InputNode[1], NewTensorSecond);
+
     }
 };
