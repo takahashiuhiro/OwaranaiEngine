@@ -78,5 +78,13 @@ void CGNode::SetOps(std::string OpsType)
     {
         this->FunOps = new MatmulOps<CGNode, Tensor>(this);
     }
+    else if(OpsType == "MatmulFirstT")
+    {
+        this->FunOps = new MatmulFirstTOps<CGNode, Tensor>(this);
+    }
+    else if(OpsType == "MatmulSecondT")
+    {
+        this->FunOps = new MatmulSecondTOps<CGNode, Tensor>(this);
+    }
 }
 
