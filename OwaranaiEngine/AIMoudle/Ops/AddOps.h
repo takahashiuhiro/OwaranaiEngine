@@ -23,15 +23,10 @@ struct AddOps:BaseOps<T, TS>
     {
         for(int a=0 ;a< this->SelfCGNode->InputNode.size();a++)
         {
-            //std::cout<<this->SelfCGNode->InputNode[a]->BackwardBuildFlag<<" shenmeshabi\n";
-            //std::cout<<-1<<" shenmeshabi\n";
             if(this->SelfCGNode->InputNode[a]->NeedGradient == 0)continue;
             T* NewCGNode = new T("Add", 1);
             NewCGNode->InputNode.push_back(this->SelfCGNode->DerivativeNode);
-            //std::cout<<this->SelfCGNode->InputNode[a]->DerivativeNode->InputNode.size()<<" shenmeshabi\n";
             this->SelfCGNode->InputNode[a]->DerivativeNode->InputNode.push_back(NewCGNode);
-            //std::cout<<this->SelfCGNode->InputNode[a]->DerivativeNode<<" meshabi\n";
-            //std::cout<<this->SelfCGNode->InputNode[a]->DerivativeNode->InputNode.size()<<" "<<this->SelfCGNode->InputNode[a]<<" shenmeshabiiii\n";
         }
     }
 };

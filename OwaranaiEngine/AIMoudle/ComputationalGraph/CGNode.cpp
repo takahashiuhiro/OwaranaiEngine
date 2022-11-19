@@ -26,7 +26,6 @@ CGNode::CGNode(std::vector<CGNode*>InputNode, std::string OpsType, bool NeedGrad
     SetOps(OpsType);
 }
 
-
 void CGNode::Forward()
 {
     if(InputNode.size() == 0 || NodeContent!=nullptr)return;
@@ -39,29 +38,20 @@ void CGNode::Forward()
 
 void CGNode::BackwardBuild(bool IsOutput)
 {
-    if(IsOutput)
-    {
-        BackwardBuildFlag = 1;
-        DerivativeNode = new CGNode("Add", NeedGradient);
-    }
+    if(IsOutput)DerivativeNode = new CGNode("Add", NeedGradient);
     for(int a=0;a<InputNode.size();a++)
     {
         /**every node needs to buld its Gradient node without NeedGradient == 0*/
-        if((InputNode[a]->NeedGradient == 0) || (InputNode[a]->BackwardBuildFlag == 1))continue;
+        if((InputNode[a]->NeedGradient == 0) || (InputNode[a]->DerivativeNode != nullptr))continue;
         InputNode[a]->DerivativeNode = new CGNode("Add", NeedGradient);
-        InputNode[a]->BackwardBuildFlag = 1;
-        //std::cout<<InputNode[a]<<" aaaaaaaameshabi "<<InputNode[a]->BackwardBuildFlag<<" "<<this<<std::endl;
-        //std::cout<<InputNode[a]->DerivativeNode<<" shenmeshabiiii\n";
     }
-    //std::cout<<"kankan jici\n";
+    if(BackwardBuildFlag)return;
     FunOps->Backward();
-
+    BackwardBuildFlag = 1;
 
     for(int a=0;a<InputNode.size();a++)
     {
         if(InputNode[a]->NeedGradient == 0 ||InputNode[a]->InputNode.size() == 0)continue;
-        //std::cout<<InputNode[a]<<" capcapcapcapcpacapcapcap "<<InputNode[a]->BackwardBuildFlag<<"  "<<InputNode[a]->InputNode.size()<<" "<<std::endl;
-        //InputNode[a]->BackwardBuildFlag = 1;
         InputNode[a]->BackwardBuild(0);
     }
 }
@@ -77,7 +67,6 @@ void CGNode::Backward(Tensor* Loss)
     DerivativeContent->shape = NodeContent->shape;
     DerivativeNode->NodeContent = DerivativeContent;
 }
-
 
 void CGNode::SetOps(std::string OpsType)
 {
