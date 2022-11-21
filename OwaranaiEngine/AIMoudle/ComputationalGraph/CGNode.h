@@ -32,7 +32,7 @@ public:
      * Input Data
      * Forward Data
     */
-    std::string NodeType;
+    std::map<std::string, bool>NodeType;
     /**backward build flag, if true return dfs*/
     bool BackwardBuildFlag = 0;
     /**Get ops pointer*/
