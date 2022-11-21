@@ -28,6 +28,7 @@ public:
     /**Ops Type*/
     std::string OpsType;
     /**
+     * if we need to make a node difference with other nodes or make a set of node have a difference process, insert a tuple to nodetype
      * Params
     */
     std::map<std::string, bool>NodeType;
