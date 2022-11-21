@@ -68,6 +68,17 @@ void CGNode::Backward(Tensor* Loss)
     DerivativeNode->NodeContent = DerivativeContent;
 }
 
+void CGNode::ClearDataContent(std::vector<std::string>NodeTypeList)
+{
+    for(int a =0 ;a<NodeTypeList.size();a++)
+    {
+        if(!NodeType.count(NodeTypeList[a]))continue;
+        delete NodeContent;
+        NodeContent = nullptr;
+        break;
+    }
+}
+
 void CGNode::SetOps(std::string OpsType)
 {
     if(OpsType == "Add")

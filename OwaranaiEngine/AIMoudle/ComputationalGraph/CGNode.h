@@ -29,8 +29,6 @@ public:
     std::string OpsType;
     /**
      * Params
-     * Input Data
-     * Forward Data
     */
     std::map<std::string, bool>NodeType;
     /**backward build flag, if true return dfs*/
@@ -43,4 +41,6 @@ public:
     void BackwardBuild(bool IsOutput);
     /**start Gradient computing from this node to Input*/
     void Backward(Tensor* Loss);
+    /**clear tensor content by nodetype*/
+    void ClearDataContent(std::vector<std::string>NodeTypeList);
 };
