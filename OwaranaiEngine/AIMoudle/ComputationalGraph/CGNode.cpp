@@ -97,5 +97,9 @@ void CGNode::SetOps(std::string OpsType)
     {
         this->FunOps = new MatmulSecondTOps<CGNode, Tensor>(this);
     }
+    else if(OpsType == "Elemul")
+    {
+        this->FunOps = new ElemulOps<CGNode, Tensor>(this);
+    }
 }
 
