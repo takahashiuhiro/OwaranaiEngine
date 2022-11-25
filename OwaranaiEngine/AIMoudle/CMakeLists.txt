@@ -8,6 +8,8 @@ find_package(CUDA)
 
 add_subdirectory(TensorCore)
 add_subdirectory(Ops)
+add_subdirectory(Optimizer)
+add_subdirectory(Layer)
 add_subdirectory(ComputationalGraph)
 
 file(GLOB_RECURSE CURRENT_HEADERS  *.h *.hpp *.cuh)
@@ -21,4 +23,6 @@ cuda_add_library(AIMoudle STATIC ${CURRENT_HEADERS} ${CURRENT_SOURCES})
 
 target_link_libraries (AIMoudle TensorCore)
 target_link_libraries (AIMoudle Ops)
+target_link_libraries (AIMoudle Optimizer)
+target_link_libraries (AIMoudle Layer)
 target_link_libraries (AIMoudle ComputationalGraph)
