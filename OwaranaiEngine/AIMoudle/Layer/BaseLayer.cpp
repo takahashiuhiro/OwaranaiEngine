@@ -12,3 +12,15 @@ void BaseLayer::Freeze()
         ParamsCGNode[a]->NodeType["Freeze"] = 1;
     }
 }
+
+CGNode* BaseLayer::Forward()
+{
+    ForwardNode->Forward();
+    return ForwardNode;
+}
+
+void BaseLayer::Backward(Tensor* Loss)
+{
+    ForwardNode->Backward(Loss);
+    ForwardNode->DerivativeNode->Forward();
+}

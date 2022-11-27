@@ -16,6 +16,16 @@ public:
     CGNode* ForwardNode;
     /**init by InputCGNode list*/
     void LayerInit(std::vector<CGNode*>InputCGNode);
+    /**get the result of the episode*/
+    CGNode* Forward();
+    void Backward(Tensor* Loss);
+    //todo::还缺个能清理梯度数据的玩意，应该就差不多了
 
+    /**do not update this layer's params matrix*/
     void Freeze();
+    /**一个虚函数，layer类必须得重写这玩意，在里面指定输出节点构建网络啥的，不装了，我这英语确实不会描述这玩意了...
+     * a virtual function, real layer class must override this function,and specific a output cgnode for build the network....?
+     * 太中式英语了，太难了，先这样吧早晚回来重写...
+    */
+    virtual void ForwardBuild() = 0;
 };
