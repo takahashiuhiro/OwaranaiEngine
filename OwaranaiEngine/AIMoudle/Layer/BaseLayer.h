@@ -8,8 +8,14 @@ struct BaseLayer
 {
 public:
 
+    /**input list of layer*/
     std::vector<CGNode*>InputCGNode;
+    /**param matrix list*/
     std::vector<CGNode*>ParamsCGNode;
+    /**forward output*/
+    CGNode* ForwardNode;
+    /**init by InputCGNode list*/
+    void LayerInit(std::vector<CGNode*>InputCGNode);
 
-    void LayerInit(std::vector<CGNode*>InputCGNode, std::vector<CGNode*>ParamsCGNode);
+    void Freeze();
 };

@@ -32,5 +32,6 @@ int main()
     tuf->NodeContent->PrintData();
     tug->DerivativeNode->NodeContent->PrintData();
     tug->NodeContent->PrintData();
-    //tue->NodeContent->PrintData();
+    std::cout<<tue->NodeType.count("Freeze")<<std::endl;
+    //std::cout<<tue->NodeType["Freeze"]<<std::endl;
 }
