@@ -22,16 +22,22 @@ int main()
     CGNode *tuf = new CGNode(std::vector<CGNode*>{tuq,tuw},"Matmul", 1);
     CGNode *tug = new CGNode(std::vector<CGNode*>{tuf,tue},"Matmul", 1);
     CGNode *tuh = new CGNode(std::vector<CGNode*>{tuq, tug},"Elemul", 1);
+    tuq->NodeType["input"] = 1;
+    tuw->NodeType["input"] = 1;
+    tue->NodeType["input"] = 1;
+    tuf->NodeType["input"] = 1;
+    tug->NodeType["input"] = 1;
+    tuh->NodeType["input"] = 1;
+
+
     tuh->Forward();
-    //tuh->NodeContent->PrintData();
     tuh->Backward(loss);
     tuq->DerivativeNode->Forward();
-    //tuw->NodeContent->PrintData();
     tuq->DerivativeNode->NodeContent->PrintData();
     tuf->DerivativeNode->NodeContent->PrintData();
     tuf->NodeContent->PrintData();
     tug->DerivativeNode->NodeContent->PrintData();
     tug->NodeContent->PrintData();
-    std::cout<<tue->NodeType.count("Freeze")<<std::endl;
-    //std::cout<<tue->NodeType["Freeze"]<<std::endl;
+
+    tuq->DerivativeNode->ClearDataDFS(std::vector<std::string>{"input"});
 }

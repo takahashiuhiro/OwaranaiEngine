@@ -44,6 +44,6 @@ public:
     void Backward(Tensor* Loss);
     /**如果节点中含有NodeTypeList中的标签则删除*/
     void ClearDataContent(std::vector<std::string>NodeTypeList);
-    /**递归的删除梯度信息，除非标签中由NodeTypeList中的信息或节点不需要梯度*/
-    void ClearGrandintDFS(std::vector<std::string>NodeTypeList);
+    /**递归的删除梯度信息，除非标签中有NodeTypeList中的信息或节点不需要梯度,如果有一个节点不需要被删，他的input也不会被删*/
+    void ClearDataDFS(std::vector<std::string>NodeTypeList);
 };

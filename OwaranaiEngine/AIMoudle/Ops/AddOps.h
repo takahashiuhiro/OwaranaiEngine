@@ -25,6 +25,7 @@ struct AddOps:BaseOps<T, TS>
         {
             if(this->SelfCGNode->InputNode[a]->NeedGradient == 0)continue;
             T* NewCGNode = new T("Add", 1);
+            NewCGNode->NodeType["Gradient"] = 1;
             NewCGNode->InputNode.push_back(this->SelfCGNode->DerivativeNode);
             this->SelfCGNode->InputNode[a]->DerivativeNode->InputNode.push_back(NewCGNode);
         }
