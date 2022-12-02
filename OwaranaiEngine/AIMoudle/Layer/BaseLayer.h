@@ -24,5 +24,4 @@ public:
     void Freeze();
     /**一个虚函数，layer类必须得重写这玩意，在里面指定输出节点构建网络啥的，不装了，我这英语确实不会描述这玩意了...*/
     virtual void ForwardBuild() = 0;
-    virtual void ClearGrandint() = 0;
 };

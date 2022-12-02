@@ -42,6 +42,8 @@ public:
     void BackwardBuild(bool IsOutput);
     /**start Gradient computing from this node to Input*/
     void Backward(Tensor* Loss);
-    /**clear tensor content by nodetype*/
+    /**如果节点中含有NodeTypeList中的标签则删除*/
     void ClearDataContent(std::vector<std::string>NodeTypeList);
+    /**递归的删除梯度信息，除非标签中由NodeTypeList中的信息或节点不需要梯度*/
+    void ClearGrandintDFS(std::vector<std::string>NodeTypeList);
 };

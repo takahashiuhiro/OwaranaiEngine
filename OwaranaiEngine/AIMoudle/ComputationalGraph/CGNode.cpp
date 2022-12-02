@@ -79,6 +79,14 @@ void CGNode::ClearDataContent(std::vector<std::string>NodeTypeList)
     }
 }
 
+void CGNode::ClearGrandintDFS(std::vector<std::string>NodeTypeList)
+{
+    for(int a =0 ;a<NodeTypeList.size();a++)
+    {
+        
+    }
+}
+
 void CGNode::SetOps(std::string OpsType)
 {
     if(OpsType == "Add")
