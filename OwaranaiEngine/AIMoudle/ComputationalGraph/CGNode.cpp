@@ -73,40 +73,55 @@ void CGNode::Backward(Tensor* Loss)
     DerivativeNode->NodeContent = DerivativeContent;
 }
 
-void CGNode::ClearDataContent(std::vector<std::string>NodeTypeList)
+void CGNode::ClearDataContent(std::vector<std::string>NodeTypeList, bool IsInclude)
 {
-    //删除包含nodetypelist中标签的节点的内容
-    for(int a =0 ;a<NodeTypeList.size();a++)
+    if(IsInclude)
     {
-        if(!NodeType.count(NodeTypeList[a]))continue;
+        //删除包含nodetypelist中标签的节点的内容
+        for(int a =0 ;a<NodeTypeList.size();a++)
+        {
+            if(!NodeType.count(NodeTypeList[a]))continue;
+            delete NodeContent;
+            NodeContent = nullptr;
+            break;
+        }
+    }
+    else
+    {
+        //删除包含nodetypelist中标签一个也没有的节点的内容
+        for(int a =0 ;a<NodeTypeList.size();a++)
+        {
+            if(NodeType.count(NodeTypeList[a]))return;
+        }
         delete NodeContent;
         NodeContent = nullptr;
-        break;
     }
 }
 
-void CGNode::ClearDataDFS(std::vector<std::string>NodeTypeList)
+void CGNode::ClearDataDFS(std::vector<std::string>NodeTypeList, bool IsInclude, std::map<CGNode*, bool>*FlagMap)
 {
     //NodeTypeList最大的作用应该是区别输入张量，前向张量，参数张量，常数张量，导数张量的
     //检测该节点是否是常数张量
     if(NeedGradient == 0)return;
     //中断多余的dfs
     if(NodeContent == nullptr)return;
-    //检测该节点是否带有保护标签
-    for(int a =0 ;a<NodeTypeList.size();a++)
-    {
-        if(NodeType.count(NodeTypeList[a]))
-        {
-            return;
-        }
-    }
+    if(FlagMap->count(this))return;
+    (*FlagMap)[this] = 1;
     //std::cout<<"你别告诉我你是空的啊 开!"<<NodeContent<<std::endl;
-    delete NodeContent;
-    NodeContent = nullptr;
+    ClearDataContent(NodeTypeList, IsInclude);
     //std::cout<<"你别告诉我你是空的啊 关!"<<NodeContent<<std::endl;
     for(int a=0;a<InputNode.size();a++)
     {
-        InputNode[a]->ClearDataDFS(NodeTypeList);
+        InputNode[a]->ClearDataDFS(NodeTypeList, IsInclude, FlagMap);
+    }
+}
+
+void CGNode::ClearGradient(std::vector<CGNode*>InputNodeList)
+{
+    std::map<CGNode*, bool>FlagMap;
+    for(int a=0;a<InputNodeList.size();a++)
+    {
+        InputNodeList[a]->DerivativeNode->ClearDataDFS(std::vector<std::string>{"Gradient"}, 1, &FlagMap);
     }
 }
 

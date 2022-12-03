@@ -42,8 +42,19 @@ public:
     void BackwardBuild(bool IsOutput);
     /**start Gradient computing from this node to Input*/
     void Backward(Tensor* Loss);
-    /**如果节点中含有NodeTypeList中的标签则删除*/
-    void ClearDataContent(std::vector<std::string>NodeTypeList);
-    /**递归的删除梯度信息，除非标签中有NodeTypeList中的信息或节点不需要梯度,如果有一个节点不需要被删，他的input也不会被删*/
-    void ClearDataDFS(std::vector<std::string>NodeTypeList);
+    /**根据输入参数删除节点的content
+     * params:
+     * NodeTypeList 装标签的lsit
+     * IsInclude 如果是True的话那就删除包含NodeTypeList内标签节点的content，False的话删除[不]包含的
+    */
+    void ClearDataContent(std::vector<std::string>NodeTypeList, bool IsInclude);
+    /**递归的删除节点的content
+     * params:
+     * NodeTypeList 装标签的lsit
+     * IsInclude 如果是True的话那就删除包含NodeTypeList内标签节点的content，False的话删除[不]包含的
+     * FlagMap 用于记忆化搜索
+    */
+    void ClearDataDFS(std::vector<std::string>NodeTypeList, bool IsInclude, std::map<CGNode*, bool>*FlagMap);
+    /**该节点为输出节点可用，清理输入节点为inputnodelist的梯度*/
+    void ClearGradient(std::vector<CGNode*>InputNodeList);
 };
