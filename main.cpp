@@ -30,4 +30,6 @@ int main()
     //tug->DerivativeNode->NodeContent->PrintData();
     //tug->NodeContent->PrintData();
     tuh->ClearGradient(std::vector<CGNode*>{tuq,tuw,tue});
+
+    std::cout<<HyperparameterTypeConst::INT<<std::endl;
 }
