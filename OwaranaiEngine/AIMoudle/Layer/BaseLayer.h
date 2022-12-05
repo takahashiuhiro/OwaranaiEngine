@@ -1,5 +1,6 @@
 #pragma once
 #include "StdInclude.h"
+#include "Hyperparameter.h"
 #include "../TensorCore/MoudleInclude.h"
 #include "../Ops/MoudleInclude.h"
 #include "../ComputationalGraph/MoudleInclude.h"

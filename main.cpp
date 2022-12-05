@@ -31,5 +31,12 @@ int main()
     //tug->NodeContent->PrintData();
     tuh->ClearGradient(std::vector<CGNode*>{tuq,tuw,tue});
 
-    std::cout<<HyperparameterTypeConst::INT<<std::endl;
+    Hyperparameter ttets;
+    ttets.Set("qwe", 2, std::vector<std::string>{"qdd", "err"});
+    std::vector<std::string>*pp = ttets.Get<std::vector<std::string>>("qwe");
+    for(int a =0 ;a<pp->size();a++)
+    {
+        std::cout<<(*pp)[a]<<std::endl;
+    }
+    //std::cout<<HyperparameterTypeConst::FLOAT<<std::endl;
 }

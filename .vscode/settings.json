@@ -55,6 +55,7 @@
         "xlocmon": "cpp",
         "xloctime": "cpp",
         "map": "cpp",
-        "xtree": "cpp"
+        "xtree": "cpp",
+        "any": "cpp"
     }
 }
