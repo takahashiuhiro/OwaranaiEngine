@@ -38,6 +38,7 @@ void CGNode::Forward()
 
 void CGNode::BackwardBuild(bool IsOutput)
 {
+    if(BackwardBuildFlag)return;
     if(IsOutput)
     {
         DerivativeNode = new CGNode("Add", NeedGradient);
@@ -50,7 +51,6 @@ void CGNode::BackwardBuild(bool IsOutput)
         InputNode[a]->DerivativeNode = new CGNode("Add", NeedGradient);
         InputNode[a]->DerivativeNode->NodeType["Gradient"] = 1;
     }
-    if(BackwardBuildFlag)return;
     FunOps->Backward();
     BackwardBuildFlag = 1;
 
