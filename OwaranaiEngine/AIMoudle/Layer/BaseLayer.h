@@ -4,6 +4,7 @@
 #include "../TensorCore/MoudleInclude.h"
 #include "../Ops/MoudleInclude.h"
 #include "../ComputationalGraph/MoudleInclude.h"
+#include "../LossFunction/MoudleInclude.h"
 
 struct BaseLayer
 {
@@ -21,9 +22,12 @@ public:
     void LayerInit(std::vector<CGNode*>InputCGNode);
     /**get the result of the episode*/
     CGNode* Forward();
+    BaseLoss* LossFunctionPointer;
     void Backward(Tensor* Loss);
     /**not to update this layer's params matrix*/
     void Freeze();
     /**layer class must override this function*/
     virtual void ForwardBuild() = 0;
+    /**设置loss的种类*/
+    void SetLossFunction(std::string LossType);
 };

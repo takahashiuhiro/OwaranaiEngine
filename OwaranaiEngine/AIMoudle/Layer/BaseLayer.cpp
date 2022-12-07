@@ -21,10 +21,17 @@ CGNode* BaseLayer::Forward()
 
 void BaseLayer::Backward(Tensor* Loss)
 {
-    ForwardNode->Backward(Loss);
+    LossFunctionPointer->LossNode->Backward(Loss);
     for(int a=0;a<ParamsCGNode.size();a++)
     {
         ParamsCGNode[a]->DerivativeNode->Forward();
-        //ParamsCGNode[a]->DerivativeNode->NodeContent->PrintData();
+    }
+}
+
+void BaseLayer::SetLossFunction(std::string LossType)
+{
+    if(LossType == "MSE")
+    {
+        LossFunctionPointer = new MSELoss();
     }
 }

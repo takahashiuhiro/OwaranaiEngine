@@ -32,6 +32,9 @@ int main()
     LinearBlock->ForwardBuild();
     /**执行前向*/
     LinearBlock->Forward();
+
+    //TODO::听我说你先别急，新加了模块现在直接跑肯定挂的，得把↑的前向结果送到loss里以后再搞↓
+
     /**设置loss*/
     Tensor* loss =new Tensor(std::vector<size_t>{2,1}, "GPU", 0);
     loss->SetV(std::vector<size_t>{0,0}, 100.);

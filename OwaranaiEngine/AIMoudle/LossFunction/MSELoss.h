@@ -11,13 +11,13 @@ public:
         Constant->FillArray(-1.);
         CGNode *ConstantNode = new CGNode(Constant, 0);
         ConstantNode->NodeType["Constant"] = 1;
-        CGNode *Intermediate_0 = new CGNode(std::vector<CGNode*>{LabelNode[0], ConstantNode},"EleMul", 1);
+        CGNode *Intermediate_0 = new CGNode(std::vector<CGNode*>{LabelNode[0], ConstantNode},"Elemul", 1);
         //用输出节点减掉标准节点
         CGNode *Intermediate_1 = new CGNode(std::vector<CGNode*>{OutputNode[0],Intermediate_0},"Add", 1);
         //复制一个节点
         CGNode *Intermediate_2 = new CGNode(std::vector<CGNode*>{Intermediate_1},"Add", 1);
         //两个节点相乘
-        CGNode *Intermediate_3 = new CGNode(std::vector<CGNode*>{Intermediate_1, Intermediate_2},"EleMul", 1);
+        CGNode *Intermediate_3 = new CGNode(std::vector<CGNode*>{Intermediate_1, Intermediate_2},"Elemul", 1);
         LossNode = Intermediate_3;
     }
 };
