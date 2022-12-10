@@ -1,6 +1,6 @@
 #pragma once
 #include "BaseOps.h"
-/**make >0 matrix add*/
+/**make >0 matrix sum*/
 template<typename T, typename TS>
 struct TensorSumOps:BaseOps<T, TS>
 {

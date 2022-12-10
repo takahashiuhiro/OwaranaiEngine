@@ -5,3 +5,5 @@
 #include "MatmulFirstTOps.h"
 #include "MatmulSecondOps.h"
 #include "ElemulOps.h"
+#include "FlattenOps.h"
+#include "AddarrayOps.h"

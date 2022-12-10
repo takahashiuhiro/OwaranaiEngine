@@ -13,8 +13,10 @@ public:
     CGNode(Tensor* NodeContent, bool NeedGradient);
     /**Init by Ops*/
     CGNode(std::string OpsType, bool NeedGradient);
+    CGNode(std::string OpsType, bool NeedGradient, Hyperparameter OpsParams);
     /**Init by Input list and Ops*/
     CGNode(std::vector<CGNode*>InputNode, std::string OpsType, bool NeedGradient);
+    CGNode(std::vector<CGNode*>InputNode, std::string OpsType, bool NeedGradient, Hyperparameter OpsParams);
     /**result of the input node computing by ops */
     Tensor* NodeContent= nullptr;
     /**require backward*/
@@ -36,6 +38,8 @@ public:
     bool BackwardBuildFlag = 0;
     /**Get ops pointer*/
     void SetOps(std::string OpsType);
+    /**设置带参数的算子*/
+    void SetOps(std::string OpsType, Hyperparameter OpsParams);
     /**start computing From Input*/
     void Forward();
     /**build backward node*/

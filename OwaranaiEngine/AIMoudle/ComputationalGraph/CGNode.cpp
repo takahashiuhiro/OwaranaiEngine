@@ -17,6 +17,12 @@ CGNode::CGNode(std::string OpsType, bool NeedGradient)
     this->NeedGradient = NeedGradient;
     SetOps(OpsType);
 }
+CGNode::CGNode(std::string OpsType, bool NeedGradient, Hyperparameter OpsParams)
+{
+    this->OpsType = OpsType;
+    this->NeedGradient = NeedGradient;
+    SetOps(OpsType, OpsParams);
+}
 
 CGNode::CGNode(std::vector<CGNode*>InputNode, std::string OpsType, bool NeedGradient)
 {
@@ -24,6 +30,14 @@ CGNode::CGNode(std::vector<CGNode*>InputNode, std::string OpsType, bool NeedGrad
     this->OpsType = OpsType;
     this->NeedGradient = NeedGradient;
     SetOps(OpsType);
+}
+
+CGNode::CGNode(std::vector<CGNode*>InputNode, std::string OpsType, bool NeedGradient, Hyperparameter OpsParams)
+{
+    this->InputNode = InputNode;
+    this->OpsType = OpsType;
+    this->NeedGradient = NeedGradient;
+    SetOps(OpsType, OpsParams);
 }
 
 void CGNode::Forward()
@@ -127,6 +141,7 @@ void CGNode::ClearGradient(std::vector<CGNode*>InputNodeList)
 
 void CGNode::SetOps(std::string OpsType)
 {
+    //不用输入参数的
     if(OpsType == "Add")
     {
         this->FunOps = new AddOps<CGNode, Tensor>(this);
@@ -146,6 +161,18 @@ void CGNode::SetOps(std::string OpsType)
     else if(OpsType == "Elemul")
     {
         this->FunOps = new ElemulOps<CGNode, Tensor>(this);
+    }
+    else if(OpsType == "Addarray")
+    {
+        this->FunOps = new AddarrayOps<CGNode, Tensor>(this);
+    }
+}
+
+void CGNode::SetOps(std::string OpsType, Hyperparameter OpsParams)
+{
+    if (OpsType == "Flatten")
+    {
+        this->FunOps = new FlattenOps<CGNode, Tensor>(this, OpsParams);
     }
 }
 
