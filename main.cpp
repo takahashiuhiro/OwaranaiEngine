@@ -28,17 +28,30 @@ int main()
     /**为网络设置输入矩阵和参数矩阵*/
     LinearBlock->InputCGNode = std::vector<CGNode*>{tuq};
     LinearBlock->ParamsCGNode = std::vector<CGNode*>{tuw, tue};
-    /**执行前向网络构建方法*/
+    //设置loss
+    LinearBlock->SetLossFunction("MSE");
+    Tensor* LabelTensor =new Tensor(std::vector<size_t>{BatchSize,(*OutputShape)[0],(*OutputShape)[1]}, "GPU", 0);
+    LabelTensor->FillArray(3149.);
+    CGNode* LabelNode = new CGNode(LabelTensor, 0);
+    /**先得到前向的结果才能构建loss，因为loss运算需要前向的结果*/
+    /**前向图构建*/
     LinearBlock->ForwardBuild();
-    /**执行前向*/
+    /**执行前向运算*/
     LinearBlock->Forward();
-
-    //TODO::听我说你先别急，新加了模块现在直接跑肯定挂的，得把↑的前向结果送到loss里以后再搞↓
-
-    /**设置loss*/
-    Tensor* loss =new Tensor(std::vector<size_t>{2,1}, "GPU", 0);
-    loss->SetV(std::vector<size_t>{0,0}, 100.);
-    loss->SetV(std::vector<size_t>{1,0}, 10000.);
+    LinearBlock->ForwardNode->NodeContent->PrintData();
+    /**输入loss所需的参数*/
+    LinearBlock->LossFunctionPointer->OutputNode.push_back(LinearBlock->ForwardNode);
+    LinearBlock->LossFunctionPointer->LabelNode.push_back(LabelNode);
+    LinearBlock->LossFunctionPointer->LossBuild();
+    /**执行前向(训练版)*/
+    LinearBlock->LossFunctionPointer->LossNode->Forward();
+    //LinearBlock->LossFunctionPointer->LossNode->NodeContent->PrintData();
     /**执行反向*/
-    LinearBlock->Backward(loss);
+    LinearBlock->Backward(LinearBlock->LossFunctionPointer->LossNode->NodeContent);
+    LinearBlock->LossFunctionPointer->LossNode->NodeContent->PrintData();
+
+    for(int a=0;a<LinearBlock->ParamsCGNode.size();a++)
+    {
+        LinearBlock->ParamsCGNode[a]->DerivativeNode->NodeContent->PrintData();
+    }
 }

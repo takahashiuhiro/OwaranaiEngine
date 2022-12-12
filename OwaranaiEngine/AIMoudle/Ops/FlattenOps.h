@@ -14,11 +14,17 @@ struct FlattenOps:BaseOps<T, TS>
     {
         this->SelfCGNode->NodeContent = this->SelfCGNode->InputNode[0]->NodeContent->AddArray(this->SelfCGNode->InputNode[0]->NodeContent);
         this->SelfCGNode->NodeContent = this->SelfCGNode->NodeContent->AddArray(this->SelfCGNode->InputNode[0]->NodeContent->MulScalar(-1.));
-        size_t ResDim = (*(this->Params).Get("ResDim"))[0];
+        size_t ResDim = (*(this->Params).template Get<std::vector<size_t> >("ResDim"))[0];
         while(this->SelfCGNode->NodeContent->shape.size() > ResDim)
         {
             this->SelfCGNode->NodeContent->shape.pop_back();
         }
+        size_t FlattenShape = 1;
+        for(int a=0;a<this->SelfCGNode->NodeContent->shape.size();a++)
+        {
+            FlattenShape*= this->SelfCGNode->NodeContent->shape[a];
+        }
+        this->SelfCGNode->NodeContent->shape[this->SelfCGNode->NodeContent->shape.size() - 1]*=this->SelfCGNode->NodeContent->ShapeCount/FlattenShape;
     }
 
     virtual void Backward()

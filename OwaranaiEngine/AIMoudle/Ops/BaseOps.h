@@ -1,6 +1,6 @@
 #pragma once
 #include "StdInclude.h"
-#include "../Layer/Hyperparameter.h"
+#include "../Helpers/MoudleInclude.h"
 
 template<typename T, typename TS>
 struct BaseOps
