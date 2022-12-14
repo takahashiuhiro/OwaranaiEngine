@@ -1,9 +1,7 @@
 #include "OwaranaiEngine/OwaranaiEngineInclude.h"
-
 int main()
 {
     std::cout<<"------------------------GPU test---------------------------------"<<std::endl;
-
     /**创建一个线性模块*/
     LinearLayer2D* LinearBlock = new LinearLayer2D();
     /**参数输入*/
@@ -38,18 +36,14 @@ int main()
     LinearBlock->ForwardBuild();
     /**执行前向运算*/
     LinearBlock->Forward();
-    LinearBlock->ForwardNode->NodeContent->PrintData();
     /**输入loss所需的参数*/
     LinearBlock->LossFunctionPointer->OutputNode.push_back(LinearBlock->ForwardNode);
     LinearBlock->LossFunctionPointer->LabelNode.push_back(LabelNode);
     LinearBlock->LossFunctionPointer->LossBuild();
     /**执行前向(训练版)*/
     LinearBlock->LossFunctionPointer->LossNode->Forward();
-    //LinearBlock->LossFunctionPointer->LossNode->NodeContent->PrintData();
     /**执行反向*/
     LinearBlock->Backward(LinearBlock->LossFunctionPointer->LossNode->NodeContent);
-    LinearBlock->LossFunctionPointer->LossNode->NodeContent->PrintData();
-
     for(int a=0;a<LinearBlock->ParamsCGNode.size();a++)
     {
         LinearBlock->ParamsCGNode[a]->DerivativeNode->NodeContent->PrintData();
