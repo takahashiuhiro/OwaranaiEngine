@@ -12,5 +12,6 @@ public:
 
     Hyperparameter OptParams;
     std::vector<CGNode*>InputNodeList;
+    std::vector<CGNode*>DerivativeNodeList;
     virtual void UpdateParams() = 0;
 };
