@@ -11,7 +11,8 @@ struct BaseOptimizer
 public:
 
     Hyperparameter OptParams;
-    std::vector<CGNode*>InputNodeList;
-    std::vector<CGNode*>DerivativeNodeList;
+    std::vector<Tensor*>InputTensorList;
+    std::vector<Tensor*>DerivativeTensorList;
+
     virtual void UpdateParams() = 0;
 };
