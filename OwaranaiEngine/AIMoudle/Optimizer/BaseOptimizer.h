@@ -9,10 +9,6 @@
 struct BaseOptimizer
 {
 public:
-
     Hyperparameter OptParams;
-    std::vector<Tensor*>InputTensorList;
-    std::vector<Tensor*>DerivativeTensorList;
-
     virtual void UpdateParams() = 0;
 };
