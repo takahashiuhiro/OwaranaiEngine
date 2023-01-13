@@ -44,8 +44,20 @@ int main()
     LinearBlock->LossFunctionPointer->LossNode->Forward();
     /**执行反向*/
     LinearBlock->Backward(LinearBlock->LossFunctionPointer->LossNode->NodeContent);
+
+    SGDOptimizer TestSGD = SGDOptimizer(0.001, SGDOptimizerInputTypeConst::BY_CGNODE);
+    TestSGD.InputCGNodeList = LinearBlock->ParamsCGNode;
+
     for(int a=0;a<LinearBlock->ParamsCGNode.size();a++)
     {
         LinearBlock->ParamsCGNode[a]->DerivativeNode->NodeContent->PrintData();
+        LinearBlock->ParamsCGNode[a]->NodeContent->PrintData();
+    }
+    TestSGD.UpdateParams();
+    std::cout<<"SGD更新一次后"<<std::endl;
+    for(int a=0;a<LinearBlock->ParamsCGNode.size();a++)
+    {
+        LinearBlock->ParamsCGNode[a]->DerivativeNode->NodeContent->PrintData();
+        LinearBlock->ParamsCGNode[a]->NodeContent->PrintData();
     }
 }

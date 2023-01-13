@@ -3,7 +3,9 @@
 
 struct SGDOptimizerInputTypeConst
 {
+    /**通过Tensor进行优化，用于FF类算法*/
     static const int BY_TENSOR = 0;
+    /**通过CGNode进行优化，一般用于反向算法*/
     static const int BY_CGNODE = 1;
 };
 
@@ -24,16 +26,22 @@ public:
     std::vector<CGNode*>InputCGNodeList;
     std::vector<CGNode*>DerivativeCGNodeList;
 
+    /**不同的输入规格代表不同的计算方式，在参数里可以找到对应参数*/
     virtual void UpdateParams()
     {
-        /**不同的输入规格代表不同的计算方式*/
+        float LearningRate = (*(OptParams).Get<std::vector<float>>("LearningRate"))[0];
+        LearningRate *= -1;
         if((*OptParams.Get<std::vector<int>>("InputType"))[0] == SGDOptimizerInputTypeConst::BY_CGNODE)
         {
-
+            for(int a = 0;a<InputCGNodeList.size();a++)
+            {
+                Tensor* Grandient = InputCGNodeList[a]->DerivativeNode->NodeContent;
+                InputCGNodeList[a]->NodeContent = InputCGNodeList[a]->NodeContent->Add(Grandient->MulScalar(LearningRate));
+            }
         }
         if((*OptParams.Get<std::vector<int>>("InputType"))[0] == SGDOptimizerInputTypeConst::BY_TENSOR)
         {
-            
+
         }
     }
 };
