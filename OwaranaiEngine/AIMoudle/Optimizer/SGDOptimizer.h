@@ -35,13 +35,25 @@ public:
         {
             for(int a = 0;a<InputCGNodeList.size();a++)
             {
-                Tensor* Grandient = InputCGNodeList[a]->DerivativeNode->NodeContent;
+                Tensor* Grandient = DerivativeCGNodeList[a]->NodeContent;
                 InputCGNodeList[a]->NodeContent = InputCGNodeList[a]->NodeContent->Add(Grandient->MulScalar(LearningRate));
             }
         }
         if((*OptParams.Get<std::vector<int>>("InputType"))[0] == SGDOptimizerInputTypeConst::BY_TENSOR)
         {
-
+            for(int a = 0;a<InputTensorList.size();a++)
+            {
+                Tensor* Grandient = DerivativeTensorList[a];
+                InputTensorList[a] = InputTensorList[a]->Add(Grandient->MulScalar(LearningRate));
+            }
         }
+    }
+
+    virtual void Clear()
+    {
+        InputTensorList.clear();
+        DerivativeTensorList.clear();
+        InputCGNodeList.clear();
+        DerivativeCGNodeList.clear();
     }
 };

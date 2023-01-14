@@ -11,4 +11,5 @@ struct BaseOptimizer
 public:
     Hyperparameter OptParams;
     virtual void UpdateParams() = 0;
+    virtual void Clear() = 0;
 };

@@ -5,6 +5,7 @@
 #include "../Ops/MoudleInclude.h"
 #include "../ComputationalGraph/MoudleInclude.h"
 #include "../LossFunction/MoudleInclude.h"
+#include "../Optimizer/MoudleInclude.h"
 
 struct BaseLayer
 {

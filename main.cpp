@@ -47,6 +47,10 @@ int main()
 
     SGDOptimizer TestSGD = SGDOptimizer(0.001, SGDOptimizerInputTypeConst::BY_CGNODE);
     TestSGD.InputCGNodeList = LinearBlock->ParamsCGNode;
+    for(int a=0;a<LinearBlock->ParamsCGNode.size();a++)
+    {
+        TestSGD.DerivativeCGNodeList.push_back(LinearBlock->ParamsCGNode[a]->DerivativeNode);
+    }
 
     for(int a=0;a<LinearBlock->ParamsCGNode.size();a++)
     {
