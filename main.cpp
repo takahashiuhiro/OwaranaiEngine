@@ -54,14 +54,20 @@ int main()
 
     for(int a=0;a<LinearBlock->ParamsCGNode.size();a++)
     {
-        LinearBlock->ParamsCGNode[a]->DerivativeNode->NodeContent->PrintData();
+        //LinearBlock->ParamsCGNode[a]->DerivativeNode->NodeContent->PrintData();
         LinearBlock->ParamsCGNode[a]->NodeContent->PrintData();
     }
+    LinearBlock->ForwardNode->NodeContent->PrintData();
     TestSGD.UpdateParams();
     std::cout<<"SGD更新一次后"<<std::endl;
+    LinearBlock->LossFunctionPointer->LossNode->ClearGradient(std::vector<CGNode*>{LinearBlock->LossFunctionPointer->LossNode});
+    LinearBlock->Forward();
+    LinearBlock->ForwardNode->NodeContent->PrintData();
     for(int a=0;a<LinearBlock->ParamsCGNode.size();a++)
     {
-        LinearBlock->ParamsCGNode[a]->DerivativeNode->NodeContent->PrintData();
+        //LinearBlock->ParamsCGNode[a]->DerivativeNode->NodeContent->PrintData();
         LinearBlock->ParamsCGNode[a]->NodeContent->PrintData();
     }
+
+
 }

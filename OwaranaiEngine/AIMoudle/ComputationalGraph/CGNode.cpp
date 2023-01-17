@@ -121,9 +121,7 @@ void CGNode::ClearDataDFS(std::vector<std::string>NodeTypeList, bool IsInclude, 
     if(NodeContent == nullptr)return;
     if(FlagMap->count(this))return;
     (*FlagMap)[this] = 1;
-    //std::cout<<"你别告诉我你是空的啊 开!"<<NodeContent<<std::endl;
     ClearDataContent(NodeTypeList, IsInclude);
-    //std::cout<<"你别告诉我你是空的啊 关!"<<NodeContent<<std::endl;
     for(int a=0;a<InputNode.size();a++)
     {
         InputNode[a]->ClearDataDFS(NodeTypeList, IsInclude, FlagMap);
@@ -136,6 +134,15 @@ void CGNode::ClearGradient(std::vector<CGNode*>InputNodeList)
     for(int a=0;a<InputNodeList.size();a++)
     {
         InputNodeList[a]->DerivativeNode->ClearDataDFS(std::vector<std::string>{"Gradient"}, 1, &FlagMap);
+    }
+}
+
+void CGNode::ClearComputeResult(std::vector<CGNode*>InputNodeList)
+{
+    std::map<CGNode*, bool>FlagMap;
+    for(int a=0;a<InputNodeList.size();a++)
+    {
+        InputNodeList[a]->DerivativeNode->ClearDataDFS(std::vector<std::string>{"Params", "Constant"}, 0, &FlagMap);
     }
 }
 

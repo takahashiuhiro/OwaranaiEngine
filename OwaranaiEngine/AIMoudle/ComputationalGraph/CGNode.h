@@ -61,4 +61,6 @@ public:
     void ClearDataDFS(std::vector<std::string>NodeTypeList, bool IsInclude, std::map<CGNode*, bool>*FlagMap);
     /**该节点为输出节点可用，清理输入节点为inputnodelist的梯度*/
     void ClearGradient(std::vector<CGNode*>InputNodeList);
+    /**该节点为输出节点可用，清理输入节点为inputnodelist的本体*/
+    void ClearComputeResult(std::vector<CGNode*>InputNodeList);
 };
