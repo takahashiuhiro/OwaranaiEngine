@@ -1,30 +1,47 @@
 #pragma once
+#include "StdInclude.h"
 
-#include"node.h"
-#include<math.h>
-
-struct vector :node
+struct Vector
 {
 public:
-	vector();
-	vector(double x, double y);
-	vector(double x, double y, double z);
-	~vector();
+	Vector(){};
+	Vector(double X, double Y)
+	{
+		this->X = X;
+		this->Y = Y;
+		this->Z = 0;
+	}
+	Vector(double X, double Y, double Z)
+	{
+		this->X = X;
+		this->Y = Y;
+		this->Z = Z;
+	}
+	~Vector(){};
 
-	double x, y, z;
+	double X, Y, Z;
 
-	vector operator + (const vector& right);
-	vector operator - (const vector& right);
-	vector operator * (const double& right);
-	double operator * (const vector& right);
-	vector operator / (const double& right);
+	/**重载基本运算*/
+	Vector operator + (const Vector& Right) { return Vector(X + Right.X, Y + Right.Y, Z + Right.Z); }
+	Vector operator - (const Vector& Right) { return Vector(X - Right.X, Y - Right.Y, Z - Right.Z); }
+	Vector operator * (const double& Right) { return Vector(X * Right, Y * Right, Z * Right); }
+	double operator * (const Vector& Right) { return (X * Right.X) + (Y * Right.Y) + (Z * Right.Z); }
+	Vector operator / (const double& Right) { return Vector(X / Right, Y / Right, Z/Right); }
 
-	double length();
-	vector direction_vector();
-	vector cross_product(vector right);
+	/**向量长度*/
+	double Length() { return sqrt(X * X + Y * Y + Z * Z); }
 
-	void print();
+	/**单位向量*/
+	Vector DirectionVector()
+	{
+		double VectorLength = Length();
+		if (VectorLength * VectorLength < 1e-8) return Vector(0, 0);
+		return *this / VectorLength;
+	}
 
-	/**compare with x and y*/
-	static bool vector_compare_x_up(vector a, vector b);
+	/**向量叉乘*/
+	Vector CrossProduct(Vector Right) { return Vector(Y * Right.Z - Right.Y * Z, Right.X * Z - X * Right.Z, X * Right.Y - Right.X * Y); }
+
+	/**打印数据*/
+	void PrintData() {std::cout << "X:" << X << " X:" << Y << " Z:"<<Z << std::endl;}
 };
