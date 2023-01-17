@@ -1,18 +1,21 @@
 # README
-## 本项目的配置:  
+## 本项目的配置  
+
 Cuda Version:11.8  
 Cuda Drive Version:522.25  
 C++ 11  
 理论上来说，只要装了nvcc/g++/cuda驱动版本合理就应该能跑起来
 --------------------------
-##  项目运行方法
+##  项目运行方法  
+
 cd build  
 cmake ../  
 make  
 ./OwaranaiEngineTest  
 执行完这些不出意外就跑的起来
 ----------------------------
-## 项目目录:  
+## 项目目录  
+
 OwaranaiEngine  项目根目录  
         AIMoudle  AI模块  
                 ComputationalGraph 计算图     
