@@ -1,12 +1,6 @@
-#project(TensorCore)
 set(TARGET_NAME "TensorCore")
 
-# required cmake version
-#cmake_minimum_required(VERSION 3.8)
-
 find_package(CUDA)
-
-
 
 if(CUDA_FOUND)
     add_subdirectory(GPUVer)

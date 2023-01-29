@@ -29,6 +29,8 @@ public:
     void Freeze();
     /**layer class must override this function*/
     virtual void ForwardBuild() = 0;
-    /**设置loss的种类*/
+    /**设置loss的种类
+     * 
+    */
     void SetLossFunction(std::string LossType);
 };
