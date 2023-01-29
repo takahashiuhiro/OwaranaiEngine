@@ -16,8 +16,8 @@ public:
     /**通过学习率初始化自身*/
     SGDOptimizer(float LearningRate, int InputType)
     {
-        OptParams.Set("LearningRate", HyperparameterTypeConst::FLOAT, std::vector<float>{LearningRate});
-        OptParams.Set("InputType", HyperparameterTypeConst::INT, std::vector<int>{InputType});
+        OptParams.Set("LearningRate",  std::vector<float>{LearningRate});
+        OptParams.Set("InputType",  std::vector<int>{InputType});
     }
 
     /**分别对应不同的输入方式*/

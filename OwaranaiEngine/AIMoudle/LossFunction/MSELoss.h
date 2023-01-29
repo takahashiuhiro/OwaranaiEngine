@@ -19,7 +19,7 @@ public:
         //两个节点相乘
         CGNode *Intermediate_3 = new CGNode(std::vector<CGNode*>{Intermediate_1, Intermediate_2},"Elemul", 1);
         Hyperparameter FlattenParam;
-        FlattenParam.Set("ResDim", HyperparameterTypeConst::SIZET, std::vector<size_t>{3});
+        FlattenParam.Set("ResDim", std::vector<size_t>{3});
         CGNode *Intermediate_4 = new CGNode(std::vector<CGNode*>{Intermediate_3},"Flatten", 1, FlattenParam);
         //求sum的过程
         Tensor* Constant_1 = new Tensor(OutputNode[0]->NodeContent->shape, OutputNode[0]->NodeContent->Device, OutputNode[0]->NodeContent->DeviceNum);

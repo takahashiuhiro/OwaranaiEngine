@@ -19,29 +19,32 @@ public:
     std::map<std::string, std::vector<std::string> >StringParams;
     std::map<std::string, std::vector<size_t> >SizetParams;
 
-    void Set(std::string ParamName, int ParamType, std::any ParamContent)
+    void Set(std::string ParamName, std::vector<size_t> ParamContent)
     {
-        HyperparameterType[ParamName] = ParamType;
-        if(ParamType == HyperparameterTypeConst::INT)
-        {
-            std::vector<int> CastParamContent = std::any_cast<std::vector<int> >(ParamContent);
-            IntParams[ParamName] = CastParamContent;
-        }
-        else if(ParamType == HyperparameterTypeConst::FLOAT)
-        {
-            std::vector<float> CastParamContent = std::any_cast<std::vector<float> >(ParamContent);
-            FloatParams[ParamName] = CastParamContent;
-        }
-        else if(ParamType == HyperparameterTypeConst::STRING)
-        {
-            std::vector<std::string> CastParamContent = std::any_cast<std::vector<std::string> >(ParamContent);
-            StringParams[ParamName] = CastParamContent;
-        }
-        else if(ParamType == HyperparameterTypeConst::SIZET)
-        {
-            std::vector<size_t> CastParamContent = std::any_cast<std::vector<size_t> >(ParamContent);
-            SizetParams[ParamName] = CastParamContent;
-        }
+        HyperparameterType[ParamName] = HyperparameterTypeConst::SIZET;
+        std::vector<size_t> CastParamContent = ParamContent;
+        SizetParams[ParamName] = CastParamContent;
+    }
+
+    void Set(std::string ParamName, std::vector<float> ParamContent)
+    {
+        HyperparameterType[ParamName] = HyperparameterTypeConst::FLOAT;
+        std::vector<float> CastParamContent = ParamContent;
+        FloatParams[ParamName] = CastParamContent;
+    }
+
+    void Set(std::string ParamName, std::vector<int> ParamContent)
+    {
+        HyperparameterType[ParamName] = HyperparameterTypeConst::INT;
+        std::vector<int> CastParamContent = ParamContent;
+        IntParams[ParamName] = CastParamContent;
+    }
+
+    void Set(std::string ParamName, std::vector<std::string> ParamContent)
+    {
+        HyperparameterType[ParamName] = HyperparameterTypeConst::STRING;
+        std::vector<std::string> CastParamContent = ParamContent;
+        StringParams[ParamName] = CastParamContent;
     }
 
     template<typename T>

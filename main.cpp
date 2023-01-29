@@ -5,9 +5,9 @@ int main()
     /**创建一个线性模块*/
     LinearLayer2D* LinearBlock = new LinearLayer2D();
     /**参数输入*/
-    LinearBlock->Params.Set("InputShape", 3, std::vector<size_t>{5,6});
-    LinearBlock->Params.Set("OutputShape", 3, std::vector<size_t>{1,8});
-    LinearBlock->Params.Set("BatchSize", 3, std::vector<size_t>{2});
+    LinearBlock->Params.Set("InputShape",  std::vector<size_t>{5,6});
+    LinearBlock->Params.Set("OutputShape",  std::vector<size_t>{1,8});
+    LinearBlock->Params.Set("BatchSize",  std::vector<size_t>{2});
     /**参数读取*/
     size_t BatchSize = (*(LinearBlock->Params).Get<std::vector<size_t>>("BatchSize"))[0];
     std::vector<size_t>*InputShape = (LinearBlock->Params).Get<std::vector<size_t>>("InputShape");
