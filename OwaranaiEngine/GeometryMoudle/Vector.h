@@ -1,5 +1,6 @@
 #pragma once
 #include "StdInclude.h"
+#include "MoudleInclude.h"
 
 struct Vector
 {
@@ -19,7 +20,7 @@ public:
 	}
 	~Vector(){};
 
-	double X, Y, Z;
+	double X=0, Y=0, Z=0;
 
 	/**重载基本运算.*/
 	Vector operator + (const Vector& Right) { return Vector(X + Right.X, Y + Right.Y, Z + Right.Z); }
