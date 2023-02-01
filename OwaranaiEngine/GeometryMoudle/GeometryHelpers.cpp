@@ -46,7 +46,6 @@ bool SegmentCross(Segment& First, Segment& Second, Vector& ResultPosition)
     Vector BiasPosition = First.StartPoint + StToStProjection;
     Vector ProjectionVec = StToEdProjection - StToStProjection;
     double ProjectionVecPercent = (StToStProjection-StToSt).Length()/((StToStProjection-StToSt).Length() + (StToEd - StToEdProjection).Length());
-    //下面都不对，别信，睡了，有空改
     ResultPosition = BiasPosition + ProjectionVec*ProjectionVecPercent;
     return 1;
 }
