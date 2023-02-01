@@ -23,5 +23,12 @@ public:
 		if (VectorLength * VectorLength < 1e-8) return Vector(0, 0);
 		return SegmentVec / VectorLength;
 	}
+
+    /**通过长度百分比得到位置.*/
+    Vector GetPosition(double LengthPercent)
+    {
+        Vector SegmentVec = EndPoint - StartPoint;
+        return StartPoint + SegmentVec*LengthPercent;
+    }
 };
 

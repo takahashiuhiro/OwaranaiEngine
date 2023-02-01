@@ -44,5 +44,5 @@ public:
 	Vector CrossProduct(Vector Right) { return Vector(Y * Right.Z - Right.Y * Z, Right.X * Z - X * Right.Z, X * Right.Y - Right.X * Y); }
 
 	/**打印数据.*/
-	void PrintData() {std::cout << "X:" << X << " X:" << Y << " Z:"<<Z << std::endl;}
+	void PrintData() {std::cout << "X:" << X << " Y:" << Y << " Z:"<<Z << std::endl;}
 };
