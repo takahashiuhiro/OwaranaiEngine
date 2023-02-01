@@ -10,4 +10,5 @@ int main()
     }
 
     Line qwe;
+    Plane ewq;
 }
