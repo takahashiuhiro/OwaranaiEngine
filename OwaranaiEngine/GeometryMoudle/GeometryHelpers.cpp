@@ -1,10 +1,6 @@
 #include "GeometryHelpers.h"
 
-/**线段相交.
- * 只计算x,y不计算z，如果需要在非水平面计算需要先转换坐标系, 不计算多个交点
- * Params: 线段1, 线段2, 交点
-*/
-bool SegmentCross(Segment& First, Segment& Second, Vector& ResultPosition)
+bool SegmentCross2D(Segment& First, Segment& Second, Vector& ResultPosition)
 {
     /**头尾相接.*/
     if((First.StartPoint - Second.StartPoint).Length() < 1e-8 || (First.StartPoint - Second.EndPoint).Length() < 1e-8 ||(First.EndPoint - Second.StartPoint).Length() < 1e-8 ||(First.EndPoint - Second.EndPoint).Length() < 1e-8)
