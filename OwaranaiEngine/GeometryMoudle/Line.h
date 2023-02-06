@@ -15,5 +15,5 @@ public:
     /**锚定点.*/
     Vector AnchorPosition = Vector(0,0,0);
     /**直线方向.*/
-    Vector DirctionVector = Vector(0,0,0);
+    Vector DirctionVector = Vector(1,0,0);
 };
