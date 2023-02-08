@@ -45,3 +45,9 @@ bool SegmentCross2D(Segment& First, Segment& Second, Vector& ResultPosition)
     ResultPosition = BiasPosition + ProjectionVec*ProjectionVecPercent;
     return 1;
 }
+
+//bool PlaneCross(Plane& First, Plane& Second, Line& ResultLine)
+//{
+//    double NormalVecProjectionLength = First.NormalVector*Second.NormalVector;
+//    if((NormalVecProjectionLength - 1)*(NormalVecProjectionLength - 1) < 1e-8) return 0;
+//}

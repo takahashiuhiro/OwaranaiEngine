@@ -4,7 +4,7 @@ project(AIMoudle)
 cmake_minimum_required(VERSION 3.8)
 
 
-add_subdirectory(TensorCore)
+#add_subdirectory(TensorCore)
 add_subdirectory(Ops)
 add_subdirectory(Optimizer)
 add_subdirectory(Layer)
@@ -21,7 +21,7 @@ source_group("Source" FILES ${CURRENT_SOURCES})
 #cuda_add_library(AIMoudle SHARED ${CURRENT_HEADERS} ${CURRENT_SOURCES})
 add_library(AIMoudle STATIC ${CURRENT_HEADERS} ${CURRENT_SOURCES})
 
-target_link_libraries (AIMoudle TensorCore)
+#target_link_libraries (AIMoudle TensorCore)
 target_link_libraries (AIMoudle Ops)
 target_link_libraries (AIMoudle Optimizer)
 target_link_libraries (AIMoudle Layer)

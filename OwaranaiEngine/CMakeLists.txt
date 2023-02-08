@@ -7,6 +7,7 @@ cmake_minimum_required(VERSION 3.8)
 
 add_subdirectory(AIMoudle)
 add_subdirectory(GeometryMoudle)
+add_subdirectory(CommonMathMoudle)
 
 file(GLOB_RECURSE CURRENT_HEADERS  *.h *.hpp *.cuh)
 file(GLOB CURRENT_SOURCES  *.cpp *.cu)
@@ -19,3 +20,4 @@ add_library(OwaranaiEngine STATIC ${CURRENT_HEADERS} ${CURRENT_SOURCES})
 
 target_link_libraries (OwaranaiEngine AIMoudle)
 target_link_libraries (OwaranaiEngine GeometryMoudle)
+target_link_libraries (OwaranaiEngine CommonMathMoudle)

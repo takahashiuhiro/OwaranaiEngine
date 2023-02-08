@@ -1,6 +1,7 @@
 #pragma once
 #include "StdInclude.h"
-#include "../TensorCore/MoudleInclude.h"
+//#include "../TensorCore/MoudleInclude.h"
+#include "../../CommonMathMoudle/MoudleInclude.h"
 #include "../Ops/MoudleInclude.h"
 
 struct CGNode

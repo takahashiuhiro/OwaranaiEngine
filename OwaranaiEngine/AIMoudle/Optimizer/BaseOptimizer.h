@@ -1,7 +1,7 @@
 #pragma once
 #include "StdInclude.h"
 #include "../Helpers/MoudleInclude.h"
-#include "../TensorCore/MoudleInclude.h"
+#include "../../CommonMathMoudle/MoudleInclude.h"
 #include "../Ops/MoudleInclude.h"
 #include "../ComputationalGraph/MoudleInclude.h"
 #include "../LossFunction/MoudleInclude.h"

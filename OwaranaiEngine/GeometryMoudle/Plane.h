@@ -35,6 +35,10 @@ public:
         }
     }
 
+    /**
+     * 通过锚点和正交基得到平面
+     * Params:锚点，单位向量1，单位向量2
+    */
     Plane(Vector AnchorPosition, Vector BaseVectorFirst, Vector BaseVectorSecond)
     {
         this->AnchorPosition = AnchorPosition;
