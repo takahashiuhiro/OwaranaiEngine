@@ -68,4 +68,9 @@ int main()
         //LinearBlock->ParamsCGNode[a]->DerivativeNode->NodeContent->PrintData();
         LinearBlock->ParamsCGNode[a]->NodeContent->PrintData();
     }
+
+    Vector qqwe =Vector(1,2,3);
+    Vector wqwe =Vector(3,2,3);
+    Segment dfg = Segment(qqwe, wqwe);
+    qqwe.PrintData();
 }
