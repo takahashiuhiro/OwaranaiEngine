@@ -90,6 +90,6 @@ public:
     Tensor* SumTensorDim(size_t InputDim);
     /**Get a average tensor by specifying dimensions*/
     Tensor* AverageTensorDim(size_t InputDim);
-
+    /**高斯消元.*/
     Tensor* GaussianElimination();
 };
