@@ -2,6 +2,38 @@
 
 #include "StdInclude.h"
 
+
+#ifdef CUDA_USEFUL
+extern "C" void cudaMallocInCPP(float** Input, size_t Size, size_t DeviceNum);
+extern "C" void DataToGPU(float* CPUPointer, float* GPUPointer, size_t Size);
+extern "C" void DataToCPU(float* CPUPointer, float* GPUPointer, size_t Size);
+extern "C" void cudaFreeInCPP(float* Input);
+extern "C" void AddArrayInCPP(float* Output, float* InputFirst, float* InputSecond, size_t Size);
+extern "C" void FillArrayInCPP(float* Input, float Scalar,size_t Size);
+extern "C" void AddInCPP(float* Output, float* HighDimInput, size_t HighDimSize, float* LowDimInput, size_t LowDimSize);
+extern "C" void EleMulInCPP(float* Output, float* HighDimInput, size_t HighDimSize, float* LowDimInput, size_t LowDimSize);
+extern "C" void MulScalarInCPP(float* Output,float* Input, float Scalar,size_t Size);
+extern "C" void AddScalarInCPP(float* Output,float* Input, float Scalar,size_t Size);
+extern "C" void DotArrayInCPP(float* Output, float* InputFirst, float* InputSecond, size_t Size);
+extern "C" void MatmulInCPP
+(
+  float* Output, 
+  size_t OutputBatchShape[8], 
+  size_t OutputMatrixShape[2],
+  float* InputFirst, 
+  size_t InputFirstBatchShape[8], 
+  size_t InputFirstMatrixShape[2],
+  float* InputSecond, 
+  size_t InputSecondBatchShape[8], 
+  size_t InputSecondMatrixShape[2],
+  size_t BatchShapeLen,
+  size_t OutputShapeCount,
+  size_t DeviceNum
+);
+extern "C" void TInCPP(float* Output, float* Input, size_t *MatrixShape, size_t ShapeCount);
+extern "C" void SumTensorDimInCPP(float* OutputData, float* InputData, size_t *InputShape, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount);
+#endif
+
 struct CudaDimVec
 {
   size_t Shape[8];
@@ -58,4 +90,6 @@ public:
     Tensor* SumTensorDim(size_t InputDim);
     /**Get a average tensor by specifying dimensions*/
     Tensor* AverageTensorDim(size_t InputDim);
+
+    Tensor* GaussianElimination();
 };

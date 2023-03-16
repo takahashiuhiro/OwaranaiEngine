@@ -13,7 +13,12 @@ Tensor::Tensor(std::vector<size_t>shape, std::string Device, size_t DeviceNum)
     this->Device = Device;
     this->DeviceNum = DeviceNum;
     for(int a=0;a<shape.size();a++)ShapeCount*=shape[a];
-    if(Device == "GPU"){}
+    if(Device == "GPU")
+    {
+        #ifdef CUDA_USEFUL
+        cudaMallocInCPP(&(this->DataGPU), ShapeCount, DeviceNum);
+        #endif
+    }
     else this->DataCPU = (float*)malloc(sizeof(float)*ShapeCount);
 }
 
@@ -34,8 +39,10 @@ void Tensor::PrintData()
     bool GPUflag = 0;
     if(Device == "GPU")
     {
+        #ifdef CUDA_USEFUL
         GPUflag = 1;
         ToCPU();
+        #endif
     }
     for(int a=0;a<ShapeCount;a++)
     {
@@ -59,35 +66,46 @@ void Tensor::PrintData()
     std::cout<<std::endl;
     if(GPUflag)ToGPU();
 }
-
+#ifdef CUDA_USEFUL
 void Tensor::ToCPU()
 {
     if(Device == "CPU")return;
     this->DataCPU = (float*)malloc(sizeof(float)*ShapeCount);
-    //DataToCPU(DataCPU, DataGPU, ShapeCount);
-    //cudaFreeInCPP(DataGPU);
+    DataToCPU(DataCPU, DataGPU, ShapeCount);
+    cudaFreeInCPP(DataGPU);
     Device = "CPU";
 }
 
 void Tensor::ToGPU()
 {
     if(Device == "GPU")return;
-    //cudaMallocInCPP(&DataGPU, ShapeCount, DeviceNum);
-    //DataToGPU(DataCPU, DataGPU, ShapeCount);
+    cudaMallocInCPP(&DataGPU, ShapeCount, DeviceNum);
+    DataToGPU(DataCPU, DataGPU, ShapeCount);
     free(DataCPU);
     Device = "GPU";
 }
+#endif
 
 void Tensor::FillArray(float Scalar)
 {
-    if(Device == "GPU"){}
+    if(Device == "GPU")
+    {
+        #ifdef CUDA_USEFUL
+        FillArrayInCPP(DataGPU, Scalar, ShapeCount);
+        #endif
+    }
     else for(int a=0;a<ShapeCount;a++)DataCPU[a] = Scalar;
 }
 
 Tensor* Tensor::AddScalar(float Scalar)
 {
     Tensor* Output = new Tensor(shape, Device, DeviceNum);
-    if(Device == "GPU"){}
+    if(Device == "GPU")
+    {
+        #ifdef CUDA_USEFUL
+        AddScalarInCPP(Output->DataGPU, DataGPU, Scalar, ShapeCount);
+        #endif
+    }
     else for(int a=0;a<ShapeCount;a++)Output->DataCPU[a] = DataCPU[a]+ Scalar;
     return Output;
 }
@@ -95,7 +113,12 @@ Tensor* Tensor::AddScalar(float Scalar)
 Tensor* Tensor::MulScalar(float Scalar)
 {
     Tensor* Output = new Tensor(shape, Device, DeviceNum);
-    if(Device == "GPU"){}
+    if(Device == "GPU")
+    {
+        #ifdef CUDA_USEFUL
+        MulScalarInCPP(Output->DataGPU, DataGPU, Scalar, ShapeCount);
+        #endif
+    }
     else for(int a=0;a<ShapeCount;a++)Output->DataCPU[a] = DataCPU[a] *Scalar;
     return Output;
 }
@@ -103,7 +126,12 @@ Tensor* Tensor::MulScalar(float Scalar)
 Tensor* Tensor::AddArray(Tensor* Input)
 {
     Tensor* Output = new Tensor(shape, Device, DeviceNum);
-    if(Device == "GPU"){}
+    if(Device == "GPU")
+    {
+        #ifdef CUDA_USEFUL
+        AddArrayInCPP(Output->DataGPU, DataGPU, Input->DataGPU, ShapeCount);
+        #endif
+    }
     else for(int a=0;a<ShapeCount;a++)Output->DataCPU[a] = DataCPU[a] + Input->DataCPU[a];
     return Output;
 }
@@ -124,7 +152,9 @@ Tensor* Tensor::Add(Tensor* Input)
     Output = new Tensor(HighDimTensor->shape, HighDimTensor->Device, HighDimTensor->DeviceNum);
     if(Device == "GPU")
     {
-        //AddInCPP(Output->DataGPU, HighDimTensor->DataGPU, HighDimTensor->ShapeCount, LowDimTensor->DataGPU, LowDimTensor->ShapeCount);
+        #ifdef CUDA_USEFUL
+        AddInCPP(Output->DataGPU, HighDimTensor->DataGPU, HighDimTensor->ShapeCount, LowDimTensor->DataGPU, LowDimTensor->ShapeCount);
+        #endif
     }
     else
     {
@@ -154,7 +184,9 @@ Tensor* Tensor::EleMul(Tensor* Input)
     Output = new Tensor(HighDimTensor->shape, HighDimTensor->Device, HighDimTensor->DeviceNum);
     if(Device == "GPU")
     {
-        //EleMulInCPP(Output->DataGPU, HighDimTensor->DataGPU, HighDimTensor->ShapeCount, LowDimTensor->DataGPU, LowDimTensor->ShapeCount);
+        #ifdef CUDA_USEFUL
+        EleMulInCPP(Output->DataGPU, HighDimTensor->DataGPU, HighDimTensor->ShapeCount, LowDimTensor->DataGPU, LowDimTensor->ShapeCount);
+        #endif
     }
     else
     {
@@ -186,8 +218,10 @@ float Tensor::GetV(std::vector<size_t> FindIndex)
     bool GPUflag = 0;
     if(Device == "GPU")
     {
+        #ifdef CUDA_USEFUL
         GPUflag = 1;
         ToCPU();
+        #endif
     }
     ReturnValue = DataCPU[GetIndex(FindIndex)];
     if(GPUflag)ToGPU();
@@ -199,11 +233,15 @@ void Tensor::SetV(std::vector<size_t> FindIndex, float Value)
     bool GPUflag = 0;
     if(Device == "GPU")
     {
+        #ifdef CUDA_USEFUL
         GPUflag = 1;
         ToCPU();
+        #endif
     }
     DataCPU[GetIndex(FindIndex)] = Value;
+    #ifdef CUDA_USEFUL
     if(GPUflag)ToGPU();
+    #endif
 }
 
 CudaDimVec Tensor::TransformFromStdVector(std::vector<size_t> InputVector, size_t ShapeLen)
@@ -226,8 +264,10 @@ Tensor* Tensor::Matmul(Tensor* Input)
             Output->DataCPU[0] = 0;
             if(Device == "GPU")
             {
+                #ifdef CUDA_USEFUL
                 Output->ToGPU();
-                //DotArrayInCPP(Output->DataGPU, DataGPU, Input->DataGPU, ShapeCount);
+                DotArrayInCPP(Output->DataGPU, DataGPU, Input->DataGPU, ShapeCount);
+                #endif
             }
             else for(int a=0;a<ShapeCount;a++)Output->DataCPU[0] += DataCPU[a]*Input->DataCPU[a];
         }
@@ -278,7 +318,23 @@ Tensor* Tensor::Matmul(Tensor* Input)
             size_t InputSecondMatrixShape[2] = {Input->shape[Input->shape.size()-2], Input->shape[Input->shape.size()-1]};
             if(Device == "GPU")
             {
-            
+                #ifdef CUDA_USEFUL
+                MatmulInCPP
+                (
+                    Output->DataGPU,
+                    OutputShapeArray.Shape, 
+                    OutputMatrixShape,
+                    DataGPU, 
+                    InputFirstArray.Shape,
+                    InputFirstMatrixShape,
+                    Input->DataGPU,
+                    InputSecondArray.Shape,
+                    InputSecondMatrixShape,
+                    Output->shape.size()-2,
+                    Output->ShapeCount,
+                    DeviceNum
+                );
+                #endif
             }
             else
             {
@@ -354,7 +410,9 @@ Tensor* Tensor::T()
     size_t InputFirstMatrixShape[2] = {shape[shape.size()-2], shape[shape.size()-1]};
     if(Device == "GPU")
     {
-        //TInCPP(Output->DataGPU, DataGPU, InputFirstMatrixShape,ShapeCount);
+        #ifdef CUDA_USEFUL
+        TInCPP(Output->DataGPU, DataGPU, InputFirstMatrixShape,ShapeCount);
+        #endif
     }
     else
     {
@@ -384,7 +442,9 @@ Tensor* Tensor::SumTensorDim(size_t InputDim)
     CudaDimVec ShapeArray = TransformFromStdVector(shape, shape.size());
     if(Device == "GPU")
     {
-        //SumTensorDimInCPP(Output->DataGPU, DataGPU, ShapeArray.Shape,OutputShape.size(),InputDim, Output->ShapeCount);
+        #ifdef CUDA_USEFUL
+        SumTensorDimInCPP(Output->DataGPU, DataGPU, ShapeArray.Shape,OutputShape.size(),InputDim, Output->ShapeCount);
+        #endif
     }
     else
     {
@@ -428,4 +488,22 @@ Tensor* Tensor::SumTensorDim(size_t InputDim)
 Tensor* Tensor::AverageTensorDim(size_t InputDim)
 {
     return SumTensorDim(InputDim)->MulScalar(1./(shape[InputDim]));
+}
+
+Tensor* Tensor::GaussianElimination()
+{
+    Tensor* ReturnTensor;
+    if(Device == "GPU")
+    {
+        #ifdef CUDA_USEFUL
+        ToCPU();
+        ReturnTensor = GaussianElimination();
+        ToGPU();
+        #endif
+    }
+    else
+    {
+        
+    }
+    return ReturnTensor;
 }
