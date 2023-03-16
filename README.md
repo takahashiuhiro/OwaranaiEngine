@@ -21,15 +21,18 @@ OwaranaiEngine  项目根目录
 --------ComputationalGraph 计算图     
 --------Layer 网络层  
 --------Ops  算子  
---------Optimizer  优化器  
---------TensorCore  张量计算  
-------------Cuda  一些cuda的基础操作实现  
+--------Optimizer  优化器   
 --------Helpers  杂项类  
 --------LossFunction  用于写loss函数的地方  
-----GeometryMoudle  几何模块  
+----CommonMathMoudle  通用数学模块  
+--------GeometryCore  几何部分  
+--------TensorCore  张量计算  
+------------Cuda  一些cuda的基础操作实现  
+----TestFile  测试模块用的各种main文件  
+
 
 ## 最近的一些计划
 
 1.跑起来一个简单的手写数字识别  
-2.搭建一些前向算法基础 
+2.实现基础的ReduNet 
 
