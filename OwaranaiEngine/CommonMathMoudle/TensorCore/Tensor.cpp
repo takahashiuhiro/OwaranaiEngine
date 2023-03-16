@@ -66,25 +66,27 @@ void Tensor::PrintData()
     std::cout<<std::endl;
     if(GPUflag)ToGPU();
 }
-#ifdef CUDA_USEFUL
 void Tensor::ToCPU()
 {
+    #ifdef CUDA_USEFUL
     if(Device == "CPU")return;
     this->DataCPU = (float*)malloc(sizeof(float)*ShapeCount);
     DataToCPU(DataCPU, DataGPU, ShapeCount);
     cudaFreeInCPP(DataGPU);
     Device = "CPU";
+    #endif
 }
 
 void Tensor::ToGPU()
 {
+    #ifdef CUDA_USEFUL
     if(Device == "GPU")return;
     cudaMallocInCPP(&DataGPU, ShapeCount, DeviceNum);
     DataToGPU(DataCPU, DataGPU, ShapeCount);
     free(DataCPU);
     Device = "GPU";
+    #endif
 }
-#endif
 
 void Tensor::FillArray(float Scalar)
 {
