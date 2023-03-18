@@ -502,7 +502,6 @@ Tensor* Tensor::GaussianElimination()
     }
     //求逆只需要最后两维度作为矩阵,其他的都是batch
 
-
     if(Device == "GPU")
     {
         #ifdef CUDA_USEFUL
@@ -513,28 +512,7 @@ Tensor* Tensor::GaussianElimination()
     }
     else
     {
-        //下面要改成多线程的,先删掉
-        size_t Row = shape[shape.size()-2];
-        size_t Column = shape[shape.size()-1];
-        for(int a=0;a<BatchSize;a++)
-        {
-            std::vector<bool>Flag(Column, 0);
-            for(int b=0;b<Row;b++)
-            {
-                int StartRow = -1;
-                for(int c=0;c<Row;c++)
-                {
-                    if(Flag[c]||(!DataCPU[Row*Column*a + b*Column + b]))continue;
-                    StartRow = c;
-                    Flag[c] = 1;
-                    break;
-                }
-                if(StartRow == -1)
-                {
-
-                }
-            }
-        }
+        
     }
     return ReturnTensor;
 }
