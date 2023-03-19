@@ -24,10 +24,8 @@ OwaranaiEngine  项目根目录
 --------Optimizer  优化器   
 --------Helpers  杂项类  
 --------LossFunction  用于写loss函数的地方  
-----CommonMathMoudle  通用数学模块  
---------GeometryCore  几何部分  
---------TensorCore  张量计算  
-------------Cuda  一些cuda的基础操作实现  
+----CommonMathMoudle  通用数学模块(包含几何与张量部分)  
+--------Cuda  一些cuda的基础操作实现  
 ----TestFile  测试模块用的各种main文件  
 
 

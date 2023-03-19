@@ -7,7 +7,3 @@
  * Params: 线段1, 线段2, 交点
 */
 bool SegmentCross2D(Segment& First, Segment& Second, Vector& ResultPosition);
-/**
- * 平面相交
-*/
-//bool PlaneCross(Plane& First, Plane& Second, Line& ResultLine);

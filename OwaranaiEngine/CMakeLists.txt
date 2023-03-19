@@ -1,9 +1,6 @@
 project(OwaranaiEngine)
 
-# required cmake version
 cmake_minimum_required(VERSION 3.8)
-
-
 
 add_subdirectory(AIMoudle)
 add_subdirectory(CommonMathMoudle)

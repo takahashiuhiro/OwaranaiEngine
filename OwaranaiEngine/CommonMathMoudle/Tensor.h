@@ -1,7 +1,6 @@
 #pragma once
-
 #include "StdInclude.h"
-
+#include "MoudleInclude.h"
 
 #ifdef CUDA_USEFUL
 extern "C" void cudaMallocInCPP(float** Input, size_t Size, size_t DeviceNum);
@@ -91,5 +90,5 @@ public:
     /**Get a average tensor by specifying dimensions*/
     Tensor* AverageTensorDim(size_t InputDim);
     /**高斯消元.*/
-    Tensor* GaussianElimination();
+    void GaussianElimination();
 };

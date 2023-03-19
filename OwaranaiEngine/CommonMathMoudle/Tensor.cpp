@@ -492,9 +492,8 @@ Tensor* Tensor::AverageTensorDim(size_t InputDim)
     return SumTensorDim(InputDim)->MulScalar(1./(shape[InputDim]));
 }
 
-Tensor* Tensor::GaussianElimination()
+void Tensor::GaussianElimination()
 {
-    Tensor* ReturnTensor;//返回矩阵
     size_t BatchSize = 1;
     for(int a=0;a<shape.size() - 2;a++)
     {
@@ -505,14 +504,22 @@ Tensor* Tensor::GaussianElimination()
     if(Device == "GPU")
     {
         #ifdef CUDA_USEFUL
+        //todo
         ToCPU();
-        ReturnTensor = GaussianElimination();
+        GaussianElimination();
         ToGPU();
         #endif
     }
     else
     {
-        
+        std::vector<std::thread>ThreadList;
+        for(int a=0;a<BatchSize;a++)
+        {
+            ThreadList.push_back(std::move(std::thread(MatrixGaussianElimination,DataCPU+a*shape[shape.size()-2]*shape[shape.size()-1],shape[shape.size()-2], shape[shape.size()-1])));
+        }
+        for(int a=0;a<ThreadList.size();a++)
+        {
+            ThreadList[a].join();
+        }
     }
-    return ReturnTensor;
 }

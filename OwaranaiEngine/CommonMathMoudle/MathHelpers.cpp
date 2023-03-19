@@ -1,6 +1,5 @@
 #include "MathHelpers.h"
 
-
 void AddVectorToVector(float* VectorInput, float* VectorOutput, float Weight, int Length)
 {
     for(int a=0;a<Length;a++)
