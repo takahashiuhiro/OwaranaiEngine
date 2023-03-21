@@ -162,6 +162,45 @@ __global__ void SumTensorDimKernel(float* OutputData, float* InputData, size_t *
   }
 }
 
+__global__ void TensorSpliceKernel(float* OutputData, float* InputDataFirst, float* InputDataSecond, size_t* InputShapeFirst, size_t* InputShapeSecond, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= OutputShapeCount)return;
+  size_t RightShapeCount = 1;
+  //算出指定维度右边的单元大小
+  for(int a=InputDim + 1;a<InputShapeLen;a++)
+  {
+    RightShapeCount*= InputShapeFirst[a];
+  }
+  //算出指定维度的大小
+  size_t InputDimCount = InputShapeFirst[InputDim] + InputShapeSecond[InputDim];
+  size_t LeftDimCount = Index/RightShapeCount;
+  size_t NowDimCount = LeftDimCount%InputDimCount;
+  size_t StrictLeftDimCount = LeftDimCount/InputDimCount;
+  if(NowDimCount < InputShapeFirst[InputDim])
+  {
+      OutputData[Index] = InputDataFirst[Index - StrictLeftDimCount*InputShapeSecond[InputDim]*RightShapeCount];
+  }
+  else
+  {
+      OutputData[Index] = InputDataSecond[Index - (StrictLeftDimCount+1)*InputShapeFirst[InputDim]*RightShapeCount];
+  }
+}
+
+void TensorSpliceInCPP(float* OutputData, float* InputDataFirst, float* InputDataSecond, size_t* InputShapeFirst, size_t* InputShapeSecond, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount)
+{
+  size_t *InputShapeFirstCuda;
+  size_t *InputShapeSecondCuda;
+  cudaMalloc((void**)&InputShapeFirstCuda, InputShapeLen*sizeof(size_t));
+  cudaMalloc((void**)&InputShapeSecondCuda, InputShapeLen*sizeof(size_t));
+  cudaMemcpy(InputShapeFirstCuda,InputShapeFirst,sizeof(size_t)*InputShapeLen,cudaMemcpyHostToDevice);
+  cudaMemcpy(InputShapeSecondCuda,InputShapeSecond,sizeof(size_t)*InputShapeLen,cudaMemcpyHostToDevice);
+  CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
+  TensorSpliceKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, InputDataFirst, InputDataSecond, InputShapeFirstCuda, InputShapeSecondCuda, InputShapeLen, InputDim, OutputShapeCount);
+  cudaFree(InputShapeFirstCuda);
+  cudaFree(InputShapeSecondCuda);
+}
+
 void SumTensorDimInCPP(float* OutputData, float* InputData, size_t *InputShape, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount)
 {
   size_t *InputShapeCuda;

@@ -31,6 +31,7 @@ extern "C" void MatmulInCPP
 );
 extern "C" void TInCPP(float* Output, float* Input, size_t *MatrixShape, size_t ShapeCount);
 extern "C" void SumTensorDimInCPP(float* OutputData, float* InputData, size_t *InputShape, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount);
+extern "C" void TensorSpliceInCPP(float* OutputData, float* InputDataFirst, float* InputDataSecond, size_t* InputShapeFirst, size_t* InputShapeSecond, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount);
 #endif
 
 struct CudaDimVec
@@ -91,4 +92,6 @@ public:
     Tensor* AverageTensorDim(size_t InputDim);
     /**高斯消元.*/
     void GaussianElimination();
+    /**张量按指定维度拼接.*/
+    Tensor* TensorSplice(Tensor* InputTensor, int SpliceDim);
 };

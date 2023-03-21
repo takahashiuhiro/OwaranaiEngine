@@ -523,3 +523,54 @@ void Tensor::GaussianElimination()
         }
     }
 }
+
+Tensor* Tensor::TensorSplice(Tensor* InputTensor, int SpliceDim)
+{
+    std::vector<size_t>ReturnShape;
+    for(int a=0; a<shape.size();a++)
+    {
+        ReturnShape.push_back(shape[a] + InputTensor->shape[a]*(a == SpliceDim));
+    }
+    Tensor* ReturnTensor = new Tensor(ReturnShape, Device, DeviceNum);
+    CudaDimVec ShapeArraySelf = TransformFromStdVector(shape, shape.size());
+    CudaDimVec ShapeArrayFirst = TransformFromStdVector(InputTensor->shape, InputTensor->shape.size());
+    if(Device == "GPU")
+    {
+        #ifdef CUDA_USEFUL
+        TensorSpliceInCPP(ReturnTensor->DataGPU , DataGPU, InputTensor->DataGPU, ShapeArraySelf.Shape, ShapeArrayFirst.Shape, shape.size(), SpliceDim, ReturnTensor->ShapeCount);
+        #endif
+    }
+    else
+    {
+        size_t InputDim = SpliceDim;
+        size_t InputShapeLen = shape.size();
+        size_t* InputShapeFirst = ShapeArraySelf.Shape;
+        size_t* InputShapeSecond = ShapeArrayFirst.Shape;
+        float* OutputData = ReturnTensor->DataCPU;
+        float* InputDataFirst = DataCPU;
+        float* InputDataSecond = InputTensor->DataCPU;
+        for(int Index=0;Index<ReturnTensor->ShapeCount;Index++)
+        {
+            size_t RightShapeCount = 1;
+            //算出指定维度右边的单元大小
+            for(int a=InputDim + 1;a<InputShapeLen;a++)
+            {
+                RightShapeCount*= InputShapeFirst[a];
+            }
+            //算出指定维度的大小
+            size_t InputDimCount = InputShapeFirst[InputDim] + InputShapeSecond[InputDim];
+            size_t LeftDimCount = Index/RightShapeCount;
+            size_t NowDimCount = LeftDimCount%InputDimCount;
+            size_t StrictLeftDimCount = LeftDimCount/InputDimCount;
+            if(NowDimCount < InputShapeFirst[InputDim])
+            {
+                OutputData[Index] = InputDataFirst[Index - StrictLeftDimCount*InputShapeSecond[InputDim]*RightShapeCount];
+            }
+            else
+            {
+                OutputData[Index] = InputDataSecond[Index - (StrictLeftDimCount+1)*InputShapeFirst[InputDim]*RightShapeCount];
+            }
+        }
+    }
+    return ReturnTensor;
+}

@@ -30,6 +30,8 @@ extern "C" void MatmulInCPP
 );
 extern "C" void TInCPP(float* Output, float* Input, size_t *MatrixShape, size_t ShapeCount);
 extern "C" void SumTensorDimInCPP(float* OutputData, float* InputData, size_t *InputShape, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount);
+/*指定张量的任意一个维度进行拼接.*/
+extern "C" void TensorSpliceInCPP(float* OutputData, float* InputDataFirst, float* InputDataSecond, size_t* InputShapeFirst, size_t* InputShapeSecond, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount);
 
 struct CudaPair 
 {
