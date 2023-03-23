@@ -94,4 +94,6 @@ public:
     void GaussianElimination();
     /**张量按指定维度拼接.*/
     Tensor* TensorSplice(Tensor* InputTensor, int SpliceDim);
+    /**返回一个常量单位矩阵.*/
+    static Tensor* GetUnitTensor(std::vector<size_t>ReturnShape, std::string Device, size_t DeviceNum);
 };

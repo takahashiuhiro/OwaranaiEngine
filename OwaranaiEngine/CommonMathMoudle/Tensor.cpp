@@ -574,3 +574,9 @@ Tensor* Tensor::TensorSplice(Tensor* InputTensor, int SpliceDim)
     }
     return ReturnTensor;
 }
+
+Tensor* Tensor::GetUnitTensor(std::vector<size_t>ReturnShape, std::string Device, size_t DeviceNum)
+{
+    Tensor* ReturnTensor = new Tensor(ReturnShape, Device, DeviceNum);
+    //todo
+}
