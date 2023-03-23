@@ -187,6 +187,28 @@ __global__ void TensorSpliceKernel(float* OutputData, float* InputDataFirst, flo
   }
 }
 
+__global__ void GetUnitTensorKernel(float* OutputData, size_t* InputShape, size_t OutputShapeCount, size_t InputShapeLen)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= OutputShapeCount)return;
+  size_t MatrixShapeCount = InputShape[InputShapeLen - 2]*InputShape[InputShapeLen - 1];
+  size_t MatrixIndex = Index%MatrixShapeCount;
+  if(MatrixIndex%InputShape[InputShapeLen - 2] == MatrixIndex/InputShape[InputShapeLen - 2])
+  {
+    OutputData[Index] = 1;
+  }
+}
+
+void GetUnitTensorInCPP(float* OutputData, size_t* InputShape, size_t OutputShapeCount, size_t InputShapeLen)
+{
+  size_t *InputShapeCuda;
+  cudaMalloc((void**)&InputShapeCuda, InputShapeLen*sizeof(size_t));
+  cudaMemcpy(InputShapeCuda,InputShape,sizeof(size_t)*InputShapeLen,cudaMemcpyHostToDevice);
+  CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
+  GetUnitTensorKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, InputShapeCuda, OutputShapeCount, InputShapeLen);
+  cudaFree(InputShapeCuda);
+}
+
 void TensorSpliceInCPP(float* OutputData, float* InputDataFirst, float* InputDataSecond, size_t* InputShapeFirst, size_t* InputShapeSecond, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount)
 {
   size_t *InputShapeFirstCuda;
@@ -341,7 +363,3 @@ void cudaMallocInCPP(float** Input, size_t Size, size_t DeviceNum)
   cudaSetDevice(DeviceNum);
   cudaMalloc(Input, Size*sizeof(float));
 }
-
-
-
-

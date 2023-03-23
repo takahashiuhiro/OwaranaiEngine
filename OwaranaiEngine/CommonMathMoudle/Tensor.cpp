@@ -575,8 +575,33 @@ Tensor* Tensor::TensorSplice(Tensor* InputTensor, int SpliceDim)
     return ReturnTensor;
 }
 
-Tensor* Tensor::GetUnitTensor(std::vector<size_t>ReturnShape, std::string Device, size_t DeviceNum)
+Tensor* Tensor::GetUnitTensor(std::vector<size_t>ReturnShape)
 {
     Tensor* ReturnTensor = new Tensor(ReturnShape, Device, DeviceNum);
-    //todo
+    CudaDimVec ShapeArray = TransformFromStdVector(ReturnShape, ReturnShape.size());
+    ReturnTensor->FillArray(0.);
+    if(Device == "GPU")
+    {
+        #ifdef CUDA_USEFUL
+        GetUnitTensorInCPP(ReturnTensor->DataGPU, ShapeArray.Shape, ReturnTensor->ShapeCount, ReturnTensor->shape.size());
+        #endif
+    }
+    else
+    {
+        size_t* InputShape = ShapeArray.Shape;
+        size_t InputShapeLen =  ReturnTensor->shape.size();
+        size_t OutputShapeCount = ReturnTensor->ShapeCount;
+        float*OutputData =  ReturnTensor->DataCPU;
+        for(int a=0;a<ReturnTensor->ShapeCount;a++)
+        {
+            size_t Index = a;
+            size_t MatrixShapeCount = InputShape[InputShapeLen - 2]*InputShape[InputShapeLen - 1];
+            size_t MatrixIndex = Index%MatrixShapeCount;
+            if(MatrixIndex%InputShape[InputShapeLen - 2] == MatrixIndex/InputShape[InputShapeLen - 2])
+            {
+              OutputData[Index] = 1;
+            }
+        }
+    }
+    return ReturnTensor;
 }
