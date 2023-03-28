@@ -504,10 +504,7 @@ void Tensor::GaussianElimination()
     if(Device == "GPU")
     {
         #ifdef CUDA_USEFUL
-        //todo
-        ToCPU();
-        GaussianElimination();
-        ToGPU();
+        GaussianEliminationInCPP(DataGPU, BatchSize, shape[shape.size()-2], shape[shape.size()-1]);
         #endif
     }
     else

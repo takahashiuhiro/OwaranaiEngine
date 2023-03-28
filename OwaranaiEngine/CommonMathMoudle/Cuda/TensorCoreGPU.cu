@@ -199,6 +199,116 @@ __global__ void GetUnitTensorKernel(float* OutputData, size_t* InputShape, size_
   }
 }
 
+/*找到主元.*/
+__global__ void GaussianEliminationGetPivotKernel(float* OutputData, size_t BatchSize, size_t Row, size_t Column, size_t* PivotRowNumList, size_t PivotRowNum)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= BatchSize)return;
+  for(int a=PivotRowNum;a<Row;a++)
+  {
+    if(OutputData[Index*Row*Column + a*Column +PivotRowNum])
+    {
+      PivotRowNumList[Index] = a;
+      break;
+    }
+  }
+  __syncthreads();
+}
+
+/*交换行数据.*/
+__global__ void GaussianEliminationSwapRowKernel(float* OutputData, size_t BatchSize, size_t Row, size_t Column, size_t* PivotRowNumList, size_t PivotRowNum)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= BatchSize*Column)return;
+  size_t ThisBatch = Index/Column;
+  size_t ThisColumn = Index%Column;
+  size_t ThisRow = PivotRowNum;
+  size_t SwapRow = PivotRowNumList[ThisBatch];
+  if(SwapRow != ThisRow)
+  {
+    float SwapTMPData = OutputData[ThisBatch*Row*Column+ThisRow*Column + ThisColumn];
+    OutputData[ThisBatch*Row*Column+ThisRow*Column + ThisColumn] = OutputData[ThisBatch*Row*Column + SwapRow*Column + ThisColumn];
+    OutputData[ThisBatch*Row*Column + SwapRow*Column + ThisColumn] = SwapTMPData;
+  }
+  __syncthreads();
+}
+
+//行除以主元的值
+__global__ void GaussianEliminationNormKernel(float* OutputData, size_t BatchSize, size_t Row, size_t Column, size_t PivotRowNum)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= BatchSize*Column)return;
+  size_t ThisBatch = Index/Column;
+  size_t ThisColumn = Index%Column;
+  size_t ThisRow = PivotRowNum;
+  if(ThisColumn!=ThisRow)
+  {
+    OutputData[ThisBatch*Row*Column+ThisRow*Column + ThisColumn]/=OutputData[ThisBatch*Row*Column+ThisRow*Column + ThisRow];
+  }
+  __syncthreads();
+}
+//主元除以主元的值
+__global__ void GaussianEliminationPivotNormKernel(float* OutputData, size_t BatchSize, size_t Row, size_t Column, size_t PivotRowNum)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= BatchSize)return;
+  size_t ThisBatch = Index;
+  size_t ThisColumn = PivotRowNum;
+  size_t ThisRow = PivotRowNum;
+  OutputData[ThisBatch*Row*Column+ThisRow*Column + ThisColumn] = 1;
+  __syncthreads();
+}
+
+__global__ void GaussianEliminationMinusPivotRowKernel(float* OutputData, size_t BatchSize, size_t Row, size_t Column, size_t PivotRowNum)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= BatchSize*Row*Column)return;
+  size_t ThisBatch = Index/(Row*Column);
+  size_t ThisRow = (Index%(Row*Column)) / Column;
+  size_t ThisColumn = Index%Column;
+  if(ThisRow != PivotRowNum)
+  {
+    if(ThisColumn != PivotRowNum)
+    {
+      OutputData[Index] -= OutputData[ThisBatch*Row*Column + ThisRow*Column + PivotRowNum]*OutputData[ThisBatch*Row*Column + PivotRowNum*Column + ThisColumn];
+    }
+  }
+  __syncthreads();
+}
+
+__global__ void GaussianEliminationPivotMinusPivotRowKernel(float* OutputData, size_t BatchSize, size_t Row, size_t Column, size_t PivotRowNum)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= BatchSize*Row)return;
+  size_t ThisBatch = Index/Row;
+  size_t ThisColumn = PivotRowNum;
+  size_t ThisRow = Index%Row;
+  if(ThisRow!=ThisColumn)
+  {
+    OutputData[ThisBatch*Row*Column+ThisRow*Column + ThisColumn] = 0;
+  }
+  __syncthreads();
+}
+
+void GaussianEliminationInCPP(float* OutputData, size_t BatchSize, size_t Row, size_t Column)
+{
+  CudaPair CudaPairInputRow = GetCudaPair(BatchSize*Column);
+  CudaPair CudaPairInputBatch = GetCudaPair(BatchSize);
+  CudaPair CudaPairInputAllData = GetCudaPair(BatchSize*Column*Row);
+  CudaPair CudaPairInputColumn = GetCudaPair(BatchSize*Row);
+  size_t* PivotRowNumList;
+  cudaMalloc((void**)&PivotRowNumList, BatchSize*sizeof(size_t));
+  for(int a=0;a<Row;a++)
+  {
+    GaussianEliminationGetPivotKernel<<<CudaPairInputBatch.block, CudaPairInputBatch.grid>>>(OutputData, BatchSize, Row, Column, PivotRowNumList, a);
+    GaussianEliminationSwapRowKernel<<<CudaPairInputRow.block, CudaPairInputRow.grid>>>(OutputData,BatchSize, Row, Column, PivotRowNumList, a);
+    GaussianEliminationNormKernel<<<CudaPairInputRow.block, CudaPairInputRow.grid>>>(OutputData,BatchSize, Row, Column,a);
+    GaussianEliminationPivotNormKernel<<<CudaPairInputBatch.block, CudaPairInputBatch.grid>>>(OutputData,BatchSize, Row, Column,a);
+    GaussianEliminationMinusPivotRowKernel<<<CudaPairInputAllData.block, CudaPairInputAllData.grid>>>(OutputData,BatchSize, Row, Column,a);
+    GaussianEliminationPivotMinusPivotRowKernel<<<CudaPairInputColumn.block, CudaPairInputColumn.grid>>>(OutputData,BatchSize, Row, Column,a);
+  }
+}
+
 void GetUnitTensorInCPP(float* OutputData, size_t* InputShape, size_t OutputShapeCount, size_t InputShapeLen)
 {
   size_t *InputShapeCuda;

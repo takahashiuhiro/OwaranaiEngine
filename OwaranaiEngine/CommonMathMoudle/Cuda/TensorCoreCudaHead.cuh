@@ -33,9 +33,11 @@ extern "C" void SumTensorDimInCPP(float* OutputData, float* InputData, size_t *I
 /*指定张量的任意一个维度进行拼接.*/
 extern "C" void TensorSpliceInCPP(float* OutputData, float* InputDataFirst, float* InputDataSecond, size_t* InputShapeFirst, size_t* InputShapeSecond, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount);
 extern "C" void GetUnitTensorInCPP(float* OutputData, size_t* InputShape, size_t OutputShapeCount, size_t InputShapeLen);
+extern "C" void GaussianEliminationInCPP(float* OutputData, size_t BatchSize, size_t Row, size_t Column);
 
 struct CudaPair 
 {
+  CudaPair(){};
   CudaPair(dim3 block, dim3 grid)
   {
     this->block = block;
