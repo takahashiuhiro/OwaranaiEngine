@@ -37,7 +37,8 @@ OwaranaiEngine  项目根目录
 ## 使用文档
 
 #### 张量计算
-位置: Tensor.h
+位置: Tensor.h  
+如无标注则该函数同时支持在张量在GPU或CPU上运算
 
 ###### 成员变量
 size_t ShapeCount  Data的长度  
@@ -52,63 +53,63 @@ Tensor(std::vector<size_t>shape)
 Tensor(std::vector<size_t>shape, std::string Device, size_t DeviceNum)  
 使用张量的形态,设备和设备计数来初始化张量
 
-###### 矩阵+标量(CPU+GPU):
+###### 矩阵+标量:
 Tensor* AddScalar(float Scalar)  
 参数输入一个标量的浮点数,返回一个和本身相加的张量  
 
-###### 矩阵+矩阵(CPU+GPU)
+###### 矩阵+矩阵
 Tensor* Add(Tensor* Input)  
 参数输入一个和原本形态相同的矩阵,返回结果矩阵的指针  
 
-###### 矩阵*标量(CPU+GPU)
+###### 矩阵*标量
 Tensor* MulScalar(float Scalar)  
 参数输入一个标量的浮点数,返回一个和本身相乘的张量  
 
-###### 矩阵广播乘(CPU+GPU)
+###### 矩阵广播乘
 Tensor* Matmul(Tensor* Input)  
 参数输入一个矩阵, 如果两个矩阵维度不相同,则缺少的部分由多的补齐,如果相同维度的形态不一,则该维度值形态值为1的那个矩阵复制后与另一个矩阵进行矩阵乘法  
 
-###### 矩阵转置(CPU+GPU)
+###### 矩阵转置
 Tensor* T()  
 返回原矩阵的转置  
 
-###### 矩阵元素乘(CPU+GPU)
+###### 矩阵元素乘
 Tensor* EleMul(Tensor* Input)  
 对输入矩阵进行元素乘后返回矩阵的指针  
 
-###### 按维度求平均值(CPU+GPU)
+###### 按维度求平均值
 Tensor* AverageTensorDim(size_t InputDim)  
 指定一个维度将该维度所有的值取平均,其他维度不变,返回矩阵  
 
-###### 按维度求和(CPU+GPU)
+###### 按维度求和
 Tensor* SumTensorDim(size_t InputDim)  
 指定一个维度将该维度所有的值求和,其他维度不变,返回矩阵  
 
-###### 取值(CPU+GPU)
+###### 取值
 float GetV(std::vector<size_t> FindIndex)  
 按照输入维度取值(GPU的情况下速度非常慢,仅供debug使用)  
 
-###### 赋值(CPU+GPU)
+###### 赋值
 void SetV(std::vector<size_t> FindIndex, float Value)  
 按照输入维度赋值(GPU的情况下速度非常慢,仅供debug使用)  
 
-###### 填充矩阵(CPU+GPU)
+###### 填充矩阵
 void FillArray(float Scalar)  
 输入一个浮点数将矩阵中所有元素变为这个数  
 
-###### 打印矩阵(CPU+GPU)
+###### 打印矩阵
 void PrintData()  
 把矩阵按照从左到右从高维到低维的顺序打印  
 
-###### 单位矩阵(CPU+GPU)
+###### 单位矩阵
 Tensor* GetUnitTensor(std::vector<size_t>ReturnShape)  
 按照输入维度返回一个单位矩阵  
 
-###### 矩阵拼接(CPU+GPU)
+###### 矩阵拼接
 Tensor* TensorSplice(Tensor* InputTensor, int SpliceDim)  
 输入一个矩阵并指定一个维度,两个矩阵从该维度进行拼接,返回一个新矩阵  
 
-###### 高斯消元(CPU+GPU)
+###### 高斯消元
 void GaussianElimination()  
 对该张量按行进行高斯消元, 需要行数≤列数(虽然等于的时候会消出一个单位矩阵没什么用就是)  
 
