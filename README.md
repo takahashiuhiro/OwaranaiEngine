@@ -38,7 +38,7 @@ OwaranaiEngine  项目根目录
 
 #### 张量计算
 位置: Tensor.h  
-如无标注则该函数同时支持在张量在GPU或CPU上运算
+如无标注则下述函数同时支持在张量在GPU或CPU上运算
 
 ###### 成员变量
 size_t ShapeCount  Data的长度  
@@ -117,3 +117,58 @@ void GaussianElimination()
 void ToGPU()  
 void ToCPU()  
 将该张量的数据从CPU移动到GPU或者从GPU移动到CPU  
+
+#### 计算图
+位置: CGNode.h 
+
+###### 成员变量
+Tensor* NodeContent  该计算节点计算后指向的数据  
+bool NeedGradient  该计算节点是否需要梯度  
+std::vector<CGNode*>InputNode  上游计算节点  
+CGNode* DerivativeNode  该计算节点指向的梯度计算节点  
+BaseOps<CGNode,Tensor>* FunOps  该计算节点使用的算子  
+std::string OpsType  该计算节点使用的算子类型  
+std::map<std::string, bool>NodeType  标记该计算节点的节点类型,例如是否常量,是否冻结等  
+bool BackwardBuildFlag  用于计算图反向过程中的记忆化标记  
+
+###### 构造函数 
+CGNode(){}  
+声明一个计算节点
+CGNode(bool NeedGradient)  
+声明一个计算节点并标注是否需要梯度  
+CGNode(Tensor* NodeContent, bool NeedGradient)  
+声明一个计算节点并表明指向的张量以及是否需要梯度  
+CGNode(std::string OpsType, bool NeedGradient)  
+声明一个计算节点并表明算子类型以及是否需要梯度  
+CGNode(std::string OpsType, bool NeedGradient, Hyperparameter OpsParams)  
+声明一个计算节点并表明算子类型以及是否需要梯度,该计算节点需要输入的参数  
+CGNode(std::vector<CGNode*>InputNode, std::string OpsType, bool NeedGradient)  
+声明一个计算节点并表明构成该计算节点上游节点,算子类型,是否需要梯度  
+CGNode(std::vector<CGNode*>InputNode, std::string OpsType, bool NeedGradient, Hyperparameter OpsParams)  
+声明一个计算节点并表明构成该计算节点上游节点,算子类型,是否需要梯度,该计算节点需要输入的参数  
+
+###### 设置算子
+void SetOps(std::string OpsType)  
+void SetOps(std::string OpsType, Hyperparameter OpsParams)  
+输入算子类型,如果需要额外参数则需要输入第二个参数  
+
+###### 计算前向
+void Forward()  
+通过该节点调用上游计算节点dfs式的得到结果,并保存到NodeContent中  
+
+###### 反向过程
+void BackwardBuild(bool IsOutput)  
+通过该节点执行反向后会通过dfs计算上游计算节点,通过每个节点对应的算子执行反向构建, 该节点需要标记是否是输出节点以和上游节点做区分  
+void Backward(Tensor* Loss)  
+对该节点执行BackwardBuild并输入loss, 如果需要求出计算图中某个链的导数只需要对该链的起点的梯度节点求前向  
+
+###### 数据清理
+void ClearDataContent(std::vector<std::string>NodeTypeList, bool IsInclude)  
+对该节点进行数据清理, 如果是True的话那就删除包含NodeTypeList内标签节点的content，False的话删除[不]包含的  
+void ClearDataDFS(std::vector<std::string>NodeTypeList, bool IsInclude, std::map<CGNode*, bool>*FlagMap)
+以该节点为起点对上游计算节点进行数据清理  
+void ClearGradient(std::vector<CGNode*>InputNodeList)  
+以该节点为起点对上游计算节点进行数据清理梯度数据  
+void ClearComputeResult(std::vector<CGNode*>InputNodeList)  
+以该节点为起点对上游计算节点进行数据清理常量和权重参数以外的量  
+
