@@ -36,7 +36,7 @@ OwaranaiEngine  项目根目录
 
 ## 使用文档
 
-#### 张量计算
+### 张量计算
 位置: Tensor.h  
 如无标注则下述函数同时支持在张量在GPU或CPU上运算
 
@@ -118,7 +118,7 @@ void ToGPU()
 void ToCPU()  
 将该张量的数据从CPU移动到GPU或者从GPU移动到CPU  
 
-#### 计算图
+### 计算图
 位置: CGNode.h 
 
 ###### 成员变量
