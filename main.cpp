@@ -7,7 +7,7 @@ int main()
     {
         qee->DataCPU[a] = ew[a];
     }
-    qee->ToGPU();
+    //qee->ToGPU();
     qee->GaussianElimination();
     qee->PrintData();
 }

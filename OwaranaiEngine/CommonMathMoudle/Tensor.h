@@ -98,4 +98,7 @@ public:
     Tensor* TensorSplice(Tensor* InputTensor, int SpliceDim);
     /**返回一个常量单位矩阵.*/
     Tensor* GetUnitTensor(std::vector<size_t>ReturnShape);
+    /**在矩阵中通过两个输入维度扣出新的矩阵.*/
+    Tensor* GetTensorBy2ShapeVector(std::vector<size_t>StartShape, std::vector<size_t>EndShape);
+
 };

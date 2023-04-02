@@ -34,16 +34,24 @@ void MatrixGaussianElimination(float* InputMatrix, int Row, int Column)
             InputMatrix[a*Column + b] /= InputMatrix[a*Column + a];
         }
         InputMatrix[a*Column+a] = 1.;
+        #ifdef THREAD_USEFUL
         //后面该多线程减了
         std::vector<std::thread> ThreadList;
+        #endif
         for(int b=0;b<Row;b++)
         {
             if(a == b||!InputMatrix[b*Column+a])continue;
+            #ifdef THREAD_USEFUL
             ThreadList.push_back(std::move(std::thread(AddVectorToVector, InputMatrix+a*Column, InputMatrix+b*Column, -1*InputMatrix[b*Column+a], Column)));
+            #else
+            AddVectorToVector(InputMatrix+a*Column, InputMatrix+b*Column, -1*InputMatrix[b*Column+a], Column);
+            #endif
         }
+        #ifdef THREAD_USEFUL
         for(int b=0;b<ThreadList.size();b++)
         {
             ThreadList[b].join();
         }
+        #endif
     }
 }

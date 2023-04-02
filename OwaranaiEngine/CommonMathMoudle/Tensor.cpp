@@ -602,3 +602,8 @@ Tensor* Tensor::GetUnitTensor(std::vector<size_t>ReturnShape)
     }
     return ReturnTensor;
 }
+
+Tensor* Tensor::GetTensorBy2ShapeVector(std::vector<size_t>StartShape, std::vector<size_t>EndShape)
+{
+    
+}
