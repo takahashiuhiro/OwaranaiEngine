@@ -509,15 +509,23 @@ void Tensor::GaussianElimination()
     }
     else
     {
+        #ifdef THREAD_USEFUL
         std::vector<std::thread>ThreadList;
+        #endif
         for(int a=0;a<BatchSize;a++)
         {
+            #ifdef THREAD_USEFUL
             ThreadList.push_back(std::move(std::thread(MatrixGaussianElimination,DataCPU+a*shape[shape.size()-2]*shape[shape.size()-1],shape[shape.size()-2], shape[shape.size()-1])));
+            #else
+            MatrixGaussianElimination(DataCPU+a*shape[shape.size()-2]*shape[shape.size()-1],shape[shape.size()-2], shape[shape.size()-1]);
+            #endif
         }
+        #ifdef THREAD_USEFUL
         for(int a=0;a<ThreadList.size();a++)
         {
             ThreadList[a].join();
         }
+        #endif
     }
 }
 
