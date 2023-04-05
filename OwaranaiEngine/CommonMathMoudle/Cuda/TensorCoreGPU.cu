@@ -290,6 +290,52 @@ __global__ void GaussianEliminationPivotMinusPivotRowKernel(float* OutputData, s
   __syncthreads();
 }
 
+__global__ void GetTensorBy2ShapeVectorKernel(float* OutputData, float* InputData, size_t* InputShape,size_t* OutputShape,size_t* StartShape, size_t* EndShape, size_t ShapeLen, size_t OutputShapeCount)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= OutputShapeCount)return;
+  size_t OutputShapeIndex[10];
+  size_t PreCount = Index;
+  size_t InputIndex = 0;
+  size_t InputIndexNowDim = 1;
+  for(int a= ShapeLen -1;a>=0;a--)
+  {
+      OutputShapeIndex[a] =PreCount%OutputShape[a];
+      OutputShapeIndex[a] += StartShape[a];
+      InputIndex += OutputShapeIndex[a]*InputIndexNowDim;
+      InputIndexNowDim*= InputShape[a];
+      PreCount/=OutputShape[a];
+  }
+  OutputData[Index] = InputData[InputIndex];
+}
+
+void GetTensorBy2ShapeVectorInCPP(float* OutputData, float* InputData, size_t* InputShape,size_t* OutputShape,size_t* StartShape, size_t* EndShape, size_t ShapeLen)
+{
+  size_t *InputShapeCuda;
+  size_t *OutputShapeCuda;
+  size_t *StartShapeCuda;
+  size_t *EndShapeCuda;
+  cudaMalloc((void**)&InputShapeCuda, ShapeLen*sizeof(size_t));
+  cudaMalloc((void**)&OutputShapeCuda, ShapeLen*sizeof(size_t));
+  cudaMalloc((void**)&StartShapeCuda, ShapeLen*sizeof(size_t));
+  cudaMalloc((void**)&EndShapeCuda, ShapeLen*sizeof(size_t));
+  cudaMemcpy(InputShapeCuda,InputShape,sizeof(size_t)*ShapeLen,cudaMemcpyHostToDevice);
+  cudaMemcpy(OutputShapeCuda,OutputShape,sizeof(size_t)*ShapeLen,cudaMemcpyHostToDevice);
+  cudaMemcpy(StartShapeCuda,StartShape,sizeof(size_t)*ShapeLen,cudaMemcpyHostToDevice);
+  cudaMemcpy(EndShapeCuda,EndShape,sizeof(size_t)*ShapeLen,cudaMemcpyHostToDevice);
+  size_t OutputShapeCount = 1;
+  for(int a=0;a<ShapeLen;a++)
+  {
+    OutputShapeCount*= OutputShape[a];
+  }
+  CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
+  GetTensorBy2ShapeVectorKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, InputData, InputShapeCuda,OutputShapeCuda,StartShapeCuda,EndShapeCuda,ShapeLen,OutputShapeCount);
+  cudaFree(InputShapeCuda);
+  cudaFree(OutputShapeCuda);
+  cudaFree(StartShapeCuda);
+  cudaFree(EndShapeCuda);
+}
+
 void GaussianEliminationInCPP(float* OutputData, size_t BatchSize, size_t Row, size_t Column)
 {
   CudaPair CudaPairInputRow = GetCudaPair(BatchSize*Column);

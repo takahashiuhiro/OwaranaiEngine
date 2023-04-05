@@ -611,7 +611,50 @@ Tensor* Tensor::GetUnitTensor(std::vector<size_t>ReturnShape)
     return ReturnTensor;
 }
 
-Tensor* Tensor::GetTensorBy2ShapeVector(std::vector<size_t>StartShape, std::vector<size_t>EndShape)
+Tensor* Tensor::GetTensorBy2ShapeVector(std::vector<size_t>StartShapeVector, std::vector<size_t>EndShapeVector)
 {
-    
+    std::vector<size_t>ReturnTensorShape;
+    for(int a=0;a<StartShapeVector.size();a++)
+    {
+        ReturnTensorShape.push_back(EndShapeVector[a] - StartShapeVector[a] + 1);
+    }
+    Tensor* ReturnTensor = new Tensor(ReturnTensorShape,Device, DeviceNum);
+    CudaDimVec StartShapeArray = TransformFromStdVector(StartShapeVector, StartShapeVector.size());
+    CudaDimVec EndShapeArray = TransformFromStdVector(EndShapeVector, EndShapeVector.size());
+    CudaDimVec InputShapeArray = TransformFromStdVector(shape, shape.size());
+    CudaDimVec OutputShapeArray = TransformFromStdVector(ReturnTensorShape, ReturnTensorShape.size());
+    size_t* InputShape = InputShapeArray.Shape;
+    size_t* OutputShape = OutputShapeArray.Shape;
+    size_t* StartShape = StartShapeArray.Shape;
+    size_t* EndShape = EndShapeArray.Shape;
+    size_t ShapeLen = shape.size();
+
+    if(Device == "GPU")
+    {
+        #ifdef CUDA_USEFUL
+        GetTensorBy2ShapeVectorInCPP(ReturnTensor->DataGPU, DataGPU, InputShape,OutputShape,StartShape, EndShape, ShapeLen);
+        #endif
+    }
+    else
+    {
+        float* OutputData = ReturnTensor->DataCPU;
+        float* InputData = DataCPU;
+        for(int Index = 0;Index < ReturnTensor->ShapeCount;Index++)
+        {
+            size_t OutputShapeIndex[10];
+            size_t PreCount = Index;
+            size_t InputIndex = 0;
+            size_t InputIndexNowDim = 1;
+            for(int a= ShapeLen -1;a>=0;a--)
+            {
+                OutputShapeIndex[a] =PreCount%OutputShape[a];
+                OutputShapeIndex[a] += StartShape[a];
+                InputIndex += OutputShapeIndex[a]*InputIndexNowDim;
+                InputIndexNowDim*= InputShape[a];
+                PreCount/=OutputShape[a];
+            }
+            OutputData[Index] = InputData[InputIndex];
+        }
+    }
+    return ReturnTensor;
 }

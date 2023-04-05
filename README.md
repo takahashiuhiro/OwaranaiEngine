@@ -53,17 +53,15 @@ Tensor(std::vector<size_t>shape)
 Tensor(std::vector<size_t>shape, std::string Device, size_t DeviceNum)  
 使用张量的形态,设备和设备计数来初始化张量
 
-###### 矩阵+标量:
+###### 矩阵元素运算: 
 Tensor* AddScalar(float Scalar)  
-参数输入一个标量的浮点数,返回一个和本身相加的张量  
-
-###### 矩阵+矩阵
+矩阵+标量, 参数输入一个标量的浮点数,返回一个和本身相加的张量  
 Tensor* Add(Tensor* Input)  
-参数输入一个和原本形态相同的矩阵,返回结果矩阵的指针  
-
-###### 矩阵*标量
+矩阵+矩阵, 参数输入一个和原本形态相同的矩阵,返回结果矩阵的指针  
 Tensor* MulScalar(float Scalar)  
-参数输入一个标量的浮点数,返回一个和本身相乘的张量  
+矩阵*标量, 参数输入一个标量的浮点数,返回一个和本身相乘的张量  
+Tensor* EleMul(Tensor* Input)  
+矩阵元素乘, 对输入矩阵进行元素乘后返回矩阵的指针  
 
 ###### 矩阵广播乘
 Tensor* Matmul(Tensor* Input)  
@@ -71,11 +69,7 @@ Tensor* Matmul(Tensor* Input)
 
 ###### 矩阵转置
 Tensor* T()  
-返回原矩阵的转置  
-
-###### 矩阵元素乘
-Tensor* EleMul(Tensor* Input)  
-对输入矩阵进行元素乘后返回矩阵的指针  
+返回原矩阵的转置   
 
 ###### 按维度求平均值
 Tensor* AverageTensorDim(size_t InputDim)  
@@ -85,13 +79,11 @@ Tensor* AverageTensorDim(size_t InputDim)
 Tensor* SumTensorDim(size_t InputDim)  
 指定一个维度将该维度所有的值求和,其他维度不变,返回矩阵  
 
-###### 取值
+###### 张量内单值操作
 float GetV(std::vector<size_t> FindIndex)  
-按照输入维度取值(GPU的情况下速度非常慢,仅供debug使用)  
-
-###### 赋值
+取值, 按照输入维度取值(GPU的情况下速度非常慢,仅供debug使用)  
 void SetV(std::vector<size_t> FindIndex, float Value)  
-按照输入维度赋值(GPU的情况下速度非常慢,仅供debug使用)  
+赋值, 按照输入维度赋值(GPU的情况下速度非常慢,仅供debug使用)  
 
 ###### 填充矩阵
 void FillArray(float Scalar)  
@@ -117,6 +109,10 @@ void GaussianElimination()
 void ToGPU()  
 void ToCPU()  
 将该张量的数据从CPU移动到GPU或者从GPU移动到CPU  
+
+###### 截取矩阵
+Tensor* GetTensorBy2ShapeVector(std::vector<size_t>StartShape, std::vector<size_t>EndShape)
+输入一个起点的索引和一个终点的索引，从中间抠出来对应的张量
 
 ### 计算图
 位置: CGNode.h 
