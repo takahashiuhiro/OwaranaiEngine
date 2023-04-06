@@ -114,6 +114,10 @@ void ToCPU()
 Tensor* GetTensorBy2ShapeVector(std::vector<size_t>StartShape, std::vector<size_t>EndShape)
 输入一个起点的索引和一个终点的索引，从中间抠出来对应的张量
 
+###### 矩阵求逆
+Tensor* Inverse()
+返回该矩阵的逆，本质上是通过组合单位矩阵和原矩阵通过高斯消元后进行对应维度的截取得到的
+
 ### 计算图
 位置: CGNode.h 
 
