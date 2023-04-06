@@ -658,3 +658,24 @@ Tensor* Tensor::GetTensorBy2ShapeVector(std::vector<size_t>StartShapeVector, std
     }
     return ReturnTensor;
 }
+
+Tensor* Tensor::Inverse()
+{
+    Tensor* ReturnUnit = GetUnitTensor(shape);
+    Tensor* SpliceTensor = TensorSplice(ReturnUnit, shape.size() - 1);
+    SpliceTensor->GaussianElimination();
+    std::vector<size_t>StartShape, EndShape;
+    for(int a=0;a<shape.size();a++)
+    {
+        EndShape.push_back(SpliceTensor->shape[a] - 1);
+        if(a<shape.size()-1)
+        {
+            StartShape.push_back(0);
+        }
+        else
+        {
+            StartShape.push_back(SpliceTensor->shape[a]/2);
+        }
+    }
+    return SpliceTensor->GetTensorBy2ShapeVector(StartShape, EndShape);
+}

@@ -101,5 +101,6 @@ public:
     Tensor* GetUnitTensor(std::vector<size_t>ReturnShape);
     /**在矩阵中通过两个输入维度扣出新的矩阵.*/
     Tensor* GetTensorBy2ShapeVector(std::vector<size_t>StartShape, std::vector<size_t>EndShape);
-
+    /**矩阵求逆.*/
+    Tensor* Inverse();
 };
