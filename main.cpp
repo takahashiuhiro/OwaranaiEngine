@@ -1,13 +1,11 @@
 #include "OwaranaiEngine/OwaranaiEngineInclude.h"
 int main()
 { 
-    Tensor* qee = new Tensor(std::vector<size_t>{2,3,3});
-    float* ew = new float[18]{1,22,3,4,5,6,7,88888,9,11,12,13,10,20,30,40,500,60};
-    for(int a=0;a<18;a++)
-    {
-        qee->DataCPU[a] = ew[a];
-    }
-    qee->Inverse()->Matmul(qee)->PrintData();
-    qee->ToGPU();
-    qee->Inverse()->Matmul(qee)->PrintData();
+    Segment t = Segment(Vector(0,0), Vector(0,2));
+    Segment y = Segment(Vector(-1,1), Vector(1,1));
+    Vector res;
+    std::cout<<t.SegmentCross2D(y,res)<<std::endl;
+    res.PrintData();
+    std::cout<<BinaryExp<long long >(2.999,10)<<std::endl;
 }
+
