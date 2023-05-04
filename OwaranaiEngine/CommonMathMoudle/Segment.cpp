@@ -53,9 +53,8 @@ bool Segment::SegmentCross2D(Segment& Input, Vector& ResultPosition)
             StToSt = First.StartPoint - Input.StartPoint;
             StToEd = First.EndPoint - Input.StartPoint;
         }
-        if(ProtoSegment.CrossProduct(StToSt).Z * ProtoSegment.CrossProduct(StToEd).Z > 0)
+        if(ProtoSegment.CrossProduct(StToSt).Z() * ProtoSegment.CrossProduct(StToEd).Z() > 0)
         {
-            std::cout<<"asdjskadsd"<<std::endl;
             return 0;
         }
     }

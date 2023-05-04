@@ -1,6 +1,7 @@
 #pragma once
 #include "StdInclude.h"
-#include "MoudleInclude.h"
+//#include "MoudleInclude.h"
+#include "MathHelpers.h"
 
 #ifdef CUDA_USEFUL
 extern "C" void cudaMallocInCPP(float** Input, size_t Size, size_t DeviceNum);

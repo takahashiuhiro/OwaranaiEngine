@@ -6,6 +6,5 @@ int main()
     Vector res;
     std::cout<<t.SegmentCross2D(y,res)<<std::endl;
     res.PrintData();
-    std::cout<<BinaryExp<long long >(2.999,10)<<std::endl;
 }
 
