@@ -1,6 +1,5 @@
 #pragma once
 #include "StdInclude.h"
-//#include "MoudleInclude.h"
 #include "MathHelpers.h"
 
 #ifdef CUDA_USEFUL
@@ -49,6 +48,7 @@ public:
     Tensor(){}
     Tensor(std::vector<size_t>shape);
     Tensor(std::vector<size_t>shape, std::string Device, size_t DeviceNum);
+    ~Tensor(){}
 
     /**shape of the tensor*/
     std::vector<size_t>shape;

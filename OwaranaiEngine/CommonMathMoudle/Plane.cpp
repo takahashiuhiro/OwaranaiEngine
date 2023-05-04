@@ -50,5 +50,18 @@ bool Plane::PlaneCross(Plane& First, Line& ResultLine)
         return 0;
     }
     Vector LineNormalVector = NormalVector.CrossProduct(First.NormalVector).DirectionVector();
-    //todo
+    
+    int ZeroDimCount = 0;
+    for(int a=0;a<LineNormalVector.ShapeCount;a++)
+    {
+        ZeroDimCount += (LineNormalVector.X() != 0);
+    }
+    if(!ZeroDimCount)
+    {
+        return 0;
+    }
+    if(ZeroDimCount == 1)
+    {
+
+    }
 }
