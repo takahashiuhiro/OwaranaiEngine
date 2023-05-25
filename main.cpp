@@ -1,10 +1,11 @@
 #include "OwaranaiEngine/OwaranaiEngineInclude.h"
 int main()
 { 
-    Segment t = Segment(Vector(0,0), Vector(0,2));
-    Segment y = Segment(std::move(Vector(-1,1)), std::move(Vector(1,1)));
-    Vector res;
-    std::cout<<t.SegmentCross2D(y,res)<<std::endl;
-    res.PrintData();
+    Plane a = Plane(Vector(0,1,0), Vector(-0.5,0,1));
+    Plane b = Plane(Vector(0,1,0), Vector(0.5,0,1));
+    Line res;
+    std::cout<<a.PlaneCross(b, res)<<std::endl;
+    res.AnchorPosition.PrintData();
+    res.DirctionVector.PrintData();
 }
 

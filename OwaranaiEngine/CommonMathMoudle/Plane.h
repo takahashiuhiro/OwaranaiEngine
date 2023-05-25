@@ -6,7 +6,7 @@ struct Plane
 {
 public:
     Plane(){}
-    /**通过铆钉点和法线方向定义平面，求出一组可用的正交基.*/
+    /**通过锚定点和法线方向定义平面，求出一组可用的正交基.*/
     Plane(Vector AnchorPosition, Vector NormalVector);
 
     /**

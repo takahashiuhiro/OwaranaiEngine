@@ -49,19 +49,28 @@ bool Plane::PlaneCross(Plane& First, Line& ResultLine)
     {
         return 0;
     }
+    //通过法向量叉乘得到交线的方向
     Vector LineNormalVector = NormalVector.CrossProduct(First.NormalVector).DirectionVector();
-    
-    int ZeroDimCount = 0;
-    for(int a=0;a<LineNormalVector.ShapeCount;a++)
+    ResultLine.DirctionVector = LineNormalVector;
+    //把First平面的锚点映射到this平面上
+    Vector FirstAnchorMapToThis = VectorProjectionToPlane(First.AnchorPosition);
+    Vector ConnectVector = FirstAnchorMapToThis - First.AnchorPosition;
+    //如果映射的点和锚点零距离，那说明这就是交线的锚点。
+    if(ConnectVector.Length() < 1e-8)
     {
-        ZeroDimCount += (LineNormalVector.X() != 0);
+        ResultLine.AnchorPosition = FirstAnchorMapToThis;
+        return 1;
     }
-    if(!ZeroDimCount)
+    //用连接的向量叉乘交线的方向向量得到映射点指向交线的方向...也可能是反方向
+    Vector MapPointToLine = ConnectVector.CrossProduct(LineNormalVector).DirectionVector();
+    //计算映射点到交线的距离
+    double MapPointToLineLen = abs(ConnectVector.Length()/std::tan(std::acos(NormalVector*First.NormalVector/(NormalVector.Length()*First.NormalVector.Length()))));
+    Vector TryPoint = FirstAnchorMapToThis - MapPointToLine*MapPointToLineLen;
+    if(First.VectorProjectionToPlane(TryPoint).Length() < 1e-8)
     {
-        return 0;
+        ResultLine.AnchorPosition = TryPoint;
+        return 1;
     }
-    if(ZeroDimCount == 1)
-    {
-
-    }
+    ResultLine.AnchorPosition = FirstAnchorMapToThis + MapPointToLine*MapPointToLineLen;
+    return 1;
 }
