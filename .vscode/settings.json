@@ -68,6 +68,8 @@
         "sstream": "cpp",
         "stop_token": "cpp",
         "xlocbuf": "cpp",
-        "xlocmes": "cpp"
+        "xlocmes": "cpp",
+        "stack": "cpp",
+        "variant": "cpp"
     }
 }

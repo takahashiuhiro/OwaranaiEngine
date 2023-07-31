@@ -1,11 +1,30 @@
-#include "OwaranaiEngine/OwaranaiEngineInclude.h"
-int main()
-{ 
-    Plane a = Plane(Vector(0,1,0), Vector(-0.5,0,1));
-    Plane b = Plane(Vector(0,1,0), Vector(0.5,0,1));
-    Line res;
-    std::cout<<a.PlaneCross(b, res)<<std::endl;
-    res.AnchorPosition.PrintData();
-    res.DirctionVector.PrintData();
-}
+//#include"Code/CommonDataStructure/BaseGraph.h"
+//#include"Code/CommonDataStructure/Dict.h"
+#include <memory>
+#include "Code/CommonMathMoudle/Tensor.h"
+#include"Code/AutomaticDifferentiation/ComputationalGraph.h"
 
+int main() {
+
+    ComputationalGraph* w = new ComputationalGraph();
+
+    w->RegisterNode("a");
+    w->GetNode("a")->Content = new Tensor(std::vector<size_t>{2,3},1);
+    w->GetNode("a")->Content->FillArray(1.5);
+
+    w->RegisterNode("b");
+    w->GetNode("b")->Content = new Tensor(std::vector<size_t>{2,3},1);
+    w->GetNode("b")->Content->FillArray(1.2);
+
+    w->RegisterNode("c");
+
+
+    w->RegisterOps("c", std::vector<std::string>{"a", "b"}, 2, Dict());
+    //w->Opss["c"].
+
+    w->Opss["c"]->Forward();
+
+    w->GetNode("c")->Content->PrintData();
+
+    return 0;
+}
