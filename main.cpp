@@ -11,10 +11,12 @@ int main() {
     w->RegisterNode("a");
     w->GetNode("a")->Content = new Tensor(std::vector<size_t>{2,3},1);
     w->GetNode("a")->Content->FillArray(1.5);
+    w->GetNode("a")->Content->PrintData();
 
     w->RegisterNode("b");
     w->GetNode("b")->Content = new Tensor(std::vector<size_t>{2,3},1);
     w->GetNode("b")->Content->FillArray(1.2);
+    w->GetNode("b")->Content->PrintData();
 
     w->RegisterNode("c");
 
@@ -25,6 +27,7 @@ int main() {
     w->Opss["c"]->Forward();
 
     w->GetNode("c")->Content->PrintData();
+    
 
     return 0;
 }

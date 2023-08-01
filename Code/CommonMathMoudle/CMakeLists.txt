@@ -5,12 +5,10 @@ find_package(CUDA)
 
 if(CUDA_FOUND)
     add_subdirectory(cuda)
-    file(GLOB_RECURSE CURRENT_HEADERS  *.h *.hpp *.cuh)
-    file(GLOB CURRENT_SOURCES  *.cpp *.cu)
-else()
-    file(GLOB_RECURSE CURRENT_HEADERS  *.h)
-    file(GLOB CURRENT_SOURCES  *.cpp)
 endif()
+
+file(GLOB CURRENT_HEADERS  *.h)
+file(GLOB CURRENT_SOURCES  *.cpp)
 
 source_group("Include" FILES ${CURRENT_HEADERS}) 
 source_group("Source" FILES ${CURRENT_SOURCES})

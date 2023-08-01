@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.8)
 find_package(CUDA)
 
 file(GLOB_RECURSE CURRENT_HEADERS *.cuh)
-file(GLOB CURRENT_SOURCES *.cu)
+file(GLOB_RECURSE CURRENT_SOURCES *.cu)
 
 source_group("Include" FILES ${CURRENT_HEADERS}) 
 source_group("Source" FILES ${CURRENT_SOURCES}) 

@@ -22,6 +22,7 @@ public:
         std::vector<std::string> &NodeidList = this->CG->GetNode(this->Nodeid)->InputNodeidList;
         Tensor* FirstInputNode = this->CG->GetNode(NodeidList[0])->Content;
         Tensor* NodeRes = new Tensor(FirstInputNode->shape, FirstInputNode->GetDeviceNum());
+        NodeRes->FillArray(0);
         for(size_t a = 0;a<NodeidList.size();a++)
         {
             NodeRes = NodeRes->Add(this->CG->GetNode(NodeidList[a])->Content);
