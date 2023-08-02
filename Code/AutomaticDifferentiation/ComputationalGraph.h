@@ -3,13 +3,13 @@
 #include "../CommonDataStructure/BaseGraph.h"
 #include "ComputationalNode.h"
 #include "../CommonDataStructure/Dict.h"
-#include "Ops/OpsFactory.h"
+#include "Ops/BaseOps.h"
 
 class ComputationalGraph:public BaseGraph
 {
 public:
 
-    using OpsMap = std::map<std::string, std::shared_ptr<BaseOps<ComputationalGraph>>>;
+    using OpsMap = std::map<std::string, std::shared_ptr<BaseOps>>;
 
     OpsMap Opss;
 

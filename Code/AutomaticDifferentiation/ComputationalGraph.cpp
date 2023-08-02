@@ -1,4 +1,6 @@
+
 #include "ComputationalGraph.h"
+#include "Ops/OpsFactory.h"
 
 ComputationalGraph::ComputationalGraph():BaseGraph()
 {
@@ -39,7 +41,7 @@ void ComputationalGraph::RegisterOpsAddEdge(std::string OutputNodeid, std::strin
 
 void ComputationalGraph::RegisterOps(std::string OutputNodeid, std::vector<std::string> InputNodeids, size_t OpsTypeid, Dict OpsParams)
 {
-    Opss[OutputNodeid] = OpsFactory::GetOps<ComputationalGraph>(OpsTypeid, OpsParams, this);
+    Opss[OutputNodeid] = OpsFactory::GetOps(OpsTypeid, OpsParams, this);
     Opss[OutputNodeid]->Nodeid = OutputNodeid;
     for(auto InputNodeid:InputNodeids)
     {
@@ -72,6 +74,9 @@ void ComputationalGraph::BackwardGraphBuild()
 
     for(std::map<std::string, BaseNode*>::iterator it = Nodes.begin();it!=Nodes.end();it++)
     {
+        if(static_cast<ComputationalNode*>(it->second)->Property.Get<bool>("Input") == 0)continue;
+        if(static_cast<ComputationalNode*>(it->second)->Property.Get<bool>("RequireGrad") == 0)continue;
+        if(Opss.find(it->first)==Opss.end())continue;
         Opss[it->first]->Backward();
     }
 

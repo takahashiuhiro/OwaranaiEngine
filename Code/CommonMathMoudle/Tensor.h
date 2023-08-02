@@ -166,7 +166,9 @@ public:
     Tensor* CopyNewEmptyTensor();
 
     void InitTensor(std::vector<size_t>shape, size_t DeviceNum);
-    ~Tensor(){};
+    ~Tensor(){
+        std::cout<<"rrrrr"<<std::endl;
+    };
 
     /**数据管理.*/
     std::shared_ptr<DevicePointerManager> DPMgr = nullptr;

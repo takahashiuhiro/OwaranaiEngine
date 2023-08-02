@@ -2,7 +2,10 @@
 #include "../../CommonMathMoudle/Tensor.h"
 #include "../../CommonDataStructure/Dict.h"
 
-template<typename ComputationalGraph>
+
+class ComputationalGraph;
+
+//template<typename ComputationalGraph>
 class BaseOps
 {
 public:
@@ -20,10 +23,5 @@ public:
     /**初始设置参数权重.*/
     virtual void ParamsDefinition() = 0;
 
-    void CommonInit(size_t OpsTypeName, Dict Params, ComputationalGraph* ParentCG)
-    {
-        this->OpsTypeName = OpsTypeName;
-        this->Params = Params;
-        CG = ParentCG;
-    }
+    void CommonInit(size_t OpsTypeName, Dict Params, ComputationalGraph* ParentCG);
 };
