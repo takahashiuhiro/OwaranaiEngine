@@ -26,4 +26,7 @@ public:
     /**导数节点的id, 空的代表没有导数.*/
     std::string DNodeid = "";
 
+    /**.*/
+    void ClearContent();
+
 };

@@ -26,3 +26,9 @@ void ComputationalNode::InitProperty()
     Property.Set("Input",false);//是否是原始输入图，允许梯度图为原始输入图
     Property.Set("RequireGrad", false);//是否需要梯度
 }
+
+void ComputationalNode::ClearContent()
+{
+    delete Content;
+    Content = nullptr;
+}

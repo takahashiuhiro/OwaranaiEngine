@@ -646,5 +646,8 @@ Tensor* Tensor::Inverse()
             StartShape.push_back(SpliceTensor->shape[a]/2);
         }
     }
-    return SpliceTensor->GetTensorBy2ShapeVector(StartShape, EndShape);
+    Tensor* ReturnTensor = SpliceTensor->GetTensorBy2ShapeVector(StartShape, EndShape);
+    delete ReturnUnit;
+    delete SpliceTensor;
+    return ReturnTensor;
 }

@@ -12,6 +12,7 @@ public:
     using OpsMap = std::map<std::string, std::shared_ptr<BaseOps>>;
 
     OpsMap Opss;
+    std::map<std::string, bool>ComputeFlag;
 
     ComputationalGraph();
     ~ComputationalGraph();
