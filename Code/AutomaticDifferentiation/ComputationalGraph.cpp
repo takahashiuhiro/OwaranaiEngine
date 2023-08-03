@@ -39,6 +39,11 @@ void ComputationalGraph::RegisterOpsAddEdge(std::string OutputNodeid, std::strin
     GetNode(InputNodeid)->OutputNodeidList.push_back(OutputNodeid);
 }
 
+std::string ComputationalGraph::GetDNodeid(std::string id)
+{
+    return id+"_d";
+}
+
 void ComputationalGraph::RegisterOps(std::string OutputNodeid, std::vector<std::string> InputNodeids, size_t OpsTypeid, Dict OpsParams)
 {
     Opss[OutputNodeid] = OpsFactory::GetOps(OpsTypeid, OpsParams, this);

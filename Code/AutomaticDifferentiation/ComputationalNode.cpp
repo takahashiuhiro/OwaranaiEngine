@@ -29,6 +29,21 @@ void ComputationalNode::InitProperty()
 
 void ComputationalNode::ClearContent()
 {
-    delete Content;
+    if(Content!=nullptr)
+    {
+        delete Content;
+    }
     Content = nullptr;
+}
+
+void ComputationalNode::AssignContent(Tensor* InputTensor)
+{
+   ClearContent();
+   Content = InputTensor;
+}
+
+Tensor* ComputationalNode::GetContent()
+{
+    assert((Content!=nullptr) && "Content is nullptr!!!");
+    return Content;
 }

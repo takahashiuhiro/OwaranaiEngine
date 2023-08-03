@@ -39,7 +39,7 @@ public:
     void RegisterDNode(std::string id);
 
     /**对该点返回一个对应的导数节点id，不支持直接注册_d结尾的节点.*/
-    std::string GetDNodeid(std::string id){return id+"_d";}
+    std::string GetDNodeid(std::string id);
 
 
 };

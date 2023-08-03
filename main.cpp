@@ -45,10 +45,9 @@ int main() {
 
 
     w->Opss["b_d"]->Forward();
-    w->GetNode("b_d")->Content->PrintData();
+    w->GetNode("b_d")->GetContent()->PrintData();
     w->Opss["a_d"]->Forward();
-    w->GetNode("a_d")->Content->PrintData();
-
+    w->GetNode("a_d")->GetContent()->PrintData();
 
     return 0;
 }

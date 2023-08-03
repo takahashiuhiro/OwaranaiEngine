@@ -10,16 +10,16 @@ AddOps::AddOps(size_t OpsTypeName, Dict Params, ComputationalGraph* ParentCG)
 void AddOps::Forward()
 {
     std::vector<std::string> &NodeidList = this->CG->GetNode(this->Nodeid)->InputNodeidList;
-    Tensor* FirstInputNode = this->CG->GetNode(NodeidList[0])->Content;
+    Tensor* FirstInputNode = this->CG->GetNode(NodeidList[0])->GetContent();
     Tensor* NodeRes = new Tensor(FirstInputNode->shape, FirstInputNode->GetDeviceNum());
     NodeRes->FillArray(0);
     auto &OutDNodeOpsParamsAddWeight = *(this->Params.template Get<AddWeightTypePtr>("AddWeight"));
     for(size_t a = 0;a<NodeidList.size();a++)
     {
-        std::shared_ptr<Tensor> EachContentMulWeight = std::shared_ptr<Tensor>(this->CG->GetNode(NodeidList[a])->Content->MulScalar(OutDNodeOpsParamsAddWeight[NodeidList[a]]));
+        std::shared_ptr<Tensor> EachContentMulWeight = std::shared_ptr<Tensor>(this->CG->GetNode(NodeidList[a])->GetContent()->MulScalar(OutDNodeOpsParamsAddWeight[NodeidList[a]]));
         NodeRes = NodeRes->Add(EachContentMulWeight.get());
     }
-    this->CG->GetNode(this->Nodeid)->Content = NodeRes;
+    this->CG->GetNode(this->Nodeid)->AssignContent(NodeRes);
 }
 
 void AddOps::Backward()
