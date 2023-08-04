@@ -28,6 +28,10 @@ public:
 
     /**注册点.*/
     void RegisterNode(std::string id);
+    /**注册变量.*/
+    void RegisterVariableNode(std::string Nodeid);
+    /**注册常量.*/
+    void RegisterConstNode(std::string Nodeid);
     /**注册算子.*/
     void RegisterOps(std::string OutputNodeid, std::vector<std::string> InputNodeid, size_t OpsTypeid, Dict OpsParams);
     /**注册算子增边.*/
@@ -44,7 +48,6 @@ public:
     /**DFS执行得到图中的计算张量.*/
     void ForwardDfs(std::string StartNodeid);
     /**对单个节点算子执行前向.*/
-
     void NodeOpsForward(std::string DfsStartNodeid);
 
 };

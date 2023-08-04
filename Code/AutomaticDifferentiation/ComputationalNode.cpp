@@ -42,8 +42,18 @@ void ComputationalNode::AssignContent(Tensor* InputTensor)
    Content = InputTensor;
 }
 
-Tensor* ComputationalNode::GetContent()
+void ComputationalNode::AssertContentNullptr()
 {
     assert((Content!=nullptr) && "Content is nullptr!!!");
+}
+
+Tensor* ComputationalNode::GetContent()
+{
+    AssertContentNullptr();
     return Content;
+}
+
+void ComputationalNode::PrintData()
+{
+    GetContent()->PrintData();
 }

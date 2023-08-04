@@ -46,6 +46,5 @@ void AddOps::Backward()
 
 void AddOps::ParamsDefinition()
 {
-    /**每个输入样本的常数权重.*/
-    this->Params.Set("AddWeight", std::make_shared<AddWeightType>());
+    BaseOps::ParamsDefinition();
 }
