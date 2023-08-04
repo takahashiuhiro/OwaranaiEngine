@@ -15,6 +15,11 @@ Tensor* Tensor::CopyNewEmptyTensor()
     return new Tensor(shape, GetDeviceNum());
 }
 
+Tensor* Tensor::Copy()
+{
+    return this->AddScalar(0);
+}
+
 void Tensor::InitTensor(std::vector<size_t>shape, size_t DeviceNum)
 {
     this->shape = shape;

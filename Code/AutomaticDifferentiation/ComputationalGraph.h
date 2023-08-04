@@ -41,5 +41,10 @@ public:
     /**对该点返回一个对应的导数节点id，不支持直接注册_d结尾的节点.*/
     std::string GetDNodeid(std::string id);
 
+    /**DFS执行得到图中的计算张量.*/
+    void ForwardDfs(std::string StartNodeid);
+    /**对单个节点算子执行前向.*/
+
+    void NodeOpsForward(std::string DfsStartNodeid);
 
 };

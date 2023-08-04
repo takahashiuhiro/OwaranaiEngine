@@ -164,6 +164,7 @@ public:
     Tensor(std::vector<size_t>shape, size_t DeviceNum);
 
     Tensor* CopyNewEmptyTensor();
+    Tensor* Copy();
 
     void InitTensor(std::vector<size_t>shape, size_t DeviceNum);
     ~Tensor(){};

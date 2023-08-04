@@ -58,8 +58,8 @@ void ComputationalGraph::RegisterDNode(std::string Nodeid)
 {
     std::string DNodeid = GetDNodeid(Nodeid);
     RegisterNode(DNodeid);
-    ComputationalNode* CurrentNode = GetNode(Nodeid);
-    CurrentNode->DNodeid = DNodeid;
+    GetNode(DNodeid)->Property.Set("RequireGrad", true);
+    GetNode(Nodeid)->DNodeid = DNodeid;
     RegisterOps(DNodeid, std::vector<std::string>{}, OpsType::Add, Dict());
 }
 
@@ -70,13 +70,16 @@ void ComputationalGraph::BackwardGraphBuild()
      * 3.对于后续求导算子，要打求导标记，应该允许让求导标记抹除和普通见图无疑，以供多次求导
      * 4.抹除后也可以提供一个选项，用来标记是几次求导，是谁导出来的
      * */
-
+    std::vector<std::string>NodeidListFromMap;
     for(std::map<std::string, BaseNode*>::iterator it = Nodes.begin();it!=Nodes.end();it++)
     {
-        if(static_cast<ComputationalNode*>(it->second)->Property.Get<bool>("RequireGrad") == 0)continue;
-        RegisterDNode(it->first);
+        NodeidListFromMap.push_back(it->first);
     }
-
+    for(auto InputNodeidFromMap:NodeidListFromMap)
+    {
+        if(static_cast<ComputationalNode*>(GetNode(InputNodeidFromMap))->Property.Get<bool>("RequireGrad") == 0)continue;
+        RegisterDNode(InputNodeidFromMap);
+    }
     for(std::map<std::string, BaseNode*>::iterator it = Nodes.begin();it!=Nodes.end();it++)
     {
         if(static_cast<ComputationalNode*>(it->second)->Property.Get<bool>("Input") == 0)continue;
@@ -84,7 +87,22 @@ void ComputationalGraph::BackwardGraphBuild()
         if(Opss.find(it->first)==Opss.end())continue;
         Opss[it->first]->Backward();
     }
+}
 
+void ComputationalGraph::NodeOpsForward(std::string Nodeid)
+{
+    if(Opss.find(Nodeid)==Opss.end())return;
+    Opss[Nodeid]->Forward();
+}
 
-
+void ComputationalGraph::ForwardDfs(std::string DfsStartNodeid)
+{
+    if(ComputeFlag.find(DfsStartNodeid) != ComputeFlag.end())return;
+    ComputeFlag[DfsStartNodeid] = true;
+    ComputationalNode* FoundNode = GetNode(DfsStartNodeid);
+    for(int a =0;a<FoundNode->InputNodeidList.size();a++)
+    {
+        ForwardDfs(FoundNode->InputNodeidList[a]);
+    }
+    NodeOpsForward(DfsStartNodeid);
 }

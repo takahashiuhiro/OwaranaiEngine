@@ -4,8 +4,6 @@
 #include "../CommonMathMoudle/Tensor.h"
 #include "../CommonDataStructure/Dict.h"
 
-
-
 class ComputationalNode:public BaseNode
 {
 public:
