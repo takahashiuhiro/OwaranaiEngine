@@ -9,12 +9,12 @@ int main() {
     w->RegisterVariableNode("a");
     w->GetNode("a")->AssignContent(new Tensor(std::vector<size_t>{2,3},1));
     w->GetNode("a")->GetContent()->FillArray(1.5);
-    w->GetNode("a")->PrintData();
+    //->GetNode("a")->PrintData();
     /**声明变量b.*/
     w->RegisterVariableNode("b");
     w->GetNode("b")->AssignContent(new Tensor(std::vector<size_t>{2,3},1));
     w->GetNode("b")->GetContent()->FillArray(1.2);
-    w->GetNode("b")->PrintData();
+    //w->GetNode("b")->PrintData();
     /**声明变量c.*/
     w->RegisterVariableNode("c");
     /**c=4*a+2*b.*/
@@ -24,25 +24,30 @@ int main() {
     w->RegisterVariableNode("d");
     w->GetNode("d")->AssignContent(new Tensor(std::vector<size_t>{2,3},1));
     w->GetNode("d")->GetContent()->FillArray(10);
-    w->GetNode("d")->PrintData();
+    //w->GetNode("d")->PrintData();
     /**声明变量e.*/
     w->RegisterVariableNode("e");
     w->GetNode("e")->AssignContent(new Tensor(std::vector<size_t>{2,3},1));
     w->GetNode("e")->GetContent()->FillArray(1000);
-    w->GetNode("e")->PrintData();
+    //w->GetNode("e")->PrintData();
     /**e=2.8*c+11111*d.*/
     w->RegisterOps("e", std::vector<std::string>{"c", "d"}, OpsType::Add, Dict());
     w->GetCGOps("e")->SetAddWeight({{"c",2.8}, {"d", 11111}});
     /**建立反向图.*/
+    w->PrintGraphAdjacencyList(3);
     w->BackwardGraphBuild();
+    w->PrintGraphAdjacencyList(3);
     /**给输出节点的导数赋值.*/
     w->GetNode("e_d")->AssignContent(new Tensor(std::vector<size_t>{2,3},1));
     w->GetNode("e_d")->GetContent()->FillArray(10);
     /**求a的导数.*/
     w->ForwardDfs("a_d");
-    w->GetNode("a_d")->PrintData();
+    //w->GetNode("a_d")->PrintData();
 
     w->ClearAllData();
-    //w->GetNode("a_d")->PrintData();
+    w->SetAllNodeToInput();
+    w->BackwardGraphBuild();
+    w->PrintGraphAdjacencyList(3);
+
     return 0;
 }

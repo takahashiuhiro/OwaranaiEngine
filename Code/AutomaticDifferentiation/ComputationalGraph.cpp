@@ -99,7 +99,9 @@ void ComputationalGraph::BackwardGraphBuild()
         if(static_cast<ComputationalNode*>(it->second)->Property.Get<bool>("Input") == 0)continue;
         if(static_cast<ComputationalNode*>(it->second)->Property.Get<bool>("RequireGrad") == 0)continue;
         if(!CheckOps(it->first))continue;
+        if(BackwardFlag.find(it->first)!=BackwardFlag.end())continue;
         GetCGOps(it->first)->Backward();
+        BackwardFlag[it->first] = true;
     }
 }
 
@@ -148,4 +150,40 @@ bool ComputationalGraph::HasNode(std::string InputNode)
 bool ComputationalGraph::HasDNode(std::string InputNode)
 {
     return HasNode(GetDNodeid(InputNode));
+}
+
+void ComputationalGraph::SetAllNodeToInput()
+{
+    for(auto &NodePtr:Nodes)
+    {
+        static_cast<ComputationalNode*>(NodePtr.second)->Property.Set("Input", true);
+    }
+}
+
+void ComputationalGraph::PrintGraphAdjacencyList(size_t Mode)
+{
+    std::cout<<"---------------Adjacency List----------------------"<<std::endl;
+    for(auto &NodePtr:Nodes)
+    {
+        std::cout<<"Node Name :"<<NodePtr.first<<std::endl;
+        if(Mode&1)
+        {
+            std::cout<<"Input Node :";
+            for(auto& ItemNode:static_cast<ComputationalNode*>(NodePtr.second)->InputNodeidList)
+            {
+                std::cout<<ItemNode<<" ";
+            }
+            std::cout<<std::endl;
+        }
+        if(Mode&2)
+        {
+            std::cout<<"Output Node :";
+            for(auto& ItemNode:static_cast<ComputationalNode*>(NodePtr.second)->OutputNodeidList)
+            {
+                std::cout<<ItemNode<<" ";
+            }
+            std::cout<<std::endl;
+        }
+        std::cout<<std::endl;
+    }
 }

@@ -12,6 +12,8 @@ public:
 
     OpsMap Opss;
     std::map<std::string, bool>ComputeFlag;
+    /**每个算子的反向建图只会执行一次，永不清空.*/
+    std::map<std::string, bool>BackwardFlag;
 
     ComputationalGraph();
     ~ComputationalGraph();
@@ -51,4 +53,8 @@ public:
     bool HasNode(std::string InputNode);
     /**是否存在导数节点.*/
     bool HasDNode(std::string InputNode);
+    /**将Input属性赋予当前图内所有节点.*/
+    void SetAllNodeToInput();
+    /**打印计算图的邻接表.*/
+    void PrintGraphAdjacencyList(size_t Mode);
 };
