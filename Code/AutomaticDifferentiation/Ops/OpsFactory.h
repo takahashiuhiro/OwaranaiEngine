@@ -2,6 +2,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include "../../CommonDataStructure/Log.h"
 #include "OpsType.h"
 #include "AllOpsTypeHeader.h"
 #include "../../CommonDataStructure/Dict.h"
@@ -13,12 +14,11 @@ public:
 
     static std::shared_ptr<BaseOps> GetOps(size_t OpsTypeid, Dict Params, ComputationalGraph* CG)
     {
-        assert(OpsTypeid != OpsType::Base && "Do Not Set Base Ops");
+        Log::Assert(OpsTypeid != OpsType::Base, std::string("Do Not Set Base Ops, id:"));
         if(OpsTypeid == OpsType::Add)
         {
             return std::make_shared<AddOps>(OpsTypeid, Params, CG);
         }
-
-        assert(0 && "No Ops Be Set");
+        Log::Assert(0, std::string("No Ops Be Set"));
     }
 };

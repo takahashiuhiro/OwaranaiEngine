@@ -1,4 +1,5 @@
 #include "ComputationalNode.h"
+#include "../CommonDataStructure/Log.h"
 
 ComputationalNode::ComputationalNode()
 {
@@ -42,14 +43,9 @@ void ComputationalNode::AssignContent(Tensor* InputTensor)
    Content = InputTensor;
 }
 
-void ComputationalNode::AssertContentNullptr()
-{
-    assert((Content!=nullptr) && "Content is nullptr!!!");
-}
-
 Tensor* ComputationalNode::GetContent()
 {
-    AssertContentNullptr();
+    Log::Assert((Content!=nullptr), std::string("Content is nullptr, Node id:") + id);
     return Content;
 }
 

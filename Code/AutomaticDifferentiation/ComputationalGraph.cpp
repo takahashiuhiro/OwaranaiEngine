@@ -1,4 +1,4 @@
-
+#include "../CommonDataStructure/Log.h"
 #include "ComputationalGraph.h"
 #include "Ops/OpsFactory.h"
 
@@ -42,7 +42,7 @@ void ComputationalGraph::RegisterConstNode(std::string Nodeid)
 
 ComputationalNode* ComputationalGraph::GetNode(std::string Nodeid)
 {
-    assert(Nodes.find(std::string(Nodeid))!=Nodes.end() && "This Graph has not this Nodeid ");
+    Log::Assert(HasNode(Nodeid), std::string("This Graph has not this Nodeid :") + Nodeid);
     return static_cast <ComputationalNode*>(Nodes[std::string(Nodeid)]);
 }
 
@@ -91,6 +91,7 @@ void ComputationalGraph::BackwardGraphBuild()
     for(auto InputNodeidFromMap:NodeidListFromMap)
     {
         if(static_cast<ComputationalNode*>(GetNode(InputNodeidFromMap))->Property.Get<bool>("RequireGrad") == 0)continue;
+        if(HasDNode(InputNodeidFromMap))continue;
         RegisterDNode(InputNodeidFromMap);
     }
     for(std::map<std::string, BaseNode*>::iterator it = Nodes.begin();it!=Nodes.end();it++)
@@ -127,6 +128,24 @@ void ComputationalGraph::ForwardDfs(std::string DfsStartNodeid)
 
 std::shared_ptr<BaseOps> ComputationalGraph::GetCGOps(std::string OpsNodeid)
 {
-    assert(CheckOps(OpsNodeid) && "This Node Has No Ops");
+    Log::Assert(CheckOps(OpsNodeid), std::string("This Node Has No Ops :")+OpsNodeid);
     return Opss[OpsNodeid];
+}
+
+void ComputationalGraph::ClearAllData()
+{
+    for(auto &NodePtr:Nodes)
+    {
+        static_cast<ComputationalNode*>(NodePtr.second)->ClearContent();
+    }
+}
+
+bool ComputationalGraph::HasNode(std::string InputNode)
+{
+    return Nodes.find(std::string(InputNode))!=Nodes.end();
+}
+
+bool ComputationalGraph::HasDNode(std::string InputNode)
+{
+    return HasNode(GetDNodeid(InputNode));
 }

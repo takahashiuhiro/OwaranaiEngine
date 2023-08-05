@@ -1,3 +1,6 @@
+/**
+测试计算图建立，用AddOps测试反向
+.*/
 #include <memory>
 #include "Code/CommonMathMoudle/Tensor.h"
 #include "Code/AutomaticDifferentiation/ComputationalGraph.h"
@@ -41,8 +44,5 @@ int main() {
     /**求a的导数.*/
     w->ForwardDfs("a_d");
     w->GetNode("a_d")->PrintData();
-
-    w->ClearAllData();
-    //w->GetNode("a_d")->PrintData();
     return 0;
 }

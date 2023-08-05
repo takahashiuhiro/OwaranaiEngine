@@ -39,8 +39,3 @@ void AddOps::Backward()
         this->CG->GetCGOps(InputDNodeid)->SetAddWeight({{ThisDNodeid, GetAddWeight(NodeidList[a])}});
     }
 }
-
-void AddOps::ParamsDefinition()
-{
-    BaseOps::ParamsDefinition();
-}

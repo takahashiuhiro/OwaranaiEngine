@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include <cassert>
+#include "../CommonDataStructure/Log.h"
 #include "MathHelpers.h"
 
 #ifdef CUDA_USEFUL
@@ -136,7 +136,7 @@ struct DevicePointerManager
             CudaFlag = 1;
             cudaMallocInCPP(&DataPointers[NewDeviceNum], ShapeCount, DeviceNumToCuda(NewDeviceNum));
             #endif
-            assert(CudaFlag);
+            Log::Assert(CudaFlag, std::string("Use Cuda Branch But..."));
             if(OldDeviceNum !=ImpossibleFrameMaxDeviceNum())
             {
                 #ifdef CUDA_USEFUL
