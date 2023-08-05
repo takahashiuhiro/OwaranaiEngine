@@ -1,7 +1,5 @@
 #pragma once
 #include <iostream>
-#include "BaseOps.h"
-#include "AddOps.h"
 
 struct OpsType
 {

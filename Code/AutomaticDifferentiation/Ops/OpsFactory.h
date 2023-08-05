@@ -1,9 +1,9 @@
-
 #pragma once
 #include <iostream>
 #include <memory>
 #include <string>
 #include "OpsType.h"
+#include "AllOpsTypeHeader.h"
 #include "../../CommonDataStructure/Dict.h"
 
 

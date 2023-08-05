@@ -2,10 +2,7 @@
 #include "../../CommonMathMoudle/Tensor.h"
 #include "../../CommonDataStructure/Dict.h"
 
-
 class ComputationalGraph;
-
-//template<typename ComputationalGraph>
 class BaseOps
 {
 public:
