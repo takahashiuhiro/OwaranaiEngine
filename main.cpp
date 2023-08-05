@@ -19,9 +19,7 @@ int main() {
     w->RegisterVariableNode("c");
     /**c=4*a+2*b.*/
     w->RegisterOps("c", std::vector<std::string>{"a", "b"}, OpsType::Add, Dict());
-    auto &OutDNodeOpsParamsAddWeight = *(w->Opss["c"]->Params.template Get<std::shared_ptr<std::map<std::string, float>>>(std::string("AddWeight")));
-    OutDNodeOpsParamsAddWeight["a"] = 4;
-    OutDNodeOpsParamsAddWeight["b"] = 2;
+    w->GetCGOps("c")->SetAddWeight({{"a",4}, {"b", 2}});
     /**声明变量d.*/
     w->RegisterVariableNode("d");
     w->GetNode("d")->AssignContent(new Tensor(std::vector<size_t>{2,3},1));
@@ -34,9 +32,7 @@ int main() {
     w->GetNode("e")->PrintData();
     /**e=2.8*c+11111*d.*/
     w->RegisterOps("e", std::vector<std::string>{"c", "d"}, OpsType::Add, Dict());
-    auto &OutDNodeOpsParamsAddWeight11 = *(w->Opss["e"]->Params.template Get<std::shared_ptr<std::map<std::string, float>>>(std::string("AddWeight")));
-    OutDNodeOpsParamsAddWeight11["c"] = 2.8;
-    OutDNodeOpsParamsAddWeight11["d"] = 11111;
+    w->GetCGOps("e")->SetAddWeight({{"c",2.8}, {"d", 11111}});
     /**建立反向图.*/
     w->BackwardGraphBuild();
     /**给输出节点的导数赋值.*/

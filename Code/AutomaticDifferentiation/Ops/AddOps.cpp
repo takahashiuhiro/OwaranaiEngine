@@ -14,10 +14,9 @@ void AddOps::Forward()
     Tensor* FirstInputNode = this->CG->GetNode(NodeidList[0])->GetContent();
     Tensor* NodeRes = new Tensor(FirstInputNode->shape, FirstInputNode->GetDeviceNum());
     NodeRes->FillArray(0);
-    auto &OutDNodeOpsParamsAddWeight = *(this->Params.template Get<AddWeightTypePtr>("AddWeight"));
     for(size_t a = 0;a<NodeidList.size();a++)
     {
-        std::shared_ptr<Tensor> EachContentMulWeight = std::shared_ptr<Tensor>(this->CG->GetNode(NodeidList[a])->GetContent()->MulScalar(OutDNodeOpsParamsAddWeight[NodeidList[a]]));
+        std::shared_ptr<Tensor> EachContentMulWeight = std::shared_ptr<Tensor>(this->CG->GetNode(NodeidList[a])->GetContent()->MulScalar(GetAddWeight(NodeidList[a])));
         NodeRes = NodeRes->Add(EachContentMulWeight.get());
     }
     this->CG->GetNode(this->Nodeid)->AssignContent(NodeRes);
@@ -37,10 +36,7 @@ void AddOps::Backward()
         }
         std::string InputDNodeid = this->CG->GetDNodeid(NodeidList[a]);
         this->CG->RegisterOpsAddEdge(InputDNodeid, ThisDNodeid);
-        auto &InputDNodeOpsParams = this->CG->Opss[InputDNodeid]->Params;
-        auto &InputDNodeOpsParamsAddWeight = *(InputDNodeOpsParams.template Get<AddWeightTypePtr>("AddWeight"));
-        auto &OutDNodeOpsParamsAddWeight = *(this->Params.template Get<AddWeightTypePtr>("AddWeight"));
-        InputDNodeOpsParamsAddWeight[ThisDNodeid] = OutDNodeOpsParamsAddWeight[NodeidList[a]];
+        this->CG->GetCGOps(InputDNodeid)->SetAddWeight({{ThisDNodeid, GetAddWeight(NodeidList[a])}});
     }
 }
 

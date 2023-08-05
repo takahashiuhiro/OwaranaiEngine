@@ -49,5 +49,9 @@ public:
     void ForwardDfs(std::string StartNodeid);
     /**对单个节点算子执行前向.*/
     void NodeOpsForward(std::string DfsStartNodeid);
+    /**检查id对应的节点是否存在算子.*/
+    bool CheckOps(std::string CheckNodeid);
+    /**拿到节点id对应的算子，包一个存在检查.*/
+    std::shared_ptr<BaseOps> GetCGOps(std::string OpsNodeid);
 
 };

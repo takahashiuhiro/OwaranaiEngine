@@ -97,15 +97,20 @@ void ComputationalGraph::BackwardGraphBuild()
     {
         if(static_cast<ComputationalNode*>(it->second)->Property.Get<bool>("Input") == 0)continue;
         if(static_cast<ComputationalNode*>(it->second)->Property.Get<bool>("RequireGrad") == 0)continue;
-        if(Opss.find(it->first)==Opss.end())continue;
-        Opss[it->first]->Backward();
+        if(!CheckOps(it->first))continue;
+        GetCGOps(it->first)->Backward();
     }
+}
+
+bool ComputationalGraph::CheckOps(std::string CheckNodeid)
+{
+    return Opss.find(CheckNodeid)!=Opss.end();
 }
 
 void ComputationalGraph::NodeOpsForward(std::string Nodeid)
 {
-    if(Opss.find(Nodeid)==Opss.end())return;
-    Opss[Nodeid]->Forward();
+    if(!CheckOps(Nodeid))return;
+    GetCGOps(Nodeid)->Forward();
 }
 
 void ComputationalGraph::ForwardDfs(std::string DfsStartNodeid)
@@ -118,4 +123,10 @@ void ComputationalGraph::ForwardDfs(std::string DfsStartNodeid)
         ForwardDfs(FoundNode->InputNodeidList[a]);
     }
     NodeOpsForward(DfsStartNodeid);
+}
+
+std::shared_ptr<BaseOps> ComputationalGraph::GetCGOps(std::string OpsNodeid)
+{
+    assert(CheckOps(OpsNodeid) && "This Node Has No Ops");
+    return Opss[OpsNodeid];
 }

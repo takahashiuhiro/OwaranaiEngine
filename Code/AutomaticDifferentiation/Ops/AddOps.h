@@ -8,11 +8,7 @@ class AddOps: public BaseOps//<ComputationalGraph>
 {
 public:
     AddOps(size_t OpsTypeName, Dict Params, ComputationalGraph* ParentCG);
-
     ~AddOps(){};
-
-    using AddWeightType = std::map<std::string, float>;
-    using AddWeightTypePtr = std::shared_ptr<AddWeightType>;
 
     virtual void Forward();
 
