@@ -34,9 +34,9 @@ int main() {
     w->RegisterOps("e", std::vector<std::string>{"c", "d"}, OpsType::Add, Dict());
     w->GetCGOps("e")->SetAddWeight({{"c",2.8}, {"d", 11111}});
     /**建立反向图.*/
-    w->PrintGraphAdjacencyList(3);
-    w->BackwardGraphBuild();
-    w->PrintGraphAdjacencyList(3);
+    w->PrintGraphAdjacencyList(2);
+    w->BackwardMultiBuildGraph(3);
+    w->PrintGraphAdjacencyList(2);
     /**给输出节点的导数赋值.*/
     w->GetNode("e_d")->AssignContent(new Tensor(std::vector<size_t>{2,3},1));
     w->GetNode("e_d")->GetContent()->FillArray(10);
@@ -44,10 +44,6 @@ int main() {
     w->ForwardDfs("a_d");
     //w->GetNode("a_d")->PrintData();
 
-    w->ClearAllData();
-    w->SetAllNodeToInput();
-    w->BackwardGraphBuild();
-    w->PrintGraphAdjacencyList(3);
 
     return 0;
 }

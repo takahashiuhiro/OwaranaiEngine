@@ -57,4 +57,6 @@ public:
     void SetAllNodeToInput();
     /**打印计算图的邻接表.*/
     void PrintGraphAdjacencyList(size_t Mode);
+    /**需要进行求几次导数的建图.*/
+    void BackwardMultiBuildGraph(size_t Times);
 };

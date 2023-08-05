@@ -187,3 +187,12 @@ void ComputationalGraph::PrintGraphAdjacencyList(size_t Mode)
         std::cout<<std::endl;
     }
 }
+
+void ComputationalGraph::BackwardMultiBuildGraph(size_t Times)
+{
+    for(size_t a = 0;a<Times;a++)
+    {
+        SetAllNodeToInput();
+        BackwardGraphBuild();
+    }
+}
