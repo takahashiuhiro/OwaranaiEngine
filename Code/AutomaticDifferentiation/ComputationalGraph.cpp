@@ -111,15 +111,6 @@ void ComputationalGraph::BackwardGraphBuild()
         BackwardFlag[InputNodeidFromMap] = true;
     }
 
-    //for(std::map<std::string, BaseNode*>::iterator it = Nodes.begin();it!=Nodes.end();it++)
-    //{
-    //    if(static_cast<ComputationalNode*>(it->second)->Property.Get<bool>("Input") == 0)continue;
-    //    if(static_cast<ComputationalNode*>(it->second)->Property.Get<bool>("RequireGrad") == 0)continue;
-    //    if(!CheckOps(it->first))continue;
-    //    if(BackwardFlag.find(it->first)!=BackwardFlag.end())continue;
-    //    GetCGOps(it->first)->Backward();
-    //    BackwardFlag[it->first] = true;
-    //}
 }
 
 bool ComputationalGraph::CheckOps(std::string CheckNodeid)
