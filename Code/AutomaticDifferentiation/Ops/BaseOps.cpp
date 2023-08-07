@@ -1,5 +1,6 @@
 #include "BaseOps.h"
 #include "../../CommonDataStructure/Log.h"
+#include "../ComputationalGraph.h"
 
 void BaseOps::CommonInit(size_t OpsTypeName, Dict Params, ComputationalGraph* ParentCG)
 {
@@ -29,3 +30,13 @@ float BaseOps::GetAddWeight(std::string InputNodeid)
     Log::Assert(OutDNodeOpsParamsAddWeight.find(InputNodeid)!=OutDNodeOpsParamsAddWeight.end(), std::string("No Weight id:")+InputNodeid);
     return OutDNodeOpsParamsAddWeight[InputNodeid];
 }
+
+std::vector<std::string> & BaseOps::GetInputNodeList()
+{
+    return this->CG->GetNode(this->Nodeid)->InputNodeidList;
+}
+
+std::vector<std::string> & BaseOps::GetInputNodeList(std::string InputNodeid)
+{
+    return this->CG->GetNode(InputNodeid)->InputNodeidList;
+}   

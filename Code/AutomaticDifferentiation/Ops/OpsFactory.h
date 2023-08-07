@@ -19,6 +19,10 @@ public:
         {
             return std::make_shared<AddOps>(OpsTypeid, Params, CG);
         }
+        if(OpsTypeid == OpsType::EleMul)
+        {
+            return std::make_shared<EleMulOps>(OpsTypeid, Params, CG);
+        }
         Log::Assert(0, std::string("No Ops Be Set"));
     }
 };

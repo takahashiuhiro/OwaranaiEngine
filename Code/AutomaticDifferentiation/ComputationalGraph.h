@@ -39,6 +39,8 @@ public:
     void RegisterDNode(std::string id);
     /**对该点返回一个对应的导数节点id，不支持直接注册_d结尾的节点.*/
     std::string GetDNodeid(std::string id);
+    /**在算子里会出现a->c且a->b的情况,在这种情况下如果c对a求导，会在a_d和c_d之间的反向过程里建立一个新节点，用来表达c_d给a_d的贡献的中间节点.*/
+    std::string GetDPartNodeid(std::string Startid, std::string Endid);
     /**DFS执行得到图中的计算张量.*/
     void ForwardDfs(std::string StartNodeid);
     /**对单个节点算子执行前向.*/
@@ -59,4 +61,6 @@ public:
     void PrintGraphAdjacencyList(size_t Mode);
     /**需要进行求几次导数的建图.*/
     void BackwardMultiBuildGraph(size_t Times);
+    /**以下词条任意为false的将被清理数据.*/
+    void ClearDataPropertyExclude(std::vector<std::string>CheckPropertyList);
 };

@@ -57,6 +57,12 @@ std::string ComputationalGraph::GetDNodeid(std::string id)
     return id+"_d";
 }
 
+std::string ComputationalGraph::GetDPartNodeid(std::string Startid, std::string Endid)
+{
+    /**Start是输入图的前序，输出的名称是导数图的后继.*/
+    return GetDNodeid(Endid) + std::string("->") + GetDNodeid(Startid);
+}
+
 void ComputationalGraph::RegisterOps(std::string OutputNodeid, std::vector<std::string> InputNodeids, size_t OpsTypeid, Dict OpsParams)
 {
     Opss[OutputNodeid] = OpsFactory::GetOps(OpsTypeid, OpsParams, this);
@@ -94,15 +100,26 @@ void ComputationalGraph::BackwardGraphBuild()
         if(HasDNode(InputNodeidFromMap))continue;
         RegisterDNode(InputNodeidFromMap);
     }
-    for(std::map<std::string, BaseNode*>::iterator it = Nodes.begin();it!=Nodes.end();it++)
+
+    for(auto InputNodeidFromMap:NodeidListFromMap)
     {
-        if(static_cast<ComputationalNode*>(it->second)->Property.Get<bool>("Input") == 0)continue;
-        if(static_cast<ComputationalNode*>(it->second)->Property.Get<bool>("RequireGrad") == 0)continue;
-        if(!CheckOps(it->first))continue;
-        if(BackwardFlag.find(it->first)!=BackwardFlag.end())continue;
-        GetCGOps(it->first)->Backward();
-        BackwardFlag[it->first] = true;
+        if(GetNode(InputNodeidFromMap)->Property.Get<bool>("Input") == 0)continue;
+        if(GetNode(InputNodeidFromMap)->Property.Get<bool>("RequireGrad") == 0)continue;
+        if(!CheckOps(InputNodeidFromMap))continue;
+        if(BackwardFlag.find(InputNodeidFromMap)!=BackwardFlag.end())continue;
+        GetCGOps(InputNodeidFromMap)->Backward();
+        BackwardFlag[InputNodeidFromMap] = true;
     }
+
+    //for(std::map<std::string, BaseNode*>::iterator it = Nodes.begin();it!=Nodes.end();it++)
+    //{
+    //    if(static_cast<ComputationalNode*>(it->second)->Property.Get<bool>("Input") == 0)continue;
+    //    if(static_cast<ComputationalNode*>(it->second)->Property.Get<bool>("RequireGrad") == 0)continue;
+    //    if(!CheckOps(it->first))continue;
+    //    if(BackwardFlag.find(it->first)!=BackwardFlag.end())continue;
+    //    GetCGOps(it->first)->Backward();
+    //    BackwardFlag[it->first] = true;
+    //}
 }
 
 bool ComputationalGraph::CheckOps(std::string CheckNodeid)
@@ -136,10 +153,7 @@ std::shared_ptr<BaseOps> ComputationalGraph::GetCGOps(std::string OpsNodeid)
 
 void ComputationalGraph::ClearAllData()
 {
-    for(auto &NodePtr:Nodes)
-    {
-        static_cast<ComputationalNode*>(NodePtr.second)->ClearContent();
-    }
+    ClearDataPropertyExclude({});
 }
 
 bool ComputationalGraph::HasNode(std::string InputNode)
@@ -194,5 +208,25 @@ void ComputationalGraph::BackwardMultiBuildGraph(size_t Times)
     {
         SetAllNodeToInput();
         BackwardGraphBuild();
+    }
+}
+
+void ComputationalGraph::ClearDataPropertyExclude(std::vector<std::string>CheckPropertyList)
+{
+    for(auto &NodePtr:Nodes)
+    {
+        bool ClearFlag = false;
+        for(auto &PropertyName:CheckPropertyList)
+        {
+            if(static_cast<ComputationalNode*>(NodePtr.second)->Property.Get<bool>(PropertyName) == true)
+            {
+                ClearFlag |= true;
+                break;
+            }
+        }
+        if(!ClearFlag)
+        {
+            static_cast<ComputationalNode*>(NodePtr.second)->ClearContent();
+        }
     }
 }

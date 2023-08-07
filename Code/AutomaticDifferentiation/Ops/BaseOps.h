@@ -1,6 +1,7 @@
 #pragma once
 #include "../../CommonMathMoudle/Tensor.h"
 #include "../../CommonDataStructure/Dict.h"
+#include "OpsType.h"
 
 class ComputationalGraph;
 class BaseOps
@@ -27,4 +28,7 @@ public:
     void SetAddWeight(std::map<std::string, float> InputNodeWeight);
     /**获取输入参数的常系数.*/
     float GetAddWeight(std::string InputNodeid);
+    /**获取节点的输入节点列表.*/
+    std::vector<std::string> &GetInputNodeList();
+    std::vector<std::string> &GetInputNodeList(std::string InputNodeid);
 };

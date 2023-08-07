@@ -9,7 +9,7 @@ AddOps::AddOps(size_t OpsTypeName, Dict Params, ComputationalGraph* ParentCG)
 
 void AddOps::Forward()
 {
-    std::vector<std::string> &NodeidList = this->CG->GetNode(this->Nodeid)->InputNodeidList;
+    auto NodeidList = GetInputNodeList();
     if(NodeidList.size()== 0)return;//暂定加算子没有输入直接退出
     Tensor* FirstInputNode = this->CG->GetNode(NodeidList[0])->GetContent();
     Tensor* NodeRes = new Tensor(FirstInputNode->shape, FirstInputNode->GetDeviceNum());
@@ -24,7 +24,7 @@ void AddOps::Forward()
 
 void AddOps::Backward()
 {
-    std::vector<std::string> &NodeidList = this->CG->GetNode(this->Nodeid)->InputNodeidList;
+    auto NodeidList = GetInputNodeList();
     std::string ThisDNodeid = this->CG->GetDNodeid(this->Nodeid);
     for(size_t a=0;a<NodeidList.size();a++)
     {
