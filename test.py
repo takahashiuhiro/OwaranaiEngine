@@ -8,7 +8,9 @@ b = torch.zeros(3,1)
 b.fill_(1.2)
 b.requires_grad = True
 
-
+g = torch.zeros(1,1)
+g.fill_(1.9)
+g.requires_grad = True
 
 c = a@b
 
@@ -16,7 +18,9 @@ d = c@a
 
 e = d@b
 
-e.backward()
+f = e*g
+
+f.backward()
 
 
 print(a.grad)

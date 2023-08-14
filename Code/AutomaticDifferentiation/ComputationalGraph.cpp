@@ -57,7 +57,6 @@ std::string ComputationalGraph::GetDNodeid(std::string id)
 std::string ComputationalGraph::GetDPartNodeid(std::string Startid, std::string Endid)
 {
     /**Start是输入图的前序，输出的名称是导数图的后继.*/
-    //return GetDNodeid(Endid) + std::string("->") + GetDNodeid(Startid);
     return std::string("(")+ GetDNodeid(Endid) + std::string("->") + GetDNodeid(Startid) + std::string(")");
 }
 
@@ -146,7 +145,7 @@ void ComputationalGraph::NodeOpsForward(std::string Nodeid)
 
 void ComputationalGraph::ForwardDfs(std::string DfsStartNodeid)
 {
-    if(ComputeFlag.find(DfsStartNodeid) != ComputeFlag.end())return;
+    if(ComputeFlag.find(DfsStartNodeid) != ComputeFlag.end() && ComputeFlag[DfsStartNodeid])return;
     ComputeFlag[DfsStartNodeid] = true;
     ComputationalNode* FoundNode = GetNode(DfsStartNodeid);
     for(int a =0;a<FoundNode->InputNodeidList.size();a++)
@@ -247,6 +246,7 @@ void ComputationalGraph::ClearDataPropertyExclude(std::vector<std::string>CheckP
         if(!ClearFlag)
         {
             static_cast<ComputationalNode*>(NodePtr.second)->ClearContent();
+            ComputeFlag[NodePtr.first] = false;
         }
     }
 }

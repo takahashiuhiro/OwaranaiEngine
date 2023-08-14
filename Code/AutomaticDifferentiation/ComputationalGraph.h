@@ -39,7 +39,7 @@ public:
     void RegisterOpsAddEdge(std::string OutputNodeid, std::string InputNodeid);
     /**一次性注册完算子所有边，并且给默认参数赋值.*/
     void RegisterOpsCompleted(std::string OutputNodeid, std::vector<std::string> InputNodeid, size_t OpsTypeid, Dict OpsParams);
-    /**给算子内的输入节点赋予默认权重.*/
+    /**给算子内的输入节点赋予默认参数.*/
     void SetOpsInputNodeDefaultParams(std::string OutputNodeid);
     /**建立反向图.*/
     void BackwardGraphBuild();
