@@ -34,6 +34,7 @@ void AddOps::Backward()
             //确定打了不需要导数的标就不需要建立链接
             continue;
         }
+        if(!this->CG->CheckInputNodeidCanBackward(NodeidList[a]))continue;
         std::string InputDNodeid = this->CG->GetDNodeid(NodeidList[a]);
         this->CG->RegisterOpsAddEdge(InputDNodeid, ThisDNodeid);
         this->CG->GetCGOps(InputDNodeid)->SetAddWeight({{ThisDNodeid, GetAddWeight(NodeidList[a])}});

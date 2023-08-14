@@ -2,10 +2,7 @@
 #include "ComputationalGraph.h"
 #include "Ops/OpsFactory.h"
 
-ComputationalGraph::ComputationalGraph():BaseGraph()
-{
-
-}
+ComputationalGraph::ComputationalGraph():BaseGraph(){}
 
 ComputationalGraph::~ComputationalGraph()
 {
@@ -60,7 +57,8 @@ std::string ComputationalGraph::GetDNodeid(std::string id)
 std::string ComputationalGraph::GetDPartNodeid(std::string Startid, std::string Endid)
 {
     /**Start是输入图的前序，输出的名称是导数图的后继.*/
-    return GetDNodeid(Endid) + std::string("->") + GetDNodeid(Startid);
+    //return GetDNodeid(Endid) + std::string("->") + GetDNodeid(Startid);
+    return std::string("(")+ GetDNodeid(Endid) + std::string("->") + GetDNodeid(Startid) + std::string(")");
 }
 
 void ComputationalGraph::RegisterOps(std::string OutputNodeid, std::vector<std::string> InputNodeids, size_t OpsTypeid, Dict OpsParams)
@@ -71,6 +69,28 @@ void ComputationalGraph::RegisterOps(std::string OutputNodeid, std::vector<std::
     {
         RegisterOpsAddEdge(OutputNodeid, InputNodeid);
     }
+}
+
+void ComputationalGraph::SetOpsInputNodeDefaultParams(std::string OutputNodeid)
+{
+    auto ThisOps = GetCGOps(OutputNodeid);
+    auto NodeidList = ThisOps->GetInputNodeList();
+    /**默认变量系数为1.*/
+    for(size_t a = 0;a<NodeidList.size();a++)
+    {
+        ThisOps->SetAddWeight({{NodeidList[a],1.}});
+    }
+    /**默认输入矩阵为不转置矩阵.*/
+    for(size_t a = 0;a<NodeidList.size();a++)
+    {
+        ThisOps->SetT({{NodeidList[a],false}});
+    }
+}
+
+void ComputationalGraph::RegisterOpsCompleted(std::string OutputNodeid, std::vector<std::string> InputNodeid, size_t OpsTypeid, Dict OpsParams)
+{
+    RegisterOps(OutputNodeid, InputNodeid, OpsTypeid, OpsParams);
+    SetOpsInputNodeDefaultParams(OutputNodeid);
 }
 
 void ComputationalGraph::RegisterDNode(std::string Nodeid)
@@ -193,10 +213,19 @@ void ComputationalGraph::PrintGraphAdjacencyList(size_t Mode)
     }
 }
 
+bool ComputationalGraph::CheckInputNodeidCanBackward(std::string InputNodeid)
+{
+    if(CurrentBackwardFlag.find(InputNodeid) == CurrentBackwardFlag.end())return false;
+    return CurrentBackwardFlag[InputNodeid] == CurrentBackwardFlagIndex;
+}
+
 void ComputationalGraph::BackwardMultiBuildGraph(size_t Times)
 {
+    CurrentBackwardFlag.clear();
     for(size_t a = 0;a<Times;a++)
     {
+        CurrentBackwardFlagIndex = a;
+        for(auto &NodePtr:Nodes)CurrentBackwardFlag[NodePtr.first] = CurrentBackwardFlagIndex;
         SetAllNodeToInput();
         BackwardGraphBuild();
     }

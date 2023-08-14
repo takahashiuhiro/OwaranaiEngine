@@ -14,6 +14,10 @@ public:
     std::map<std::string, bool>ComputeFlag;
     /**每个算子的反向建图只会执行一次，永不清空.*/
     std::map<std::string, bool>BackwardFlag;
+    /**当前哪些节点需要被求导，本轮新增节点不求导.*/
+    std::map<std::string, size_t>CurrentBackwardFlag;
+    /**当前的求导编号*/
+    size_t CurrentBackwardFlagIndex = 0;
 
     ComputationalGraph();
     ~ComputationalGraph();
@@ -33,6 +37,10 @@ public:
     void RegisterOps(std::string OutputNodeid, std::vector<std::string> InputNodeid, size_t OpsTypeid, Dict OpsParams);
     /**注册算子增边.*/
     void RegisterOpsAddEdge(std::string OutputNodeid, std::string InputNodeid);
+    /**一次性注册完算子所有边，并且给默认参数赋值.*/
+    void RegisterOpsCompleted(std::string OutputNodeid, std::vector<std::string> InputNodeid, size_t OpsTypeid, Dict OpsParams);
+    /**给算子内的输入节点赋予默认权重.*/
+    void SetOpsInputNodeDefaultParams(std::string OutputNodeid);
     /**建立反向图.*/
     void BackwardGraphBuild();
     /**注册梯度节点.*/
@@ -63,4 +71,6 @@ public:
     void BackwardMultiBuildGraph(size_t Times);
     /**以下词条任意为false的将被清理数据.*/
     void ClearDataPropertyExclude(std::vector<std::string>CheckPropertyList);
+    /**查询输入节点编号是否是待求导编号.*/
+    bool CheckInputNodeidCanBackward(std::string InputNodeid);
 };

@@ -10,7 +10,7 @@ EleMulOps::EleMulOps(size_t OpsTypeName, Dict Params, ComputationalGraph* Parent
 void EleMulOps::Forward()
 {
     auto NodeidList = GetInputNodeList();
-    Log::Assert(NodeidList.size() == 2, std::string("EleMulOps Must Has 2 Input Node"));
+    Log::Assert(NodeidList.size() == 2, std::string("EleMulOps Must Have 2 Input Node"));
     Tensor* FirstInputNode = this->CG->GetNode(NodeidList[0])->GetContent();
     Tensor* SecondInputNode = this->CG->GetNode(NodeidList[1])->GetContent();
     std::shared_ptr<Tensor> NodeRes = std::shared_ptr<Tensor>(FirstInputNode->EleMul(SecondInputNode));
@@ -33,7 +33,7 @@ void EleMulOps::BuildSingleGrad(std::string FirstNodeid, std::string SecondNodei
 void EleMulOps::Backward()
 {
     auto NodeidList = GetInputNodeList();
-    Log::Assert(NodeidList.size() == 2, std::string("EleMulOps Must Has 2 Input Node"));
+    Log::Assert(NodeidList.size() == 2, std::string("EleMulOps Must Have 2 Input Node"));
     std::string ThisDNodeid = this->CG->GetDNodeid(this->Nodeid);
     if(this->CG->GetNode(NodeidList[0])->Property.Get<bool>("RequireGrad"))
     {

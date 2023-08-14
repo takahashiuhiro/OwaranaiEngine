@@ -13,9 +13,21 @@ void BaseOps::ParamsDefinition()
 {
     /**每个输入样本的常数权重.*/
     this->Params.Set("AddWeight", std::make_shared<AddWeightType>());
+    /**每个输入样本的是否转置.*/
+    this->Params.Set("T", std::make_shared<TType>());
 }
 
-void BaseOps::SetAddWeight(std::map<std::string, float> InputNodeWeight)
+std::vector<std::string> & BaseOps::GetInputNodeList()
+{
+    return this->CG->GetNode(this->Nodeid)->InputNodeidList;
+}
+
+std::vector<std::string> & BaseOps::GetInputNodeList(std::string InputNodeid)
+{
+    return this->CG->GetNode(InputNodeid)->InputNodeidList;
+}  
+
+void BaseOps::SetAddWeight(AddWeightType InputNodeWeight)
 {
     auto &OutDNodeOpsParamsAddWeight = *(Params.template Get<AddWeightTypePtr>("AddWeight"));
     for(auto& CGNodeidItem:InputNodeWeight)
@@ -31,12 +43,18 @@ float BaseOps::GetAddWeight(std::string InputNodeid)
     return OutDNodeOpsParamsAddWeight[InputNodeid];
 }
 
-std::vector<std::string> & BaseOps::GetInputNodeList()
+void BaseOps::SetT(TType InputNodeIsT)
 {
-    return this->CG->GetNode(this->Nodeid)->InputNodeidList;
+    auto &OutDNodeOpsParamsAddWeight = *(Params.template Get<TTypePtr>("T"));
+    for(auto& CGNodeidItem:InputNodeIsT)
+    {
+        OutDNodeOpsParamsAddWeight[CGNodeidItem.first] = CGNodeidItem.second;
+    }
 }
 
-std::vector<std::string> & BaseOps::GetInputNodeList(std::string InputNodeid)
+bool BaseOps::GetT(std::string InputNodeid)
 {
-    return this->CG->GetNode(InputNodeid)->InputNodeidList;
-}   
+    auto &OutDNodeOpsParamsT = *(Params.template Get<TTypePtr>("T"));
+    Log::Assert(OutDNodeOpsParamsT.find(InputNodeid)!=OutDNodeOpsParamsT.end(), std::string("This Node Is Not Set T  Node id:")+InputNodeid);
+    return OutDNodeOpsParamsT[InputNodeid];
+}
