@@ -19,9 +19,18 @@ void ComputationalGraph::AddNode(BaseNode* NewNode)
     Nodes[NewNode->id] = NewNode;
 }
 
+void ComputationalGraph::RegisterDefaultProperty(std::string Nodeid)
+{
+    GetNode(Nodeid)->Property.Set("RequireGrad", false);
+    GetNode(Nodeid)->Property.Set("Input", false);
+    GetNode(Nodeid)->Property.Set("Const", false);
+    GetNode(Nodeid)->Property.Set("Weight", false);
+}
+
 void ComputationalGraph::RegisterNode(std::string id)
 {
     AddNode(new ComputationalNode(id));
+    RegisterDefaultProperty(id);
 }
 
 void ComputationalGraph::RegisterVariableNode(std::string Nodeid)
@@ -31,10 +40,17 @@ void ComputationalGraph::RegisterVariableNode(std::string Nodeid)
     GetNode(Nodeid)->Property.Set("Input", true);
 }
 
+void ComputationalGraph::RegisterWeightNode(std::string Nodeid)
+{
+    RegisterVariableNode(Nodeid);
+    GetNode(Nodeid)->Property.Set("Weight", true);
+}
+
 void ComputationalGraph::RegisterConstNode(std::string Nodeid)
 {
     RegisterNode(Nodeid);
     GetNode(Nodeid)->Property.Set("Input", true);
+    GetNode(Nodeid)->Property.Set("Const", true);
 }
 
 ComputationalNode* ComputationalGraph::GetNode(std::string Nodeid)
@@ -249,4 +265,9 @@ void ComputationalGraph::ClearDataPropertyExclude(std::vector<std::string>CheckP
             ComputeFlag[NodePtr.first] = false;
         }
     }
+}
+
+void ComputationalGraph::ClearDataPropertyExclude()
+{
+    ClearDataPropertyExclude({"Weight", "Const"});
 }

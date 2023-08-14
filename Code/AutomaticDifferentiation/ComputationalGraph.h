@@ -29,8 +29,12 @@ public:
     void CommonInit();
     /**注册点.*/
     void RegisterNode(std::string id);
+    /**注册点默认属性.*/
+    void RegisterDefaultProperty(std::string Nodeid);
     /**注册变量.*/
     void RegisterVariableNode(std::string Nodeid);
+    /**注册权重变量.*/
+    void RegisterWeightNode(std::string Nodeid);
     /**注册常量.*/
     void RegisterConstNode(std::string Nodeid);
     /**注册算子.*/
@@ -71,6 +75,8 @@ public:
     void BackwardMultiBuildGraph(size_t Times);
     /**以下词条任意为false的将被清理数据.*/
     void ClearDataPropertyExclude(std::vector<std::string>CheckPropertyList);
+    /**清除Weight和Const以外的节点.*/
+    void ClearDataPropertyExclude();
     /**查询输入节点编号是否是待求导编号.*/
     bool CheckInputNodeidCanBackward(std::string InputNodeid);
 };
