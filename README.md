@@ -12,7 +12,7 @@ git clone https://github.com/takahashiuhiro/OwaranaiEngine.git
 cd build  
 cmake ../  
 make  
-./OwaranaiEngineTest  
+./OwaranaiEngineMain  
 
 ## 项目目录  
 
