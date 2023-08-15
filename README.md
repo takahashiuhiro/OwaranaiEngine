@@ -8,7 +8,7 @@ C++ 11
 
 ##  项目运行方法  
 
-git clone https://github.com/takahashiuhiro/OwaranaiEngine.git
+git clone https://github.com/takahashiuhiro/OwaranaiEngine.git  
 cd build  
 cmake ../  
 make  
