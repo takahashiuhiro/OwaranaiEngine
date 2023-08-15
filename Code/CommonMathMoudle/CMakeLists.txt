@@ -4,7 +4,7 @@ project(${TARGET_NAME})
 find_package(CUDA)
 
 if(CUDA_FOUND)
-    add_subdirectory(cuda)
+    add_subdirectory(Cuda)
 endif()
 
 file(GLOB CURRENT_HEADERS  *.h)
