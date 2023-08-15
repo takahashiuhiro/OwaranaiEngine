@@ -1,4 +1,4 @@
-#include "MatmulOps.h"
+#include "MatMulOps.h"
 #include "../ComputationalGraph.h"
 
 MatMulOps::MatMulOps(size_t OpsTypeName, Dict Params, ComputationalGraph* ParentCG)
