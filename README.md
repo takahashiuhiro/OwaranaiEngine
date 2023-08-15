@@ -22,7 +22,7 @@ OwaranaiEngine  项目根目录
 ------------Ops  算子  
 ------------其他  计算图相关  
 --------CommonDataStructure  通用数据结构  
---------CommonMathMoudle  通用数学 
+--------CommonMathMoudle  通用数学  
 ------------Cuda  一些cuda的基础操作实现  
 ------------其他  张量相关  
 ----TestSample  测试模块用的各种main文件  
