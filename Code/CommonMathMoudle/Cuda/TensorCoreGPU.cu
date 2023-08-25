@@ -1,4 +1,5 @@
 #include "TensorCoreCudaHead.cuh"
+#include <math.h>
 
 __global__ void AddArrayKernel(float* Output, float* InputFirst, float* InputSecond,size_t Size) 
 {
@@ -126,6 +127,54 @@ __global__ void MatmulKernel
   }
 }
 
+__global__ void MaximumOrMinimumTensorDimKernel(float* OutputData, float* InputData, size_t *InputShape, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount, bool IsMaximum)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index < OutputShapeCount)
+  {
+    if(IsMaximum)
+    {
+      OutputData[Index] = -1e9+7;
+    }
+    else
+    {
+      OutputData[Index] = 1e9+7;
+    }
+    size_t OutputIndex[8];
+    size_t OutputSizeTMP = Index;
+    for(int a=InputShapeLen-1;a>=0;a--)
+    {
+      if(a != InputDim) 
+      {
+        OutputIndex[a] = OutputSizeTMP%InputShape[a];
+        OutputSizeTMP /= InputShape[a];
+      }
+      else
+      {
+        OutputIndex[a] = 0;
+      }
+    }
+    for(int a =0;a<InputShape[InputDim];a++)
+    {
+      size_t InputDimIndex = 0;
+      size_t InputSizeTMP = 1;
+      for(int b = InputShapeLen - 1;b>=0;b--)
+      {
+        if(b!=InputDim)InputDimIndex += InputSizeTMP*OutputIndex[b];
+        else InputDimIndex += InputSizeTMP*a;
+        InputSizeTMP*=InputShape[b];
+      }
+      if(IsMaximum)
+      {
+        OutputData[Index] = max(OutputData[Index], InputData[InputDimIndex]);
+      }
+      else
+      {
+        OutputData[Index] = min(OutputData[Index], InputData[InputDimIndex]);
+      }
+    }
+  }
+}
 
 __global__ void SumTensorDimKernel(float* OutputData, float* InputData, size_t *InputShape, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount)
 {
@@ -386,6 +435,16 @@ void SumTensorDimInCPP(float* OutputData, float* InputData, size_t *InputShape, 
   cudaMemcpy(InputShapeCuda,InputShape,sizeof(size_t)*InputShapeLen,cudaMemcpyHostToDevice);
   CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
   SumTensorDimKernel<<<CudaPairInput.block, CudaPairInput.grid>>>( OutputData, InputData, InputShapeCuda, InputShapeLen, InputDim, OutputShapeCount);
+  cudaFree(InputShapeCuda);
+}
+
+void MaximumOrMinimumTensorDimInCPP(float* OutputData, float* InputData, size_t *InputShape, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount, bool IsMaximum)
+{
+  size_t *InputShapeCuda;
+  cudaMalloc((void**)&InputShapeCuda, InputShapeLen*sizeof(size_t));
+  cudaMemcpy(InputShapeCuda,InputShape,sizeof(size_t)*InputShapeLen,cudaMemcpyHostToDevice);
+  CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
+  MaximumOrMinimumTensorDimKernel<<<CudaPairInput.block, CudaPairInput.grid>>>( OutputData, InputData, InputShapeCuda, InputShapeLen, InputDim, OutputShapeCount, IsMaximum);
   cudaFree(InputShapeCuda);
 }
 

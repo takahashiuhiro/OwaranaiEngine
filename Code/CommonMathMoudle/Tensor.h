@@ -33,6 +33,7 @@ extern "C" void MatmulInCPP
 );
 extern "C" void TInCPP(float* Output, float* Input, size_t *MatrixShape, size_t ShapeCount);
 extern "C" void SumTensorDimInCPP(float* OutputData, float* InputData, size_t *InputShape, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount);
+extern "C" void MaximumOrMinimumTensorDimInCPP(float* OutputData, float* InputData, size_t *InputShape, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount, bool IsMaximum);
 extern "C" void TensorSpliceInCPP(float* OutputData, float* InputDataFirst, float* InputDataSecond, size_t* InputShapeFirst, size_t* InputShapeSecond, size_t InputShapeLen, size_t InputDim, size_t OutputShapeCount);
 extern "C" void GetUnitTensorInCPP(float* OutputData, size_t* InputShape, size_t OutputShapeCount, size_t InputShapeLen);
 extern "C" void GaussianEliminationInCPP(float* OutputData, size_t BatchSize, size_t Row, size_t Column);
@@ -232,4 +233,8 @@ public:
     Tensor* GetTensorBy2ShapeVector(std::vector<size_t>StartShape, std::vector<size_t>EndShape);
     /**矩阵求逆.*/
     Tensor* Inverse();
+    /**求最大值或者最小值.*/
+    Tensor* MaximumOrMinimum(size_t InputDim,  bool IsMaximum);
+    Tensor* Maximum(size_t InputDim);
+    Tensor* Minimum(size_t InputDim);
 };

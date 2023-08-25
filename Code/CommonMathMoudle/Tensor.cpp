@@ -406,6 +406,84 @@ Tensor* Tensor::T()
     return Output;
 }
 
+Tensor* Tensor::MaximumOrMinimum(size_t InputDim, bool IsMaximum)
+{
+    std::vector<size_t>OutputShape;
+    for(int a=0;a<shape.size();a++)
+    {
+        if(a!=InputDim)OutputShape.push_back(shape[a]);
+        else OutputShape.push_back(1);
+    }
+    Tensor *Output = new Tensor(OutputShape, GetDeviceNum());
+    CudaDimVec ShapeArray = TransformFromStdVector(shape, shape.size());
+    if(GetDeviceNum())
+    {
+        #ifdef CUDA_USEFUL
+        MaximumOrMinimumTensorDimInCPP(Output->GetDevicePointer(), GetDevicePointer(), ShapeArray.Shape,OutputShape.size(),InputDim, Output->ShapeCount, IsMaximum);
+        #endif
+    }
+    else
+    {
+        size_t InputShapeLen = OutputShape.size();
+        size_t *InputShape = ShapeArray.Shape;
+        for(int Index = 0 ;Index < Output->ShapeCount;Index++)
+        {
+          if(IsMaximum)
+          {
+            Output->GetDevicePointer()[Index] = -1e9+7;
+          }
+          else
+          {
+            Output->GetDevicePointer()[Index] = 1e9+7;
+          }
+          size_t OutputIndex[8];
+          size_t OutputSizeTMP = Index;
+          for(int a=InputShapeLen-1;a>=0;a--)
+          {
+            if(a != InputDim) 
+            {
+              OutputIndex[a] = OutputSizeTMP%InputShape[a];
+              OutputSizeTMP /= InputShape[a];
+            }
+            else
+            {
+              OutputIndex[a] = 0;
+            }
+          }
+          for(int a =0;a<InputShape[InputDim];a++)
+          {
+            size_t InputDimIndex = 0;
+            size_t InputSizeTMP = 1;
+            for(int b = InputShapeLen - 1;b>=0;b--)
+            {
+              if(b!=InputDim)InputDimIndex += InputSizeTMP*OutputIndex[b];
+              else InputDimIndex += InputSizeTMP*a;
+              InputSizeTMP*=InputShape[b];
+            }
+            if(IsMaximum)
+            {
+              Output->GetDevicePointer()[Index] = std::max(Output->GetDevicePointer()[Index], GetDevicePointer()[InputDimIndex]);
+            }
+            else
+            {
+              Output->GetDevicePointer()[Index] = std::min(Output->GetDevicePointer()[Index], GetDevicePointer()[InputDimIndex]);
+            }
+          }
+        }
+    }
+    return Output;
+}
+
+Tensor* Tensor::Minimum(size_t InputDim)
+{
+    return MaximumOrMinimum(InputDim, false);
+}
+
+Tensor* Tensor::Maximum(size_t InputDim)
+{
+    return MaximumOrMinimum(InputDim, true);
+}
+
 Tensor* Tensor::SumTensorDim(size_t InputDim)
 {
     std::vector<size_t>OutputShape;
