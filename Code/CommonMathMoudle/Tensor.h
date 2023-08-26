@@ -2,6 +2,7 @@
 #include <memory>
 #include "../CommonDataStructure/Log.h"
 #include "MathHelpers.h"
+#include <cmath>
 
 #ifdef CUDA_USEFUL
 extern "C" void cudaMallocInCPP(float** Input, size_t Size, size_t DeviceNum);
@@ -38,6 +39,7 @@ extern "C" void TensorSpliceInCPP(float* OutputData, float* InputDataFirst, floa
 extern "C" void GetUnitTensorInCPP(float* OutputData, size_t* InputShape, size_t OutputShapeCount, size_t InputShapeLen);
 extern "C" void GaussianEliminationInCPP(float* OutputData, size_t BatchSize, size_t Row, size_t Column);
 extern "C" void GetTensorBy2ShapeVectorInCPP(float* OutputData, float* InputData, size_t* InputShape,size_t* OutputShape,size_t* StartShape, size_t* EndShape, size_t ShapeLen);
+extern "C" void EleExpInCPP(float* OutputData, size_t OutputShape, float BaseNum);
 #endif
 
 struct CudaDimVec
@@ -237,4 +239,6 @@ public:
     Tensor* MaximumOrMinimum(size_t InputDim,  bool IsMaximum);
     Tensor* Maximum(size_t InputDim);
     Tensor* Minimum(size_t InputDim);
+    /**对元素求指数函数.*/
+    Tensor* EleExp(float BaseNum);
 };

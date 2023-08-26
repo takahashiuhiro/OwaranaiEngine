@@ -734,3 +734,22 @@ Tensor* Tensor::Inverse()
     delete SpliceTensor;
     return ReturnTensor;
 }
+
+Tensor* Tensor::EleExp(float BaseNum)
+{
+    Tensor* ReturnTensor = Copy();
+    if(GetDeviceNum())
+    {
+        #ifdef CUDA_USEFUL
+        EleExpInCPP(ReturnTensor->GetDevicePointer(), ReturnTensor->ShapeCount, BaseNum);
+        #endif
+    }
+    else
+    {
+        for(size_t Index = 0;Index < ReturnTensor->ShapeCount;Index++)
+        {
+            ReturnTensor->GetDevicePointer()[Index] = powf(BaseNum, ReturnTensor->GetDevicePointer()[Index]);
+        }
+    }
+    return ReturnTensor;
+}

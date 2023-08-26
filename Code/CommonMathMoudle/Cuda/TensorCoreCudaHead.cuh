@@ -38,6 +38,7 @@ extern "C" void TensorSpliceInCPP(float* OutputData, float* InputDataFirst, floa
 extern "C" void GetUnitTensorInCPP(float* OutputData, size_t* InputShape, size_t OutputShapeCount, size_t InputShapeLen);
 extern "C" void GaussianEliminationInCPP(float* OutputData, size_t BatchSize, size_t Row, size_t Column);
 extern "C" void GetTensorBy2ShapeVectorInCPP(float* OutputData, float* InputData, size_t* InputShape,size_t* OutputShape,size_t* StartShape, size_t* EndShape, size_t ShapeLen);
+extern "C" void EleExpInCPP(float* OutputData, size_t OutputShape, float BaseNum);
 
 struct CudaPair 
 {

@@ -358,6 +358,19 @@ __global__ void GetTensorBy2ShapeVectorKernel(float* OutputData, float* InputDat
   OutputData[Index] = InputData[InputIndex];
 }
 
+__global__ void EleExpKernel(float* OutputData, size_t OutputShape, float BaseNum)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= OutputShape)return;
+  OutputData[Index] = powf(BaseNum, OutputData[Index]);
+}
+
+void EleExpInCPP(float* OutputData, size_t OutputShape, float BaseNum)
+{
+  CudaPair CudaPairInput = GetCudaPair(OutputShape);
+  EleExpKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, OutputShape, BaseNum);
+}
+
 void GetTensorBy2ShapeVectorInCPP(float* OutputData, float* InputData, size_t* InputShape,size_t* OutputShape,size_t* StartShape, size_t* EndShape, size_t ShapeLen)
 {
   size_t *InputShapeCuda;
