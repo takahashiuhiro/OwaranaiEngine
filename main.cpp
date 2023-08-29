@@ -5,8 +5,9 @@
 #include <cmath>
 int main() 
 {
-    Tensor *t = new Tensor({2,3},1);
+    Tensor *t = new Tensor({1,2,1},0);
     t->FillArray(4.);
-    t->SetV({1,1}, 1);
-    t->EleExp(M_E)->PrintData();
+    t->SetV({0,1,0}, 1);
+    t->PrintData();
+    t->BroadCastTo({4,2,3})->PrintData();
 }

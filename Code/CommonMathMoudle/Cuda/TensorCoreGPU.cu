@@ -365,6 +365,41 @@ __global__ void EleExpKernel(float* OutputData, size_t OutputShape, float BaseNu
   OutputData[Index] = powf(BaseNum, OutputData[Index]);
 }
 
+__global__ void BroadCastToKernel(float* OutputData, float* InputData, size_t* OutputShape, size_t* InputShape, size_t ShapeLen, size_t OutputShapeCount)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= OutputShapeCount)return;
+  size_t ShapeIndex[10];
+  size_t NowIndex = Index;
+  for(int a = ShapeLen - 1 ;a >= 0;a--)
+  {
+    ShapeIndex[a] = NowIndex%OutputShape[a];
+    NowIndex = size_t(NowIndex/OutputShape[a]);
+    if(OutputShape[a] > InputShape[a])ShapeIndex[a] = 0;
+  }
+  size_t FixedInputIndex = 0;
+  for(size_t a = 0;a<ShapeLen;a++)
+  {
+    FixedInputIndex *= InputShape[a];
+    FixedInputIndex += ShapeIndex[a];
+  }
+  OutputData[Index] = InputData[FixedInputIndex];
+}
+
+void BroadCastToInCPP(float* OutputData, float* InputData, size_t* OutputShape, size_t* InputShape, size_t ShapeLen, size_t OutputShapeCount)
+{
+  size_t *InputShapeCuda;
+  size_t *OutputShapeCuda;
+  cudaMalloc((void**)&InputShapeCuda, ShapeLen*sizeof(size_t));
+  cudaMalloc((void**)&OutputShapeCuda, ShapeLen*sizeof(size_t));
+  cudaMemcpy(InputShapeCuda,InputShape,sizeof(size_t)*ShapeLen,cudaMemcpyHostToDevice);
+  cudaMemcpy(OutputShapeCuda,OutputShape,sizeof(size_t)*ShapeLen,cudaMemcpyHostToDevice);
+  CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
+  BroadCastToKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, InputData, OutputShapeCuda, InputShapeCuda, ShapeLen, OutputShapeCount);
+  cudaFree(InputShapeCuda);
+  cudaFree(OutputShapeCuda);
+}
+
 void EleExpInCPP(float* OutputData, size_t OutputShape, float BaseNum)
 {
   CudaPair CudaPairInput = GetCudaPair(OutputShape);

@@ -753,3 +753,63 @@ Tensor* Tensor::EleExp(float BaseNum)
     }
     return ReturnTensor;
 }
+
+Tensor* Tensor::BroadCastTo(std::vector<size_t>BroadCastShape)
+{
+    Tensor* ReturnTensor = new Tensor(BroadCastShape, GetDeviceNum());
+    std::vector<size_t>FixedShape;
+    for(int a=0;;a++)
+    {
+        if(a+shape.size() < BroadCastShape.size())
+        {
+            FixedShape.push_back(1);
+        }
+        else
+        {
+            if(a >= BroadCastShape.size())
+            {
+                break;
+            }
+            FixedShape.push_back(shape[a + shape.size() -BroadCastShape.size()]);
+        }
+    }
+    CudaDimVec FixedShapeArray = TransformFromStdVector(FixedShape, FixedShape.size());
+    CudaDimVec OutputShapeArray = TransformFromStdVector(ReturnTensor->shape, ReturnTensor->shape.size());
+    size_t* FixedShapePointer = FixedShapeArray.Shape;
+    size_t* OutputShapePointer = OutputShapeArray.Shape;
+    if(GetDeviceNum())
+    {
+        #ifdef CUDA_USEFUL
+        BroadCastToInCPP(ReturnTensor->GetDevicePointer(), GetDevicePointer(), OutputShapePointer, FixedShapePointer, ReturnTensor->shape.size(), ReturnTensor->ShapeCount);
+        #endif
+    }
+    else
+    {
+        for(size_t Index = 0;Index < ReturnTensor->ShapeCount;Index++)
+        {
+            size_t ShapeIndex[10];
+            size_t NowIndex = Index;
+            for(int a = FixedShape.size() - 1 ;a >= 0;a--)
+            {
+              ShapeIndex[a] = NowIndex%OutputShapePointer[a];
+              NowIndex = size_t(NowIndex/OutputShapePointer[a]);
+              if(OutputShapePointer[a] > FixedShapePointer[a])ShapeIndex[a] = 0;
+            }
+            size_t FixedInputIndex = 0;
+            for(size_t a = 0;a<FixedShape.size();a++)
+            {
+              FixedInputIndex *= FixedShapePointer[a];
+              FixedInputIndex += ShapeIndex[a];
+            }
+            ReturnTensor->GetDevicePointer()[Index] = GetDevicePointer()[FixedInputIndex];
+        }
+    }
+    return ReturnTensor;
+}
+
+Tensor* Tensor::Softmax(size_t InputDim)
+{
+    Tensor* ReturnTensor = Copy();
+    //todo
+    return ReturnTensor;
+}
