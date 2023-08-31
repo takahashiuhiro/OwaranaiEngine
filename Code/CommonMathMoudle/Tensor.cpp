@@ -807,9 +807,43 @@ Tensor* Tensor::BroadCastTo(std::vector<size_t>BroadCastShape)
     return ReturnTensor;
 }
 
+Tensor* Tensor::EleInverse()
+{
+    Tensor* ReturnTensor = Copy();
+    if(GetDeviceNum())
+    {
+        #ifdef CUDA_USEFUL
+        EleInverseInCPP(ReturnTensor->GetDevicePointer(), ShapeCount);
+        #endif
+    }
+    else
+    {
+        for(size_t Index = 0;Index < ShapeCount;Index++)
+        {
+            ReturnTensor->GetDevicePointer()[Index] = 1./ReturnTensor->GetDevicePointer()[Index];
+        }
+    }
+    return ReturnTensor;
+}
+
 Tensor* Tensor::Softmax(size_t InputDim)
 {
     Tensor* ReturnTensor = Copy();
-    //todo
+    Tensor* MaxTensor = ReturnTensor->Maximum(InputDim);
+    Tensor* MaxTensorBroadCastTo = MaxTensor->BroadCastTo(ReturnTensor->shape);
+    delete MaxTensor;
+    Tensor* MaxMinus = MaxTensorBroadCastTo->MulScalar(-1.);
+    delete MaxTensorBroadCastTo;
+    Tensor* ReturnTensorMinusMaximum = ReturnTensor->Add(MaxMinus);
+    delete MaxMinus;
+    delete ReturnTensor;
+    Tensor* ExpResult = ReturnTensorMinusMaximum->EleExp(M_E);
+    Tensor* SumResult = ExpResult->SumTensorDim(InputDim);
+    Tensor* SumResultBroadCastTo = SumResult->BroadCastTo(shape);
+    delete SumResult;
+    Tensor* SumEleInverseResult = SumResultBroadCastTo->EleInverse();
+    delete SumResultBroadCastTo;
+    ReturnTensor = ExpResult->EleMul(SumEleInverseResult);
+    delete ExpResult;
     return ReturnTensor;
 }

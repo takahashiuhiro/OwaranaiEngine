@@ -386,6 +386,19 @@ __global__ void BroadCastToKernel(float* OutputData, float* InputData, size_t* O
   OutputData[Index] = InputData[FixedInputIndex];
 }
 
+__global__ void EleInverseKernel(float* OutputData, size_t OutputShape)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= OutputShape)return;
+  OutputData[Index] = 1./OutputData[Index];
+}
+
+void EleInverseInCPP(float* OutputData, size_t OutputShape)
+{
+  CudaPair CudaPairInput = GetCudaPair(OutputShape);
+  EleInverseKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, OutputShape);
+}
+
 void BroadCastToInCPP(float* OutputData, float* InputData, size_t* OutputShape, size_t* InputShape, size_t ShapeLen, size_t OutputShapeCount)
 {
   size_t *InputShapeCuda;
