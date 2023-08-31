@@ -15,6 +15,8 @@ void BaseOps::ParamsDefinition()
     this->Params.Set("AddWeight", std::make_shared<AddWeightType>());
     /**每个输入样本的是否转置.*/
     this->Params.Set("T", std::make_shared<TType>());
+    /**每个输入样本选择的维度.*/
+    this->Params.Set("SelectDim", std::make_shared<SelectDimType>());
 }
 
 std::vector<std::string> & BaseOps::GetInputNodeList()
@@ -58,3 +60,20 @@ bool BaseOps::GetT(std::string InputNodeid)
     Log::Assert(OutDNodeOpsParamsT.find(InputNodeid)!=OutDNodeOpsParamsT.end(), std::string("This Node Is Not Set T  Node id:")+InputNodeid);
     return OutDNodeOpsParamsT[InputNodeid];
 }
+
+void BaseOps::SetSelectDim(SelectDimType InputNodeSelectDim)
+{
+    auto &OutDNodeOpsParamsSelectDim = *(Params.template Get<SelectDimTypePtr>("SelectDim"));
+    for(auto& CGNodeidItem:InputNodeSelectDim)
+    {
+        OutDNodeOpsParamsSelectDim[CGNodeidItem.first] = CGNodeidItem.second;
+    }
+}
+
+size_t BaseOps::GetSelectDim(std::string InputNodeid)
+{
+    auto &OutDNodeOpsParamsSelectDim = *(Params.template Get<SelectDimTypePtr>("SelectDim"));
+    Log::Assert(OutDNodeOpsParamsSelectDim.find(InputNodeid)!=OutDNodeOpsParamsSelectDim.end(), std::string("This Node Is Not Set SelectDim Node id:")+InputNodeid);
+    return OutDNodeOpsParamsSelectDim[InputNodeid];
+}
+

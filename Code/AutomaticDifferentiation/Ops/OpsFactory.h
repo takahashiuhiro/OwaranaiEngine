@@ -27,6 +27,10 @@ public:
         {
             return std::make_shared<MatMulOps>(OpsTypeid, Params, CG);
         }
+        if(OpsTypeid == OpsType::Softmax)
+        {
+            return std::make_shared<SoftmaxOps>(OpsTypeid, Params, CG);
+        }
         Log::Assert(0, std::string("No Ops Be Set"));
     }
 };

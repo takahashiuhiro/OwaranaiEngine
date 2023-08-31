@@ -9,6 +9,4 @@ public:
     ~MatMulOps(){};
     virtual void Forward();
     virtual void Backward();
-    /**对first求导.*/
-    //void BuildSingleGrad(std::string FirstNodeid, std::string SecondNodeid);
 };

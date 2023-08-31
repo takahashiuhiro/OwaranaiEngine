@@ -3,3 +3,4 @@
 #include "AddOps.h"
 #include "EleMulOps.h"
 #include "MatMulOps.h"
+#include "SoftmaxOps.h"

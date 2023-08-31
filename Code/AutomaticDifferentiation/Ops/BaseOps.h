@@ -18,6 +18,9 @@ public:
     /**节点是否转置.*/
     using TType = std::map<std::string, bool>;
     using TTypePtr = std::shared_ptr<TType>;
+    /**节点选择的维度.*/
+    using SelectDimType = std::map<std::string, size_t>;
+    using SelectDimTypePtr = std::shared_ptr<SelectDimType>;
 
     virtual ~BaseOps(){};
     /**前向计算.*/
@@ -40,5 +43,8 @@ public:
     void SetT(TType InputNodeIsT);
     /**获取输入参数是否为转置.*/
     bool GetT(std::string InputNodeid);
-
+    /**设置该张量使用的输入维度.*/
+    void SetSelectDim(SelectDimType InputNodeSelectDim);
+    /**获取该张量使用的输入维度.*/
+    size_t GetSelectDim(std::string InputNodeid);
 };
