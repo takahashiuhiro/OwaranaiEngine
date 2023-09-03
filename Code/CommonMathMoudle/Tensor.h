@@ -247,6 +247,8 @@ public:
     Tensor* EleExp(float BaseNum);
     /**把矩阵广播到输入形状.*/
     Tensor* BroadCastTo(std::vector<size_t>BroadCastShape);
+    /**是否能广播.*/
+    bool CanBroadCastTo(std::vector<size_t>BroadCastShape);
     /**softmax.*/
     Tensor* Softmax(size_t InputDim);
 };

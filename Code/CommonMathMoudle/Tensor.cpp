@@ -754,6 +754,13 @@ Tensor* Tensor::EleExp(float BaseNum)
     return ReturnTensor;
 }
 
+bool Tensor::CanBroadCastTo(std::vector<size_t>BroadCastShape)
+{
+    if(BroadCastShape.size() < shape.size())return false;
+    //todo
+    return true;
+}
+
 Tensor* Tensor::BroadCastTo(std::vector<size_t>BroadCastShape)
 {
     Tensor* ReturnTensor = new Tensor(BroadCastShape, GetDeviceNum());

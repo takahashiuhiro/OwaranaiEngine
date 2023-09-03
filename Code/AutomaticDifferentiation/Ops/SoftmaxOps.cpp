@@ -18,5 +18,7 @@ void SoftmaxOps::Forward()
 
 void SoftmaxOps::Backward()
 {
-    
+    auto NodeidList = GetInputNodeList();
+    Log::Assert(NodeidList.size() == 1, std::string("SoftmaxOps Must Have 1 Input Node"));
+    //todo
 }
