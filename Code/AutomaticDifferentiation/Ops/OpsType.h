@@ -8,5 +8,7 @@ struct OpsType
     static const size_t Add = 2;//矩阵加
     static const size_t EleMul = 3;//元素乘
     static const size_t MatMul = 4;//矩阵乘
-    static const size_t Softmax = 5;//Softmax
+    static const size_t BroadCastTo = 5;//矩阵广播
+    static const size_t Sum = 6;//矩阵求和
+    static const size_t Softmax = 7;//Softmax
 };
