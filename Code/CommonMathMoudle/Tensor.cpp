@@ -757,7 +757,10 @@ Tensor* Tensor::EleExp(float BaseNum)
 bool Tensor::CanBroadCastTo(std::vector<size_t>BroadCastShape)
 {
     if(BroadCastShape.size() < shape.size())return false;
-    //todo
+    for(int a = 0;a<shape.size();a++)
+    {
+        if(BroadCastShape[BroadCastShape.size()-a-1]!=shape[shape.size()-a-1] && shape[shape.size()-a-1]!=1)return false;
+    }
     return true;
 }
 
