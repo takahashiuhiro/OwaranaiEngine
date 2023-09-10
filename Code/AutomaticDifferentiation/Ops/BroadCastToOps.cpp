@@ -23,6 +23,20 @@ void BroadCastToOps::Backward()
     std::string ThisDNodeid = this->CG->GetDNodeid(this->Nodeid);
     if(this->CG->GetNode(NodeidList[0])->Property.Get<bool>("RequireGrad"))
     {
-        
+        std::string NewDNode = this->CG->GetDPartNodeid(NodeidList[0], Nodeid);
+        this->CG->RegisterVariableNode(NewDNode);
+        this->CG->RegisterOps(NewDNode, std::vector<std::string>{ThisDNodeid}, OpsType::Sum, Dict());
+        auto SumShape = this->GetBroadCastTo(NodeidList[0]);
+        std::vector<size_t>SumDims;
+        for(size_t a = 0;a < SumShape[0].size(); a++)
+        {
+            if(SumShape[0][a]!=SumShape[1][a])
+            {
+                SumDims.push_back(a);
+            }
+        }
+        this->CG->GetCGOps(NewDNode)->SetSelectDims({{ThisDNodeid,SumDims}});
+        this->CG->RegisterOpsAddEdge(this->CG->GetDNodeid(NodeidList[0]), NewDNode);
+        this->CG->GetCGOps(this->CG->GetDNodeid(NodeidList[0]))->SetAddWeight({{NewDNode, 1.}});
     }
 }
