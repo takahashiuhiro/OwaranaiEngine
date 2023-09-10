@@ -17,6 +17,9 @@ void BaseOps::ParamsDefinition()
     this->Params.Set("T", std::make_shared<TType>());
     /**每个输入样本选择的维度.*/
     this->Params.Set("SelectDim", std::make_shared<SelectDimType>());
+    this->Params.Set("SelectDims", std::make_shared<SelectDimsType>());
+    /**每个输入样本广播的shape对.*/
+    this->Params.Set("BroadCastTo", std::make_shared<BroadCastToType>());
 }
 
 std::vector<std::string> & BaseOps::GetInputNodeList()
@@ -77,3 +80,34 @@ size_t BaseOps::GetSelectDim(std::string InputNodeid)
     return OutDNodeOpsParamsSelectDim[InputNodeid];
 }
 
+void BaseOps::SetBroadCastTo(BroadCastToType BroadCastToShape)
+{
+    auto &OutDNodeOpsParamsBroadCastTo = *(Params.template Get<BroadCastToTypePtr>("BroadCastTo"));
+    for(auto& CGNodeidItem:BroadCastToShape)
+    {
+        OutDNodeOpsParamsBroadCastTo[CGNodeidItem.first] = CGNodeidItem.second;
+    }
+}
+
+std::vector<std::vector<size_t>> BaseOps::GetBroadCastTo(std::string InputNodeid)
+{
+    auto &OutDNodeOpsParamsBroadCastTo = *(Params.template Get<BroadCastToTypePtr>("BroadCastTo"));
+    Log::Assert(OutDNodeOpsParamsBroadCastTo.find(InputNodeid)!=OutDNodeOpsParamsBroadCastTo.end(), std::string("This Node Is Not Set BroadCastTo Node id:")+InputNodeid);
+    return OutDNodeOpsParamsBroadCastTo[InputNodeid];
+}
+
+void BaseOps::SetSelectDims(SelectDimsType InputNodeSelectDims)
+{
+    auto &OutDNodeOpsParamsSelectDims = *(Params.template Get<SelectDimsTypePtr>("SelectDims"));
+    for(auto& CGNodeidItem:InputNodeSelectDims)
+    {
+        OutDNodeOpsParamsSelectDims[CGNodeidItem.first] = CGNodeidItem.second;
+    }
+}
+
+std::vector<size_t> BaseOps::GetSelectDims(std::string InputNodeid)
+{
+    auto &OutDNodeOpsParamsSelectDims = *(Params.template Get<SelectDimsTypePtr>("SelectDims"));
+    Log::Assert(OutDNodeOpsParamsSelectDims.find(InputNodeid)!=OutDNodeOpsParamsSelectDims.end(), std::string("This Node Is Not Set SelectDims Node id:")+InputNodeid);
+    return OutDNodeOpsParamsSelectDims[InputNodeid];
+}

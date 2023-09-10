@@ -484,6 +484,18 @@ Tensor* Tensor::Maximum(size_t InputDim)
     return MaximumOrMinimum(InputDim, true);
 }
 
+Tensor* Tensor::Sum(std::vector<size_t>InputDims)
+{
+    Tensor* ResTensor = SumTensorDim(InputDims[0]);
+    for(size_t a = 1;a<InputDims.size();a++)
+    {
+        Tensor* TMPTensor = ResTensor->SumTensorDim(InputDims[a]);
+        delete ResTensor;
+        ResTensor = TMPTensor;
+    }
+    return ResTensor;
+}
+
 Tensor* Tensor::SumTensorDim(size_t InputDim)
 {
     std::vector<size_t>OutputShape;
@@ -766,6 +778,7 @@ bool Tensor::CanBroadCastTo(std::vector<size_t>BroadCastShape)
 
 Tensor* Tensor::BroadCastTo(std::vector<size_t>BroadCastShape)
 {
+    Log::Assert(CanBroadCastTo(BroadCastShape), std::string("Broad Cast Shape Not Match"));
     Tensor* ReturnTensor = new Tensor(BroadCastShape, GetDeviceNum());
     std::vector<size_t>FixedShape;
     for(int a=0;;a++)

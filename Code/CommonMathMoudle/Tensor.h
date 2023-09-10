@@ -223,6 +223,8 @@ public:
     Tensor* Matmul(Tensor* Input);
     /**make the tensor Transpose*/
     Tensor* T();
+    /**对标定维度求Sum.*/
+    Tensor* Sum(std::vector<size_t>InputDims);
     /**Get a sum tensor by specifying dimensions*/
     Tensor* SumTensorDim(size_t InputDim);
     /**Get a average tensor by specifying dimensions*/

@@ -27,6 +27,14 @@ public:
         {
             return std::make_shared<MatMulOps>(OpsTypeid, Params, CG);
         }
+        if(OpsTypeid == OpsType::BroadCastTo)
+        {
+            return std::make_shared<BroadCastToOps>(OpsTypeid, Params, CG);
+        }
+        if(OpsTypeid == OpsType::Sum)
+        {
+            return std::make_shared<SumOps>(OpsTypeid, Params, CG);
+        }
         if(OpsTypeid == OpsType::Softmax)
         {
             return std::make_shared<SoftmaxOps>(OpsTypeid, Params, CG);

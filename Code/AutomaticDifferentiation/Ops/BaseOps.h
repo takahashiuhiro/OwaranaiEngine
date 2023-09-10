@@ -21,6 +21,12 @@ public:
     /**节点选择的维度.*/
     using SelectDimType = std::map<std::string, size_t>;
     using SelectDimTypePtr = std::shared_ptr<SelectDimType>;
+    using SelectDimsType = std::map<std::string, std::vector<size_t>>;
+    using SelectDimsTypePtr = std::shared_ptr<SelectDimsType>;
+    /**广播维度.*/
+    using BroadCastToPair = std::vector<std::vector<size_t>>;
+    using BroadCastToType = std::map<std::string, BroadCastToPair>;
+    using BroadCastToTypePtr = std::shared_ptr<BroadCastToType>;
 
     virtual ~BaseOps(){};
     /**前向计算.*/
@@ -47,4 +53,14 @@ public:
     void SetSelectDim(SelectDimType InputNodeSelectDim);
     /**获取该张量使用的输入维度.*/
     size_t GetSelectDim(std::string InputNodeid);
+    /**设置该张量使用的输入维度数组.*/
+    void SetSelectDims(SelectDimsType InputNodeSelectDims);
+    /**获取该张量使用的输入维度数组.*/
+    std::vector<size_t> GetSelectDims(std::string InputNodeid);
+    /**设置广播矩阵参数.*/
+    void SetBroadCastTo(BroadCastToType BroadCastToShape);
+    /**获取该张量使用的输入维度.*/
+    BroadCastToPair GetBroadCastTo(std::string InputNodeid);
+
+
 };
