@@ -19,6 +19,16 @@ void SumOps::Forward()
 void SumOps::Backward()
 {
     auto NodeidList = GetInputNodeList();
+    Log::Assert(NodeidList.size() == 1, std::string("SumOps Must Have 1 Input Node"));
     std::string ThisDNodeid = this->CG->GetDNodeid(this->Nodeid);
-    //todo
+    if(this->CG->GetNode(NodeidList[0])->Property.Get<bool>("RequireGrad"))
+    {
+        std::string NewDNode = this->CG->GetDPartNodeid(NodeidList[0], Nodeid);
+        this->CG->RegisterVariableNode(NewDNode);
+        this->CG->RegisterOps(NewDNode, std::vector<std::string>{ThisDNodeid}, OpsType::BroadCastTo, Dict());
+        auto SumShape = this->GetBroadCastTo(NodeidList[0]);
+        this->CG->GetCGOps(NewDNode)->SetBroadCastTo({{ThisDNodeid, {SumShape[1], SumShape[0]}}});
+        this->CG->RegisterOpsAddEdge(this->CG->GetDNodeid(NodeidList[0]), NewDNode);
+        this->CG->GetCGOps(this->CG->GetDNodeid(NodeidList[0]))->SetAddWeight({{NewDNode, 1.}});
+    }
 }

@@ -36,6 +36,7 @@ void BroadCastToOps::Backward()
             }
         }
         this->CG->GetCGOps(NewDNode)->SetSelectDims({{ThisDNodeid,SumDims}});
+        this->CG->GetCGOps(NewDNode)->SetBroadCastTo({{ThisDNodeid, {SumShape[1], SumShape[0]}}});
         this->CG->RegisterOpsAddEdge(this->CG->GetDNodeid(NodeidList[0]), NewDNode);
         this->CG->GetCGOps(this->CG->GetDNodeid(NodeidList[0]))->SetAddWeight({{NewDNode, 1.}});
     }
