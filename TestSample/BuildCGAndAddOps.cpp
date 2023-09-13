@@ -9,17 +9,24 @@ int main() {
     /**声明变量*/
     w->RegisterWeightNode("a");//声明权重变量
     w->RegisterVariableNode("b");
+    w->GetNode("a")->NodeContentShape = {1,3};
+    w->GetNode("b")->NodeContentShape = {3,1};
     w->RegisterVariableNode("c");
     w->RegisterVariableNode("d");
     w->RegisterVariableNode("e");
     w->RegisterVariableNode("f");
     w->RegisterVariableNode("g");
+    w->GetNode("g")->NodeContentShape = {1,1};
 
     /**声明算子.*/
     w->RegisterOpsCompleted("c", std::vector<std::string>{"a", "b"}, OpsType::MatMul, Dict());//c = a@b
+    w->GetCGOps("c")->AfterSettingShapeComputing();
     w->RegisterOpsCompleted("d", std::vector<std::string>{"c", "a"}, OpsType::MatMul, Dict());
+    w->GetCGOps("d")->AfterSettingShapeComputing();
     w->RegisterOpsCompleted("e", std::vector<std::string>{"d", "b"}, OpsType::MatMul, Dict());
+    w->GetCGOps("e")->AfterSettingShapeComputing();
     w->RegisterOpsCompleted("f", std::vector<std::string>{"e", "g"}, OpsType::MatMul, Dict());
+    w->GetCGOps("f")->AfterSettingShapeComputing();
 
     /**求导.*/
     w->BackwardMultiBuildGraph(1);

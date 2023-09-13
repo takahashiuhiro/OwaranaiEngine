@@ -24,8 +24,7 @@ public:
     using SelectDimsType = std::map<std::string, std::vector<size_t>>;
     using SelectDimsTypePtr = std::shared_ptr<SelectDimsType>;
     /**广播维度.*/
-    using BroadCastToPair = std::vector<std::vector<size_t>>;
-    using BroadCastToType = std::map<std::string, BroadCastToPair>;
+    using BroadCastToType = std::map<std::string, std::vector<size_t>>;
     using BroadCastToTypePtr = std::shared_ptr<BroadCastToType>;
 
     virtual ~BaseOps(){};
@@ -62,7 +61,7 @@ public:
     /**设置广播矩阵参数.*/
     void SetBroadCastTo(BroadCastToType BroadCastToShape);
     /**获取该张量使用的输入维度.*/
-    BroadCastToPair GetBroadCastTo(std::string InputNodeid);
+    std::vector<size_t> GetBroadCastTo(std::string InputNodeid);
 
 
 };

@@ -47,6 +47,7 @@ void MatMulOps::Backward()
             this->CG->GetCGOps(NewDNode)->SetAddWeight({{this->CG->GetDNodeid(Nodeid), 1.},{NodeidList[1], AddWeightDot}});
             this->CG->GetCGOps(NewDNode)->SetT({{this->CG->GetDNodeid(Nodeid), true},{NodeidList[1], false}});
         }
+        this->CG->GetCGOps(NewDNode)->AfterSettingShapeComputing();
         this->CG->RegisterOpsAddEdge(this->CG->GetDNodeid(NodeidList[0]), NewDNode);
         this->CG->GetCGOps(this->CG->GetDNodeid(NodeidList[0]))->SetAddWeight({{NewDNode, 1.}});
     }
@@ -66,6 +67,7 @@ void MatMulOps::Backward()
             this->CG->GetCGOps(NewDNode)->SetAddWeight({{this->CG->GetDNodeid(Nodeid), 1.},{NodeidList[0], AddWeightDot}});
             this->CG->GetCGOps(NewDNode)->SetT({{this->CG->GetDNodeid(Nodeid), true},{NodeidList[0], false}});
         }
+        this->CG->GetCGOps(NewDNode)->AfterSettingShapeComputing();
         this->CG->RegisterOpsAddEdge(this->CG->GetDNodeid(NodeidList[1]), NewDNode);
         this->CG->GetCGOps(this->CG->GetDNodeid(NodeidList[1]))->SetAddWeight({{NewDNode, 1.}});
     }
@@ -76,5 +78,10 @@ void MatMulOps::AfterSettingShapeComputing()
     auto NodeidList = GetInputNodeList();
     this->CG->GetNode(this->Nodeid)->NodeContentShape = this->CG->GetNode(NodeidList[0])->NodeContentShape;
     size_t LastIndex = this->CG->GetNode(this->Nodeid)->NodeContentShape.size()-1;
-    this->CG->GetNode(this->Nodeid)->NodeContentShape[LastIndex] = this->CG->GetNode(NodeidList[1])->NodeContentShape[LastIndex];
+    bool TFlagFirst = GetT(NodeidList[0]);
+    bool TFlagSecond = GetT(NodeidList[1]);
+    if(TFlagFirst)this->CG->GetNode(this->Nodeid)->NodeContentShape[LastIndex-1] = this->CG->GetNode(NodeidList[0])->NodeContentShape[LastIndex];
+    else this->CG->GetNode(this->Nodeid)->NodeContentShape[LastIndex-1] = this->CG->GetNode(NodeidList[0])->NodeContentShape[LastIndex-1];
+    if(TFlagSecond)this->CG->GetNode(this->Nodeid)->NodeContentShape[LastIndex] = this->CG->GetNode(NodeidList[1])->NodeContentShape[LastIndex-1];
+    else this->CG->GetNode(this->Nodeid)->NodeContentShape[LastIndex] = this->CG->GetNode(NodeidList[1])->NodeContentShape[LastIndex];
 }

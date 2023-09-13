@@ -26,6 +26,7 @@ void EleMulOps::BuildSingleGrad(std::string FirstNodeid, std::string SecondNodei
     auto NodeidList = GetInputNodeList();
     float AddWeightDot = GetAddWeight(NodeidList[0])*GetAddWeight(NodeidList[1]);
     this->CG->GetCGOps(NewDNode)->SetAddWeight({{this->CG->GetDNodeid(Nodeid), 1.},{SecondNodeid, AddWeightDot}});
+    this->CG->GetCGOps(NewDNode)->AfterSettingShapeComputing();
     this->CG->RegisterOpsAddEdge(this->CG->GetDNodeid(FirstNodeid), NewDNode);
     this->CG->GetCGOps(this->CG->GetDNodeid(FirstNodeid))->SetAddWeight({{NewDNode, 1.}});
 }

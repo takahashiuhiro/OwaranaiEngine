@@ -89,7 +89,7 @@ void BaseOps::SetBroadCastTo(BroadCastToType BroadCastToShape)
     }
 }
 
-std::vector<std::vector<size_t>> BaseOps::GetBroadCastTo(std::string InputNodeid)
+std::vector<size_t> BaseOps::GetBroadCastTo(std::string InputNodeid)
 {
     auto &OutDNodeOpsParamsBroadCastTo = *(Params.template Get<BroadCastToTypePtr>("BroadCastTo"));
     Log::Assert(OutDNodeOpsParamsBroadCastTo.find(InputNodeid)!=OutDNodeOpsParamsBroadCastTo.end(), std::string("This Node Is Not Set BroadCastTo Node id:")+InputNodeid);

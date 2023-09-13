@@ -26,8 +26,8 @@ void SumOps::Backward()
         std::string NewDNode = this->CG->GetDPartNodeid(NodeidList[0], Nodeid);
         this->CG->RegisterVariableNode(NewDNode);
         this->CG->RegisterOps(NewDNode, std::vector<std::string>{ThisDNodeid}, OpsType::BroadCastTo, Dict());
-        auto SumShape = this->GetBroadCastTo(NodeidList[0]);
-        this->CG->GetCGOps(NewDNode)->SetBroadCastTo({{ThisDNodeid, {SumShape[1], SumShape[0]}}});
+        this->CG->GetCGOps(NewDNode)->SetBroadCastTo({{ThisDNodeid, this->CG->GetNode(NodeidList[0])->NodeContentShape}});
+        this->CG->GetCGOps(NewDNode)->AfterSettingShapeComputing();
         this->CG->RegisterOpsAddEdge(this->CG->GetDNodeid(NodeidList[0]), NewDNode);
         this->CG->GetCGOps(this->CG->GetDNodeid(NodeidList[0]))->SetAddWeight({{NewDNode, 1.}});
     }

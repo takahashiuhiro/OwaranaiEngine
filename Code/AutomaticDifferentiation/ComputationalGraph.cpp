@@ -126,6 +126,7 @@ void ComputationalGraph::RegisterDNode(std::string Nodeid)
     RegisterNode(DNodeid);
     GetNode(DNodeid)->Property.Set("RequireGrad", true);
     GetNode(Nodeid)->DNodeid = DNodeid;
+    GetNode(DNodeid)->NodeContentShape = GetNode(Nodeid)->NodeContentShape;
     RegisterOps(DNodeid, std::vector<std::string>{}, OpsType::Add, Dict());
 }
 

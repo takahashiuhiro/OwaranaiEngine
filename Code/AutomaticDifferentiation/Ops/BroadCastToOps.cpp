@@ -13,7 +13,7 @@ void BroadCastToOps::Forward()
     Log::Assert(NodeidList.size() == 1, std::string("BroadCastToOps Must Have 1 Input Node"));
     Tensor* FirstInputNode = this->CG->GetNode(NodeidList[0])->GetContent();
     auto BroadCastToPairShape = this->GetBroadCastTo(NodeidList[0]);
-    this->CG->GetNode(this->Nodeid)->AssignContent(FirstInputNode->BroadCastTo(BroadCastToPairShape[1]));
+    this->CG->GetNode(this->Nodeid)->AssignContent(FirstInputNode->BroadCastTo(BroadCastToPairShape));
 }
 
 void BroadCastToOps::Backward()
@@ -26,17 +26,16 @@ void BroadCastToOps::Backward()
         std::string NewDNode = this->CG->GetDPartNodeid(NodeidList[0], Nodeid);
         this->CG->RegisterVariableNode(NewDNode);
         this->CG->RegisterOps(NewDNode, std::vector<std::string>{ThisDNodeid}, OpsType::Sum, Dict());
-        auto SumShape = this->GetBroadCastTo(NodeidList[0]);
         std::vector<size_t>SumDims;
-        for(size_t a = 0;a < SumShape[0].size(); a++)
+        for(size_t a = 0;a < this->CG->GetNode(this->Nodeid)->NodeContentShape.size(); a++)
         {
-            if(SumShape[0][a]!=SumShape[1][a])
+            if(this->CG->GetNode(this->Nodeid)->NodeContentShape[a]!=this->CG->GetNode(NodeidList[0])->NodeContentShape[a])
             {
                 SumDims.push_back(a);
             }
         }
         this->CG->GetCGOps(NewDNode)->SetSelectDims({{ThisDNodeid,SumDims}});
-        this->CG->GetCGOps(NewDNode)->SetBroadCastTo({{ThisDNodeid, {SumShape[1], SumShape[0]}}});
+        this->CG->GetCGOps(NewDNode)->AfterSettingShapeComputing();
         this->CG->RegisterOpsAddEdge(this->CG->GetDNodeid(NodeidList[0]), NewDNode);
         this->CG->GetCGOps(this->CG->GetDNodeid(NodeidList[0]))->SetAddWeight({{NewDNode, 1.}});
     }
@@ -45,6 +44,5 @@ void BroadCastToOps::Backward()
 void BroadCastToOps::AfterSettingShapeComputing()
 {
     auto NodeidList = GetInputNodeList();
-    auto BroadCastToPairShape = this->GetBroadCastTo(NodeidList[0]);
-    this->CG->GetNode(this->Nodeid)->NodeContentShape = BroadCastToPairShape[1];
+    this->CG->GetNode(this->Nodeid)->NodeContentShape = this->GetBroadCastTo(NodeidList[0]);
 }
