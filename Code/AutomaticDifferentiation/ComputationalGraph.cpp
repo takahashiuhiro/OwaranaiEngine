@@ -1,6 +1,7 @@
 #include "../CommonDataStructure/Log.h"
 #include "ComputationalGraph.h"
 #include "Ops/OpsFactory.h"
+#include "../CommonDataStructure/CommonFuncHelpers.h"
 
 ComputationalGraph::ComputationalGraph():BaseGraph(){}
 
@@ -74,6 +75,17 @@ std::string ComputationalGraph::GetDPartNodeid(std::string Startid, std::string 
 {
     /**Start是输入图的前序，输出的名称是导数图的后继.*/
     return std::string("(")+ GetDNodeid(Endid) + std::string("->") + GetDNodeid(Startid) + std::string(")");
+}
+
+std::string ComputationalGraph::GetNodeidByOps(size_t OpsName, std::vector<std::string>InputNodeNameArray)
+{
+    std::string PreStr = std::string("({Ops:") + NumberToString(OpsName) +std::string("},{NodeName:");
+    for(size_t a = 0;a < InputNodeNameArray.size();a++)
+    {
+        PreStr += InputNodeNameArray[a] + std::string(",");
+    }
+    PreStr += std::string("})");
+    return PreStr;
 }
 
 void ComputationalGraph::RegisterOps(std::string OutputNodeid, std::vector<std::string> InputNodeids, size_t OpsTypeid, Dict OpsParams)

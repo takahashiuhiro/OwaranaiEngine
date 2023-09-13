@@ -53,6 +53,8 @@ public:
     std::string GetDNodeid(std::string id);
     /**在算子里会出现a->c且a->b的情况,在这种情况下如果c对a求导，会在a_d和c_d之间的反向过程里建立一个新节点，用来表达c_d给a_d的贡献的中间节点.*/
     std::string GetDPartNodeid(std::string Startid, std::string Endid);
+    /**有的时候不是很好起节点名字，先这么起，后续需要节点按照名字解析成图.*/
+    std::string GetNodeidByOps(size_t OpsName, std::vector<std::string>InputNodeNameArray);
     /**DFS执行得到图中的计算张量.*/
     void ForwardDfs(std::string StartNodeid);
     /**对单个节点算子执行前向.*/

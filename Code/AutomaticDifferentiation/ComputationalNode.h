@@ -18,6 +18,7 @@ public:
 
     std::vector<std::string> OutputNodeidList;
     std::vector<std::string> InputNodeidList;
+    std::vector<size_t>NodeContentShape;
 
     Tensor* Content = nullptr;
 
