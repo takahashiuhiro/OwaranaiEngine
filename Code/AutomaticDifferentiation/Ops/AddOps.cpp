@@ -40,3 +40,9 @@ void AddOps::Backward()
         this->CG->GetCGOps(InputDNodeid)->SetAddWeight({{ThisDNodeid, GetAddWeight(NodeidList[a])}});
     }
 }
+
+void AddOps::AfterSettingShapeComputing()
+{
+    auto NodeidList = GetInputNodeList();
+    this->CG->GetNode(this->Nodeid)->NodeContentShape = this->CG->GetNode(NodeidList[0])->NodeContentShape;
+}

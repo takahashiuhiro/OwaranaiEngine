@@ -12,10 +12,11 @@ int main()
     w->RegisterVariableNode("a");//声明权重变量
     w->RegisterVariableNode("b");
     w->GetNode("a")->NodeContentShape = {1,1,3};
-    w->GetNode("b")->NodeContentShape = {1,1,3};
+    //w->GetNode("b")->NodeContentShape = {1,1,3};
 
     w->RegisterOpsCompleted("b", std::vector<std::string>{"a"}, OpsType::Softmax, Dict());
     w->GetCGOps("b")->SetSelectDim({{"a",2}});
+    w->GetCGOps("b")->AfterSettingShapeComputing();
 
     w->BackwardMultiBuildGraph(1);
 

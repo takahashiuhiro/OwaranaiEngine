@@ -70,3 +70,11 @@ void MatMulOps::Backward()
         this->CG->GetCGOps(this->CG->GetDNodeid(NodeidList[1]))->SetAddWeight({{NewDNode, 1.}});
     }
 }
+
+void MatMulOps::AfterSettingShapeComputing()
+{
+    auto NodeidList = GetInputNodeList();
+    this->CG->GetNode(this->Nodeid)->NodeContentShape = this->CG->GetNode(NodeidList[0])->NodeContentShape;
+    size_t LastIndex = this->CG->GetNode(this->Nodeid)->NodeContentShape.size()-1;
+    this->CG->GetNode(this->Nodeid)->NodeContentShape[LastIndex] = this->CG->GetNode(NodeidList[1])->NodeContentShape[LastIndex];
+}

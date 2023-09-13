@@ -9,4 +9,5 @@ public:
     ~SumOps(){};
     virtual void Forward();
     virtual void Backward();
+    virtual void AfterSettingShapeComputing();
 };

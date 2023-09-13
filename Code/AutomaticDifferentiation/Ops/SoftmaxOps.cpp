@@ -57,3 +57,9 @@ void SoftmaxOps::Backward()
     }
 
 }
+
+void SoftmaxOps::AfterSettingShapeComputing()
+{
+    auto NodeidList = GetInputNodeList();
+    this->CG->GetNode(this->Nodeid)->NodeContentShape = this->CG->GetNode(NodeidList[0])->NodeContentShape;
+}

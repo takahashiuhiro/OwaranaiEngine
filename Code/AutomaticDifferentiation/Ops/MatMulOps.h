@@ -9,4 +9,5 @@ public:
     ~MatMulOps(){};
     virtual void Forward();
     virtual void Backward();
+    virtual void AfterSettingShapeComputing();
 };

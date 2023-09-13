@@ -41,3 +41,10 @@ void BroadCastToOps::Backward()
         this->CG->GetCGOps(this->CG->GetDNodeid(NodeidList[0]))->SetAddWeight({{NewDNode, 1.}});
     }
 }
+
+void BroadCastToOps::AfterSettingShapeComputing()
+{
+    auto NodeidList = GetInputNodeList();
+    auto BroadCastToPairShape = this->GetBroadCastTo(NodeidList[0]);
+    this->CG->GetNode(this->Nodeid)->NodeContentShape = BroadCastToPairShape[1];
+}

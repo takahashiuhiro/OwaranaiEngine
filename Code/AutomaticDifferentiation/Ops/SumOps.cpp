@@ -32,3 +32,14 @@ void SumOps::Backward()
         this->CG->GetCGOps(this->CG->GetDNodeid(NodeidList[0]))->SetAddWeight({{NewDNode, 1.}});
     }
 }
+
+void SumOps::AfterSettingShapeComputing()
+{
+    auto NodeidList = GetInputNodeList();
+    auto SumDims = this->GetSelectDims(NodeidList[0]);
+    this->CG->GetNode(this->Nodeid)->NodeContentShape = this->CG->GetNode(NodeidList[0])->NodeContentShape;
+    for(size_t a=0;a<SumDims.size();a++)
+    {
+        this->CG->GetNode(this->Nodeid)->NodeContentShape[SumDims[a]] = 1;
+    }
+}

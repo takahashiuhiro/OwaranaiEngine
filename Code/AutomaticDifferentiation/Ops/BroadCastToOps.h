@@ -9,5 +9,6 @@ public:
     ~BroadCastToOps(){};
     virtual void Forward();
     virtual void Backward();
+    virtual void AfterSettingShapeComputing();
 };
 

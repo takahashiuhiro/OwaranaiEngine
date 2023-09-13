@@ -41,6 +41,8 @@ public:
     std::vector<std::string> &GetInputNodeList();
     std::vector<std::string> &GetInputNodeList(std::string InputNodeid);
 
+    virtual void AfterSettingShapeComputing() = 0;
+
     /**设置每个输入参数的常系数.*/
     void SetAddWeight(AddWeightType InputNodeWeight);
     /**获取输入参数的常系数.*/
