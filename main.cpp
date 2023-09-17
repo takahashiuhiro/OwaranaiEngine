@@ -2,6 +2,7 @@
 #include "Code/CommonMathMoudle/Tensor.h"
 #include "Code/AutomaticDifferentiation/ComputationalGraph.h"
 #include "Code/AutomaticDifferentiation/Ops/OpsType.h"
+#include "Code/AutomaticDifferentiation/AutoDiffCommon.h"
 #include <cmath>
 int main() 
 {
@@ -39,6 +40,12 @@ int main()
 
     //std::cout<<q->CanBroadCastTo({3,3,3})<<std::endl;
 
+    ComputationalNodeInfo qa = ComputationalNodeInfo("{Ops:1,Name:{Ops:1,Name:{Ops:1,Name:{Ops:1,Name:asd,D:0,ExtraInfo:tutututu,},D:0,ExtraInfo:tutututu,},D:0,ExtraInfo:tutututu,},D:0,ExtraInfo:{Ops:1,Name:{Ops:1,Name:{Ops:1,Name:{Ops:1,Name:asd,D:0,ExtraInfo:tutututu,},D:0,ExtraInfo:tutututu,},D:0,ExtraInfo:tutututu,},D:0,ExtraInfo:tutututu,},}");
+
+    std::cout<<qa.D<<std::endl;
+    std::cout<<qa.Ops<<std::endl;
+    std::cout<<qa.ExtraInfo<<std::endl;
+    std::cout<<qa.Name<<std::endl;
 
 }
 
