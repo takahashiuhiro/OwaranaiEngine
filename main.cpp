@@ -47,6 +47,20 @@ int main()
     std::cout<<qa.ExtraInfo<<std::endl;
     std::cout<<qa.Name<<std::endl;
 
+    std::string tt = qa.DumpToString();
+    std::cout<<qa.DumpToString()<<std::endl;
+    qa = ComputationalNodeInfo(qa.DumpToString());
+    qa = ComputationalNodeInfo(qa.DumpToString());
+    qa = ComputationalNodeInfo(qa.DumpToString());
+    qa = ComputationalNodeInfo(qa.DumpToString());
+    qa = ComputationalNodeInfo(qa.DumpToString());
+    qa = ComputationalNodeInfo(tt);
+    qa = ComputationalNodeInfo(qa.DumpToString());
+    qa = ComputationalNodeInfo(qa.DumpToString());
+    qa = ComputationalNodeInfo(qa.DumpToString());
+    qa = ComputationalNodeInfo(qa.DumpToString());
+    std::cout<<qa.DumpToString()<<std::endl;
+    std::cout<<(qa.DumpToString() == tt)<<std::endl;
 }
 
 

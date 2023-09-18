@@ -15,4 +15,6 @@ struct ComputationalNodeInfo
 
     void DecodeByString(std::string ProtoData);
     void DecodeSingleBlock(std::string ProtoData);
+    std::string DumpToString();
+    std::string BlockDumpToString(std::string BlockString);
 };
