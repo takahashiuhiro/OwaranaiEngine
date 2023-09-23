@@ -23,6 +23,7 @@ Tensor* Tensor::Copy()
 void Tensor::InitTensor(std::vector<size_t>shape, size_t DeviceNum)
 {
     this->shape = shape;
+    ShapeCount = 1;
     for(int a=0;a<shape.size();a++)ShapeCount*=shape[a];
     DPMgr = std::make_shared<DevicePointerManager>(DeviceNum, ShapeCount);
 }
@@ -869,4 +870,48 @@ Tensor* Tensor::Softmax(size_t InputDim)
     ReturnTensor = ExpResult->EleMul(SumEleInverseResult);
     delete ExpResult;
     return ReturnTensor;
+}
+
+void Tensor::SaveToFile(std::string FilePath)
+{
+    std::ofstream file(FilePath, std::ios::binary);
+    SaveToFile(file);
+    file.close();
+}
+
+void Tensor::SaveToFile(std::ofstream& OpenedFile)
+{
+    Log::Assert(OpenedFile.is_open(), std::string("This File Is Not Opened."));
+    //InitTensor(shape,0)
+    //然后是一个size_t的类型，是shape的维度
+    //然后把shape数组存进去，全是size_t
+    //然后把data数组存进去，全是float
+
+    size_t ProtoDeviceNum = GetDeviceNum();
+    ToDevice(0);
+    size_t ShapeSize = shape.size();
+    OpenedFile.write(reinterpret_cast<const char*>(&ShapeSize), sizeof(ShapeSize));
+    OpenedFile.write(reinterpret_cast<const char*>(shape.data()), sizeof(size_t)*shape.size());
+    OpenedFile.write(reinterpret_cast<const char*>(GetDevicePointer()), sizeof(float)*ShapeCount);
+    ToDevice(ProtoDeviceNum);
+}
+
+void Tensor::LoadFromFile(std::ifstream& OpenedFile)
+{
+    size_t ProtoDeviceNum = GetDeviceNum();
+    ToDevice(0);
+    size_t ShapeSize;
+    OpenedFile.read(reinterpret_cast<char*>(&ShapeSize), sizeof(ShapeSize));
+    std::vector<size_t>LoadShape;
+    LoadShape.resize(ShapeSize);
+    OpenedFile.read(reinterpret_cast<char*>(LoadShape.data()), sizeof(size_t)*LoadShape.size());
+    InitTensor(LoadShape,0);
+    OpenedFile.read(reinterpret_cast<char*>(GetDevicePointer()), sizeof(float)*ShapeCount);
+    ToDevice(ProtoDeviceNum);
+}
+void Tensor::LoadFromFile(std::string FilePath)
+{
+    std::ifstream file(FilePath, std::ios::binary);
+    LoadFromFile(file);
+    file.close();
 }

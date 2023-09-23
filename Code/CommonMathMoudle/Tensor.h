@@ -3,6 +3,7 @@
 #include "../CommonDataStructure/Log.h"
 #include "MathHelpers.h"
 #include <cmath>
+#include <fstream>
 
 #ifdef CUDA_USEFUL
 extern "C" void cudaMallocInCPP(float** Input, size_t Size, size_t DeviceNum);
@@ -253,4 +254,10 @@ public:
     bool CanBroadCastTo(std::vector<size_t>BroadCastShape);
     /**softmax.*/
     Tensor* Softmax(size_t InputDim);
+    /**把张量存成二进制文件.*/
+    void SaveToFile(std::ofstream& OpenedFile);
+    void SaveToFile(std::string FilePath);
+    /**从二进制文件里取出张量.*/
+    void LoadFromFile(std::ifstream& OpenedFile);
+    void LoadFromFile(std::string FilePath);
 };
