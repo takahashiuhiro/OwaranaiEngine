@@ -10,6 +10,20 @@ Tensor::Tensor(std::vector<size_t>shape, size_t DeviceNum)
     InitTensor(shape,DeviceNum);
 }
 
+Tensor* Tensor::CreateTensorByLoadPath(std::string LoadPath, size_t DeviceNum)
+{
+    Tensor* ReturnTensor = Tensor::CreateTensorByLoadPath(LoadPath);
+    ReturnTensor->ToDevice(DeviceNum);
+    return ReturnTensor;
+}
+
+Tensor* Tensor::CreateTensorByLoadPath(std::string LoadPath)
+{
+    Tensor* ReturnTensor = new Tensor();
+    ReturnTensor->LoadFromFile(LoadPath);
+    return ReturnTensor;
+}
+
 Tensor* Tensor::CopyNewEmptyTensor()
 {
     return new Tensor(shape, GetDeviceNum());
@@ -898,8 +912,17 @@ void Tensor::SaveToFile(std::ofstream& OpenedFile)
 
 void Tensor::LoadFromFile(std::ifstream& OpenedFile)
 {
-    size_t ProtoDeviceNum = GetDeviceNum();
-    ToDevice(0);
+    size_t ProtoDeviceNum;
+    bool CreateFlag = false;
+    if(DPMgr != nullptr)
+    {
+        ProtoDeviceNum = GetDeviceNum();
+        ToDevice(0);
+    }
+    else
+    {
+        CreateFlag = true;
+    }
     size_t ShapeSize;
     OpenedFile.read(reinterpret_cast<char*>(&ShapeSize), sizeof(ShapeSize));
     std::vector<size_t>LoadShape;
@@ -907,7 +930,10 @@ void Tensor::LoadFromFile(std::ifstream& OpenedFile)
     OpenedFile.read(reinterpret_cast<char*>(LoadShape.data()), sizeof(size_t)*LoadShape.size());
     InitTensor(LoadShape,0);
     OpenedFile.read(reinterpret_cast<char*>(GetDevicePointer()), sizeof(float)*ShapeCount);
-    ToDevice(ProtoDeviceNum);
+    if(!CreateFlag)
+    {
+        ToDevice(ProtoDeviceNum);
+    }
 }
 void Tensor::LoadFromFile(std::string FilePath)
 {
