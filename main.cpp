@@ -5,16 +5,10 @@
 #include "Code/AutomaticDifferentiation/AutoDiffCommon.h"
 #include <cmath>
 #include <fstream>
+#include "Code/AutomaticDifferentiation/Layers/BaseLayer.h"
+#include "Code/AutomaticDifferentiation/Layers/LinearSoftmaxLayer.h"
 int main() 
 {
-    Tensor* q = new Tensor({2,5,4}, 0);
-    Tensor* w = new Tensor({1,2,5}, 0);
-    q->FillArray(12);
-    std::string qq = "ww.ee";
-    w->FillArray(1);
-    w->SaveToFile(qq);
-
-    //Tensor* w = Tensor::CreateTensorByLoadPath(qq);
-    w->Matmul(q)->PrintData();
-    w->PrintData();
+    ComputationalGraph *w = new ComputationalGraph();
+    LinearSoftmaxLayer *m = new LinearSoftmaxLayer(nullptr, "gachi",{3,2,1}, 0);
 }
