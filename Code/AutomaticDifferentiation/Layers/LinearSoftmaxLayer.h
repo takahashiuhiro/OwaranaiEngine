@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseLayer.h"
+#include "LinearLayer.h"
 
 class LinearSoftmaxLayer:public BaseLayer
 {

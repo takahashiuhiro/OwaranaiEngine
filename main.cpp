@@ -9,6 +9,6 @@
 #include "Code/AutomaticDifferentiation/Layers/LinearSoftmaxLayer.h"
 int main() 
 {
-    ComputationalGraph *w = new ComputationalGraph();
     LinearSoftmaxLayer *m = new LinearSoftmaxLayer(nullptr, "gachi",{3,2,1}, 0);
+    std::cout<<m->SubLayers["layer_1"]->LayerName<<std::endl;
 }
