@@ -5,10 +5,11 @@ bool BaseLayer::IsRootNode()
     return ParentLayer == nullptr;
 }
 
-void BaseLayer::CommonInit(BaseLayer* InputParentLayer, std::string InputLayerName)
+void BaseLayer::CommonInit(BaseLayer* InputParentLayer, std::string InputLayerName, size_t ThisDeviceNum)
 {
     ParentLayer = InputParentLayer;
     LayerName = InputLayerName;
+    DeviceNum = ThisDeviceNum;
     if(IsRootNode())
     {
         CG = std::make_shared<ComputationalGraph>();
@@ -23,4 +24,14 @@ void BaseLayer::CommonInit(BaseLayer* InputParentLayer, std::string InputLayerNa
 void BaseLayer::RegisterLayer(std::shared_ptr<BaseLayer>InputLayer)
 {
     SubLayers[InputLayer->LayerName] = InputLayer;
+}
+
+void BaseLayer::RegisterWeightNode()
+{
+
+}
+
+void BaseLayer::CommonDestroy()
+{
+
 }

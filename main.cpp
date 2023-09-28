@@ -9,6 +9,7 @@
 #include "Code/AutomaticDifferentiation/Layers/LinearSoftmaxLayer.h"
 int main() 
 {
-    LinearSoftmaxLayer *m = new LinearSoftmaxLayer(nullptr, "gachi",{3,2,1}, 0);
+    LinearSoftmaxLayer *m = new LinearSoftmaxLayer(nullptr, "gachi",1,{3,2,1}, 0);
     std::cout<<m->SubLayers["layer_1"]->LayerName<<std::endl;
+    std::cout<<m->SubLayers["layer_1"]->DeviceNum<<std::endl;
 }
