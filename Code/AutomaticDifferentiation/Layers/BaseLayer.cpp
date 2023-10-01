@@ -26,12 +26,18 @@ void BaseLayer::RegisterLayer(std::shared_ptr<BaseLayer>InputLayer)
     SubLayers[InputLayer->LayerName] = InputLayer;
 }
 
-void BaseLayer::RegisterWeightNode()
+void BaseLayer::RegisterWeightNode(std::string InputNodeid,std::vector<size_t>InputTensorShape)
 {
-
+    CG->RegisterWeightNode(PreName+std::string(".")+InputNodeid, InputTensorShape);
+    WeightNodeArray.push_back(InputNodeid);
 }
 
 void BaseLayer::CommonDestroy()
 {
 
+}
+
+std::string BaseLayer::GetLayerNodeName(std::string InputNodeName)
+{
+    return PreName + std::string(".") + InputNodeName;
 }

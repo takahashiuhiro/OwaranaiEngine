@@ -29,14 +29,19 @@ public:
     void CommonInit();
     /**注册点.*/
     void RegisterNode(std::string id);
+    void RegisterNode(std::string id, std::vector<size_t>ThisNodeShape);
     /**注册点默认属性.*/
     void RegisterDefaultProperty(std::string Nodeid);
+    void RegisterDefaultProperty(std::string Nodeid, std::vector<size_t>ThisNodeShape);
     /**注册变量.*/
     void RegisterVariableNode(std::string Nodeid);
+    void RegisterVariableNode(std::string Nodeid, std::vector<size_t>ThisNodeShape);
     /**注册权重变量.*/
     void RegisterWeightNode(std::string Nodeid);
+    void RegisterWeightNode(std::string Nodeid, std::vector<size_t>ThisNodeShape);
     /**注册常量.*/
     void RegisterConstNode(std::string Nodeid);
+    void RegisterConstNode(std::string Nodeid, std::vector<size_t>ThisNodeShape);
     /**注册算子.*/
     void RegisterOps(std::string OutputNodeid, std::vector<std::string> InputNodeid, size_t OpsTypeid, Dict OpsParams);
     /**注册算子增边.*/

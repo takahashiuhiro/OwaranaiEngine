@@ -18,6 +18,8 @@ public:
     std::string LayerName = "";
     /**子节点们.*/
     std::map<std::string, std::shared_ptr<BaseLayer>>SubLayers;//todo::别忘了这里要释放内存
+    /**本层所属的权重矩阵.*/
+    std::vector<std::string>WeightNodeArray;
     /**root的计算图，只允许root是非nullptr.*/
     std::shared_ptr<ComputationalGraph> CG = nullptr;
     /**父节点，root为nullptr.*/
@@ -32,12 +34,13 @@ public:
     /**在这里注册网络.*/
     void RegisterLayer(std::shared_ptr<BaseLayer>InputLayer);
     /**注册参数矩阵.*/
-    void RegisterWeightNode();
+    void RegisterWeightNode(std::string InputNodeid,std::vector<size_t>InputTensorShape);
     /**公共析构需要调用的.*/
     void CommonDestroy();
+    std::string GetLayerNodeName(std::string InputNodeName);
 
     /**进行前向构建的.*/
-    virtual void Forward(){};
+    virtual std::vector<std::string> Forward(std::vector<std::string>InputNodeArray) = 0;
     /**感觉应该还得有一个启动函数.*/
     virtual void Run(){};
 };

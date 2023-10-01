@@ -34,11 +34,23 @@ void ComputationalGraph::RegisterNode(std::string id)
     RegisterDefaultProperty(id);
 }
 
+void ComputationalGraph::RegisterNode(std::string id, std::vector<size_t>ThisNodeShape)
+{
+    RegisterNode(id);
+    GetNode(id)->NodeContentShape = ThisNodeShape;
+}
+
 void ComputationalGraph::RegisterVariableNode(std::string Nodeid)
 {
     RegisterNode(Nodeid);
     GetNode(Nodeid)->Property.Set("RequireGrad", true);
     GetNode(Nodeid)->Property.Set("Input", true);
+}
+
+void ComputationalGraph::RegisterVariableNode(std::string Nodeid, std::vector<size_t>ThisNodeShape)
+{
+    RegisterVariableNode(Nodeid);
+    GetNode(Nodeid)->NodeContentShape = ThisNodeShape;
 }
 
 void ComputationalGraph::RegisterWeightNode(std::string Nodeid)
@@ -47,11 +59,23 @@ void ComputationalGraph::RegisterWeightNode(std::string Nodeid)
     GetNode(Nodeid)->Property.Set("Weight", true);
 }
 
+void ComputationalGraph::RegisterWeightNode(std::string Nodeid, std::vector<size_t>ThisNodeShape)
+{
+    RegisterWeightNode(Nodeid);
+    GetNode(Nodeid)->NodeContentShape = ThisNodeShape;
+}
+
 void ComputationalGraph::RegisterConstNode(std::string Nodeid)
 {
     RegisterNode(Nodeid);
     GetNode(Nodeid)->Property.Set("Input", true);
     GetNode(Nodeid)->Property.Set("Const", true);
+}
+
+void ComputationalGraph::RegisterConstNode(std::string Nodeid, std::vector<size_t>ThisNodeShape)
+{
+    RegisterConstNode(Nodeid);
+    GetNode(Nodeid)->NodeContentShape = ThisNodeShape;
 }
 
 ComputationalNode* ComputationalGraph::GetNode(std::string Nodeid)
