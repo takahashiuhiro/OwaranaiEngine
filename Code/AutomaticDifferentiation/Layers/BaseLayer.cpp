@@ -32,12 +32,22 @@ void BaseLayer::RegisterWeightNode(std::string InputNodeid,std::vector<size_t>In
     WeightNodeArray.push_back(InputNodeid);
 }
 
-void BaseLayer::CommonDestroy()
-{
-
-}
-
 std::string BaseLayer::GetLayerNodeName(std::string InputNodeName)
 {
     return PreName + std::string(".") + InputNodeName;
+}
+
+void BaseLayer::SaveToFile(std::string SavePath)
+{
+    //todo
+}
+
+void BaseLayer::LoadFromFile(std::string LoadPath)
+{
+    //todo
+}
+
+std::vector<std::string> BaseLayer::GetAllSubLayersNodeDfs()
+{
+    //todo
 }

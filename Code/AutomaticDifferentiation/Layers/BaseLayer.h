@@ -35,12 +35,17 @@ public:
     void RegisterLayer(std::shared_ptr<BaseLayer>InputLayer);
     /**注册参数矩阵.*/
     void RegisterWeightNode(std::string InputNodeid,std::vector<size_t>InputTensorShape);
-    /**公共析构需要调用的.*/
-    void CommonDestroy();
+    /**根据层内相对名字获取绝对名字.*/
     std::string GetLayerNodeName(std::string InputNodeName);
+    /**储存网络权重.*/
+    void SaveToFile(std::string SavePath);
+    /**加载网络权重.*/
+    void LoadFromFile(std::string LoadPath);
+    /**dfs的输出所有子层要保存权重的节点.*/
+    std::vector<std::string> GetAllSubLayersNodeDfs();
 
     /**进行前向构建的.*/
-    virtual std::vector<std::string> Forward(std::vector<std::string>InputNodeArray) = 0;
+    virtual std::vector<std::string> Forward(std::vector<std::string>InputNodeArray){};
     /**感觉应该还得有一个启动函数.*/
     virtual void Run(){};
 };

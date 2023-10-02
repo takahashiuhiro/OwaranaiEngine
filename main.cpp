@@ -9,12 +9,12 @@
 #include "Code/AutomaticDifferentiation/Layers/LinearSoftmaxLayer.h"
 int main() 
 {
-    LinearSoftmaxLayer *m = new LinearSoftmaxLayer(nullptr, "gachi",0,{2,4,3}, 0);
+    LinearSoftmaxLayer *m = new LinearSoftmaxLayer(nullptr, "gachi",1,{2,4,3}, 0);
 
     m->CG->RegisterVariableNode("x", {2,3,4});
-    auto ForwardRes = m->Forward({std::string("x")});
+    auto ForwardRes = m->Forward({"x"});
 
-    m->CG->GetNode("x")->AssignContent(new Tensor({2,3,4},0));//对节点f的导数赋值张量
+    m->CG->GetNode("x")->AssignContent(new Tensor({2,3,4},1));//对节点f的导数赋值张量
     m->CG->GetNode("x")->GetContent()->FillArray(4);
 
     //m->CG->PrintGraphAdjacencyList(1);
