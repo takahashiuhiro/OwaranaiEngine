@@ -171,6 +171,8 @@ public:
 
     Tensor* CopyNewEmptyTensor();
     Tensor* Copy();
+    static Tensor* CreateTensorByLoadPath(std::ifstream& OpenedFile, size_t DeviceNum);
+    static Tensor* CreateTensorByLoadPath(std::ifstream& OpenedFile);
     static Tensor* CreateTensorByLoadPath(std::string LoadPath, size_t DeviceNum);
     static Tensor* CreateTensorByLoadPath(std::string LoadPath);
 

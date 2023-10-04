@@ -10,6 +10,20 @@ Tensor::Tensor(std::vector<size_t>shape, size_t DeviceNum)
     InitTensor(shape,DeviceNum);
 }
 
+Tensor* Tensor::CreateTensorByLoadPath(std::ifstream& OpenedFile, size_t DeviceNum)
+{
+    Tensor* ReturnTensor = Tensor::CreateTensorByLoadPath(OpenedFile);
+    ReturnTensor->ToDevice(DeviceNum);
+    return ReturnTensor;
+}
+
+Tensor* Tensor::CreateTensorByLoadPath(std::ifstream& OpenedFile)
+{
+    Tensor* ReturnTensor = new Tensor();
+    ReturnTensor->LoadFromFile(OpenedFile);
+    return ReturnTensor;
+}
+
 Tensor* Tensor::CreateTensorByLoadPath(std::string LoadPath, size_t DeviceNum)
 {
     Tensor* ReturnTensor = Tensor::CreateTensorByLoadPath(LoadPath);

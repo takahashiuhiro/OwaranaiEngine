@@ -4,6 +4,7 @@
 #include <memory>
 #include <map>
 #include <vector>
+#include "../../CommonDataStructure/CommonFuncHelpers.h"
 #include "../../CommonMathMoudle/Tensor.h"
 #include "../../CommonDataStructure/Dict.h"
 #include "../ComputationalGraph.h"
@@ -43,6 +44,9 @@ public:
     void LoadFromFile(std::string LoadPath);
     /**dfs的输出所有子层要保存权重的节点.*/
     std::vector<std::string> GetAllSubLayersNodeDfs();
+    std::vector<std::string> GetAllSubLayersNodeDfs(bool AutoFlag);
+    /**衔接树链.*/
+    std::string GetLinkName(std::string PreStr, std::string NxtStr);
 
     /**进行前向构建的.*/
     virtual std::vector<std::string> Forward(std::vector<std::string>InputNodeArray){};
