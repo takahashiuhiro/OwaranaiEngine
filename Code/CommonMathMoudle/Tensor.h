@@ -4,6 +4,8 @@
 #include "MathHelpers.h"
 #include <cmath>
 #include <fstream>
+#include <random>
+#include <chrono>
 
 #ifdef CUDA_USEFUL
 extern "C" void cudaMallocInCPP(float** Input, size_t Size, size_t DeviceNum);
@@ -264,4 +266,6 @@ public:
     /**从二进制文件里取出张量.*/
     void LoadFromFile(std::ifstream& OpenedFile);
     void LoadFromFile(std::string FilePath);
+    /**填充随机数.*/
+    void FillRandomValNormal();
 };

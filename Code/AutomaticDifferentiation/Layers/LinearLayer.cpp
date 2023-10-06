@@ -4,9 +4,8 @@ LinearLayer::LinearLayer(BaseLayer* ParentThis,std::string ThisLayerName, size_t
 {
     this->CommonInit(ParentThis, ThisLayerName, ThisDeviceNum);
     this->RegisterWeightNode("LinearWeight", WeightShape);
-    //test
-    //CG->GetNode(this->GetLayerNodeName("LinearWeight"))->AssignContent(new Tensor(WeightShape,ThisDeviceNum));
-    //CG->GetNode(this->GetLayerNodeName("LinearWeight"))->GetContent()->FillArray(4.);
+    CG->GetNode(this->GetLayerNodeName("LinearWeight"))->AssignContent(new Tensor(WeightShape,ThisDeviceNum));
+    CG->GetNode(this->GetLayerNodeName("LinearWeight"))->GetContent()->FillArray(16.);
 }
 
 std::vector<std::string> LinearLayer::Forward(std::vector<std::string>InputNodeArray)

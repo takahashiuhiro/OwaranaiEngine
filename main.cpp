@@ -21,9 +21,15 @@ int main()
     m->CG->GetNode("x")->GetContent()->FillArray(4);
 
     //m->SaveToFile("tttt");
+    //m->SubLayers["layer_1"]->SaveToFile("tttt1111");
     //m->LoadFromFile("tttt");
+    m->SubLayers["layer_1"]->LoadFromFile("tttt1111");
 
     m->CG->ForwardDfs(ForwardRes[0]);
     m->CG->GetNode(ForwardRes[0])->PrintData();
+
+    Tensor* fgfg = new Tensor({2,3});
+    fgfg->FillRandomValNormal();
+    fgfg->PrintData();
 
 }

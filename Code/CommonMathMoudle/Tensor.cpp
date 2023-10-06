@@ -955,3 +955,23 @@ void Tensor::LoadFromFile(std::string FilePath)
     LoadFromFile(file);
     file.close();
 }
+
+void Tensor::FillRandomValNormal()
+{
+    if(GetDeviceNum())
+    {
+        #ifdef CUDA_USEFUL
+        //todo
+        #endif
+    }
+    else
+    {
+        unsigned Seed = std::chrono::system_clock::now().time_since_epoch().count();
+        std::default_random_engine Gen(Seed);
+        std::normal_distribution<> Dist(0.0, 1.0);
+        for(size_t a = 0;a<ShapeCount;a++)
+        {
+            GetDevicePointer()[a] = Dist(Gen);
+        }
+    }
+}

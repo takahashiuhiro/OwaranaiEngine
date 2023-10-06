@@ -63,7 +63,6 @@ void BaseLayer::LoadFromFile(std::string LoadPath)
     {
         std::string ThisNodeName = LoadFromFileString(OpenedFile);
         Tensor* ThisNodeContent = Tensor::CreateTensorByLoadPath(OpenedFile, DeviceNum);
-        std::cout<<"????: "<<ThisNodeName<<std::endl;
         CG->GetNode(GetLayerNodeName(ThisNodeName))->AssignContent(ThisNodeContent);
     }
 }
