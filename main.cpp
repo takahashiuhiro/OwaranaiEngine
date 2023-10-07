@@ -28,8 +28,12 @@ int main()
     m->CG->ForwardDfs(ForwardRes[0]);
     m->CG->GetNode(ForwardRes[0])->PrintData();
 
-    Tensor* fgfg = new Tensor({2,3});
+    Tensor* fgfg = new Tensor({2,3},1);
     fgfg->FillRandomValNormal();
     fgfg->PrintData();
+
+    Tensor* fgfg1 = new Tensor({2,3},0);
+    fgfg1->FillRandomValNormal();
+    fgfg1->PrintData();
 
 }

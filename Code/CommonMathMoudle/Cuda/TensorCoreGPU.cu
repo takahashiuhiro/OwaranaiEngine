@@ -640,3 +640,11 @@ void cudaMallocInCPP(float** Input, size_t Size, size_t DeviceNum)
   cudaSetDevice(DeviceNum);
   cudaMalloc(Input, Size*sizeof(float));
 }
+
+void FillRandomValNormalInCPP(float* OutputData, size_t OutputShapeCount, unsigned Seed)
+{
+  curandGenerator_t gen;
+  curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
+  curandSetPseudoRandomGeneratorSeed(gen, Seed);
+  curandGenerateNormal(gen, OutputData, OutputShapeCount, 0.0f, 1.0f);
+}

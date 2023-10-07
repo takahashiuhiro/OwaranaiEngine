@@ -45,6 +45,7 @@ extern "C" void GetTensorBy2ShapeVectorInCPP(float* OutputData, float* InputData
 extern "C" void EleExpInCPP(float* OutputData, size_t OutputShape, float BaseNum);
 extern "C" void EleInverseInCPP(float* OutputData, size_t OutputShape);
 extern "C" void BroadCastToInCPP(float* OutputData, float* InputData, size_t* OutputShape, size_t* InputShape, size_t ShapeLen, size_t OutputShapeCount);
+extern "C" void FillRandomValNormalInCPP(float* OutputData, size_t OutputShapeCount, unsigned Seed);
 #endif
 
 struct CudaDimVec
@@ -268,4 +269,5 @@ public:
     void LoadFromFile(std::string FilePath);
     /**填充随机数.*/
     void FillRandomValNormal();
+    void FillRandomValNormal(unsigned Seed);
 };

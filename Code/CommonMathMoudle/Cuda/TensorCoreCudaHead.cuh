@@ -1,6 +1,7 @@
 #include <cuda_runtime.h>
 #include <stdio.h>
 #include <cublas_v2.h>
+#include <curand.h>
 #define THREAD_NUM 256
 
 extern "C" void cudaMallocInCPP(float** Input, size_t Size, size_t DeviceNum);
@@ -41,6 +42,7 @@ extern "C" void GetTensorBy2ShapeVectorInCPP(float* OutputData, float* InputData
 extern "C" void EleExpInCPP(float* OutputData, size_t OutputShape, float BaseNum);
 extern "C" void EleInverseInCPP(float* OutputData, size_t OutputShape);
 extern "C" void BroadCastToInCPP(float* OutputData, float* InputData, size_t* OutputShape, size_t* InputShape, size_t ShapeLen, size_t OutputShapeCount);
+extern "C" void FillRandomValNormalInCPP(float* OutputData, size_t OutputShapeCount, unsigned Seed);
 
 struct CudaPair 
 {
