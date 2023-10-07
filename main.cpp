@@ -23,17 +23,15 @@ int main()
     //m->SaveToFile("tttt");
     //m->SubLayers["layer_1"]->SaveToFile("tttt1111");
     //m->LoadFromFile("tttt");
-    m->SubLayers["layer_1"]->LoadFromFile("tttt1111");
+    //m->SubLayers["layer_1"]->LoadFromFile("tttt1111");
 
     m->CG->ForwardDfs(ForwardRes[0]);
     m->CG->GetNode(ForwardRes[0])->PrintData();
 
-    Tensor* fgfg = new Tensor({2,3},1);
-    fgfg->FillRandomValNormal();
-    fgfg->PrintData();
+    m->CG->BackwardMultiBuildGraph(1);
 
-    Tensor* fgfg1 = new Tensor({2,3},0);
-    fgfg1->FillRandomValNormal();
-    fgfg1->PrintData();
-
+    m->CG->GetNode(m->CG->GetDNodeid(ForwardRes[0]))->AssignContent(new Tensor({2,3,3},dd));
+    m->CG->GetNode(m->CG->GetDNodeid(ForwardRes[0]))->GetContent()->FillArray(1.);
+    m->CG->ForwardDfs(m->CG->GetDNodeid("gachi.layer_1.LinearWeight"));
+    m->CG->GetNode(m->CG->GetDNodeid("gachi.layer_1.LinearWeight"))->PrintData();
 }
