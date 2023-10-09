@@ -14,10 +14,9 @@ int main()
 
     LinearSoftmaxLayer *m = new LinearSoftmaxLayer(nullptr, "gachi",dd,{2,4,3}, 0);
 
-    m->CG->RegisterVariableNode("x", {2,3,4});
+    m->RegisterInputNode("x", {2,3,4});
     auto ForwardRes = m->Forward({"x"});
 
-    m->CG->GetNode("x")->AssignContent(new Tensor({2,3,4},dd));//对节点f的导数赋值张量
     m->CG->GetNode("x")->GetContent()->FillArray(4);
 
     //m->SaveToFile("tttt");

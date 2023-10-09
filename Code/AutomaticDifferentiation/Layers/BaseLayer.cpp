@@ -31,6 +31,16 @@ void BaseLayer::RegisterWeightNode(std::string InputNodeid,std::vector<size_t>In
 {
     CG->RegisterWeightNode(GetLayerNodeName(InputNodeid), InputTensorShape);
     WeightNodeArray.push_back(InputNodeid);
+    CG->GetNode(this->GetLayerNodeName(InputNodeid))->AssignContent(new Tensor(InputTensorShape,DeviceNum));
+    CG->GetNode(this->GetLayerNodeName(InputNodeid))->GetContent()->FillRandomValNormal();
+}
+
+void BaseLayer::RegisterInputNode(std::string InputNodeid,std::vector<size_t>InputTensorShape)
+{
+    CG->RegisterVariableNode(InputNodeid, InputTensorShape);
+    InputNodes.push_back(InputNodeid);
+    CG->GetNode(InputNodeid)->AssignContent(new Tensor(InputTensorShape,DeviceNum));
+    CG->GetNode(InputNodeid)->GetContent()->FillRandomValNormal();
 }
 
 std::string BaseLayer::GetLayerNodeName(std::string InputNodeName)

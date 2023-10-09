@@ -4,8 +4,6 @@ LinearLayer::LinearLayer(BaseLayer* ParentThis,std::string ThisLayerName, size_t
 {
     this->CommonInit(ParentThis, ThisLayerName, ThisDeviceNum);
     this->RegisterWeightNode("LinearWeight", WeightShape);
-    CG->GetNode(this->GetLayerNodeName("LinearWeight"))->AssignContent(new Tensor(WeightShape,ThisDeviceNum));
-    CG->GetNode(this->GetLayerNodeName("LinearWeight"))->GetContent()->FillRandomValNormal();
 }
 
 std::vector<std::string> LinearLayer::Forward(std::vector<std::string>InputNodeArray)

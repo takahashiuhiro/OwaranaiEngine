@@ -27,6 +27,7 @@ public:
     BaseLayer* ParentLayer = nullptr;
     /**设备数(同tensor的设备数)*/
     size_t DeviceNum = 0;
+    std::vector<std::string> InputNodes;
 
     /**判断该层是否为root节点.*/
     bool IsRootNode();
@@ -36,6 +37,8 @@ public:
     void RegisterLayer(std::shared_ptr<BaseLayer>InputLayer);
     /**注册参数矩阵.*/
     void RegisterWeightNode(std::string InputNodeid,std::vector<size_t>InputTensorShape);
+    /**注册输入矩阵.*/
+    void RegisterInputNode(std::string InputNodeid,std::vector<size_t>InputTensorShape);
     /**根据层内相对名字获取绝对名字.*/
     std::string GetLayerNodeName(std::string InputNodeName);
     /**储存网络权重.*/
