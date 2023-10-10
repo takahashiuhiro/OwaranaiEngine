@@ -3,6 +3,7 @@ project(${TARGET_NAME})
 
 add_subdirectory(Ops)
 add_subdirectory(Layers)
+add_subdirectory(Optimizer)
 
 file(GLOB_RECURSE CURRENT_HEADERS  *.h)
 file(GLOB_RECURSE CURRENT_SOURCES  *.cpp)
