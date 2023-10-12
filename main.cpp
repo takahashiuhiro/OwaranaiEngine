@@ -28,5 +28,11 @@ int main()
     m->CG->ForwardDfs(m->CG->GetDNodeid("gachi.layer_1.LinearWeight"));
     //m->CG->GetNode(m->CG->GetDNodeid("gachi.layer_1.LinearWeight"))->PrintData();
 
-    BaseOptimizer qweddd;
+    BaseOptimizer* qweddd = new BaseOptimizer();
+    qweddd->CG = m->CG;
+    auto ttp = qweddd->GetWeightUpdateNodes();
+    for(auto ff:ttp)
+    {
+        std::cout<<ff<<std::endl;
+    }
 }

@@ -14,7 +14,6 @@ public:
 
     /**记录属性.*/
     Dict Property;
-    void InitProperty();
 
     std::vector<std::string> OutputNodeidList;
     std::vector<std::string> InputNodeidList;

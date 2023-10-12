@@ -3,13 +3,12 @@
 
 ComputationalNode::ComputationalNode()
 {
-    InitProperty();
+    //InitProperty();
 }
 
 ComputationalNode::ComputationalNode(std::string id)
 {
     this->id = id;
-    InitProperty();
 }
 
 ComputationalNode::~ComputationalNode()
@@ -20,13 +19,6 @@ ComputationalNode::~ComputationalNode()
     }
     OutputNodeidList.clear();
     InputNodeidList.clear();
-}
-
-void ComputationalNode::InitProperty()
-{
-    Property.Set("Input",false);//是否是原始输入图，允许梯度图为原始输入图
-    Property.Set("RequireGrad", false);//是否需要梯度
-    Property.Set("IsParamNode", false);//是否是参数矩阵
 }
 
 void ComputationalNode::ClearContent()

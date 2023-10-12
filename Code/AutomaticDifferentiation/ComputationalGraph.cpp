@@ -22,10 +22,11 @@ void ComputationalGraph::AddNode(BaseNode* NewNode)
 
 void ComputationalGraph::RegisterDefaultProperty(std::string Nodeid)
 {
-    GetNode(Nodeid)->Property.Set("RequireGrad", false);
-    GetNode(Nodeid)->Property.Set("Input", false);
-    GetNode(Nodeid)->Property.Set("Const", false);
-    GetNode(Nodeid)->Property.Set("Weight", false);
+    GetNode(Nodeid)->Property.Set("RequireGrad", false);//是否可导
+    GetNode(Nodeid)->Property.Set("Input", false);//是否是输入
+    GetNode(Nodeid)->Property.Set("Const", false);//是否是常量
+    GetNode(Nodeid)->Property.Set("Weight", false);//是否是权重
+    GetNode(Nodeid)->Property.Set("Freeze", false);//是否是冻结参数
 }
 
 void ComputationalGraph::RegisterNode(std::string id)
@@ -307,4 +308,35 @@ void ComputationalGraph::ClearDataPropertyExclude(std::vector<std::string>CheckP
 void ComputationalGraph::ClearDataPropertyExclude()
 {
     ClearDataPropertyExclude({"Weight", "Const"});
+}
+
+std::vector<std::string> ComputationalGraph::GetNodesByProperty(std::vector<std::string>IncludeList, std::vector<std::string>ExcludeList)
+{
+    std::vector<std::string>ReturnVector;
+    for(auto& NodePair:Nodes)
+    {
+        ComputationalNode* CGNodeIt = static_cast<ComputationalNode*>(NodePair.second);
+        bool flag = 0;
+        for(size_t a = 0;a < IncludeList.size();a++)
+        {
+            if(!CGNodeIt->Property.Get<bool>(IncludeList[a]))
+            {
+                flag = 1;
+                break;
+            }
+        }
+        for(size_t a = 0;a < ExcludeList.size();a++)
+        {
+            if(CGNodeIt->Property.Get<bool>(ExcludeList[a]))
+            {
+                flag = 1;
+                break;
+            }
+        }
+        if(!flag)
+        {
+            ReturnVector.push_back(NodePair.first);
+        }
+    }
+    return ReturnVector;
 }

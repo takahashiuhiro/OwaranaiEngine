@@ -1,6 +1,6 @@
 #include "BaseOptimizer.h"
 
-std::vector<std::string> BaseOptimizer::GetWeightUpdateNode()
+std::vector<std::string> BaseOptimizer::GetWeightUpdateNodes()
 {
-    
+    return CG->GetNodesByProperty({"Weight","RequireGrad"},{"Freeze"});
 }
