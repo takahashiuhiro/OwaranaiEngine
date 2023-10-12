@@ -8,7 +8,7 @@ class ComputationalNode:public BaseNode
 {
 public:
 
-    ComputationalNode();
+    ComputationalNode(){};
     ComputationalNode(std::string);
     ~ComputationalNode();
 

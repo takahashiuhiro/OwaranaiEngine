@@ -1,11 +1,6 @@
 #include "ComputationalNode.h"
 #include "../CommonDataStructure/Log.h"
 
-ComputationalNode::ComputationalNode()
-{
-    //InitProperty();
-}
-
 ComputationalNode::ComputationalNode(std::string id)
 {
     this->id = id;
