@@ -31,6 +31,8 @@ public:
     void AssignTensor(std::string TensorName,Tensor* ProtoTensor, Tensor* DTensor);
     /**从计算图同步张量指针.*/
     void SyncTensorByCG();
+    /**把结果同步向计算图.*/
+    void SyncTensorToCG();
 
     /**初始化优化器.*/
     virtual void Init();
@@ -45,6 +47,6 @@ public:
     virtual void Update() = 0;
     /**设置优化器默认参数.*/
     virtual void SetDefaultParams(){};
-
+    /**清空结果数据.*/
     virtual void ClearData();
 };

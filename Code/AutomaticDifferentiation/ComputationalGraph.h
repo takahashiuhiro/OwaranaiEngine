@@ -83,7 +83,7 @@ public:
     /**以下词条任意为false的将被清理数据.*/
     void ClearDataPropertyExclude(std::vector<std::string>CheckPropertyList);
     /**清除Weight和Const以外的节点.*/
-    void ClearDataPropertyExclude();
+    void ClearWeightConstExclude();
     /**查询输入节点编号是否是待求导编号.*/
     bool CheckInputNodeidCanBackward(std::string InputNodeid);
     /**查询节点需包含什么属性，不能含有什么属性.*/

@@ -305,7 +305,7 @@ void ComputationalGraph::ClearDataPropertyExclude(std::vector<std::string>CheckP
     }
 }
 
-void ComputationalGraph::ClearDataPropertyExclude()
+void ComputationalGraph::ClearWeightConstExclude()
 {
     ClearDataPropertyExclude({"Weight", "Const"});
 }

@@ -55,3 +55,11 @@ void BaseOptimizer::ClearData()
 {
     ResTensorMap.clear();
 }
+
+void BaseOptimizer::SyncTensorToCG()
+{
+    for(auto& TensorPair:ResTensorMap)
+    {
+        CG->GetNode(TensorPair.first)->AssignContent(TensorPair.second);
+    }
+}

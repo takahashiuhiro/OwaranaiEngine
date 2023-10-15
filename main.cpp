@@ -18,15 +18,22 @@ int main()
     m->CG->GetNode("x")->GetContent()->FillArray(4);
     m->CG->ForwardDfs(ForwardRes[0]);
     m->CG->BackwardMultiBuildGraph(1);
-    m->CG->GetNode(m->CG->GetDNodeid(ForwardRes[0]))->AssignContent(new Tensor({1,3,3},dd));
-    m->CG->GetNode(m->CG->GetDNodeid(ForwardRes[0]))->GetContent()->FillArray(1.);
-    m->CG->ForwardDfs(m->CG->GetDNodeid("gachi.layer_1.LinearWeight"));
 
     BaseOptimizer* qweddd = new SGDOptimizer();
     qweddd->Init(m->CG);
-    qweddd->SyncTensorByCG();
-    qweddd->TensorMap["gachi.layer_1.LinearWeight"].first->PrintData();
-    qweddd->TensorMap["gachi.layer_1.LinearWeight"].second->PrintData();
-    qweddd->Update();
-    qweddd->ResTensorMap["gachi.layer_1.LinearWeight"]->PrintData();
+
+    m->CG->GetNode("gachi.layer_1.LinearWeight")->PrintData();
+    for(int a=1;a<3;a++)
+    {
+        m->CG->GetNode("x")->AssignContent(new Tensor({1,3,3},dd));
+        m->CG->GetNode("x")->GetContent()->FillArray(4);
+        m->CG->GetNode(m->CG->GetDNodeid(ForwardRes[0]))->AssignContent(new Tensor({1,3,3},dd));
+        m->CG->GetNode(m->CG->GetDNodeid(ForwardRes[0]))->GetContent()->FillArray(a*1.);
+        m->CG->ForwardDfs(m->CG->GetDNodeid("gachi.layer_1.LinearWeight"));
+        qweddd->SyncTensorByCG();
+        qweddd->Update();
+        qweddd->SyncTensorToCG();
+        m->CG->ClearWeightConstExclude();
+        m->CG->GetNode("gachi.layer_1.LinearWeight")->PrintData();
+    }
 }
