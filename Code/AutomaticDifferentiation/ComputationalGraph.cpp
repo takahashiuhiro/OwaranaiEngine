@@ -340,3 +340,12 @@ std::vector<std::string> ComputationalGraph::GetNodesByProperty(std::vector<std:
     }
     return ReturnVector;
 }
+
+void ComputationalGraph::ComputeWeightNodesDForward()
+{
+    auto NodeList = GetNodesByProperty({"Weight","RequireGrad"},{});
+    for(size_t a = 0;a<NodeList.size();a++)
+    {
+        ForwardDfs(GetDNodeid(NodeList[a]));
+    }
+}

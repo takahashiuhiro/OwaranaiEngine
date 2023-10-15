@@ -29,7 +29,7 @@ int main()
         m->CG->GetNode("x")->GetContent()->FillArray(4);
         m->CG->GetNode(m->CG->GetDNodeid(ForwardRes[0]))->AssignContent(new Tensor({1,3,3},dd));
         m->CG->GetNode(m->CG->GetDNodeid(ForwardRes[0]))->GetContent()->FillArray(a*1.);
-        m->CG->ForwardDfs(m->CG->GetDNodeid("gachi.layer_1.LinearWeight"));
+        m->CG->ComputeWeightNodesDForward();
         qweddd->SyncTensorByCG();
         qweddd->Update();
         qweddd->SyncTensorToCG();

@@ -88,4 +88,6 @@ public:
     bool CheckInputNodeidCanBackward(std::string InputNodeid);
     /**查询节点需包含什么属性，不能含有什么属性.*/
     std::vector<std::string> GetNodesByProperty(std::vector<std::string>IncludeList, std::vector<std::string>ExcludeList);
+    /**运算需要求导的节点.*/
+    void ComputeWeightNodesDForward();
 };
