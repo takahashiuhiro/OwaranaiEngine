@@ -56,6 +56,8 @@ public:
     void RegisterDNode(std::string id);
     /**对该点返回一个对应的导数节点id，不支持直接注册_d结尾的节点.*/
     std::string GetDNodeid(std::string id);
+    /**得到一个复制的节点名称.*/
+    std::string GetCopyNode(std::string id);
     /**在算子里会出现a->c且a->b的情况,在这种情况下如果c对a求导，会在a_d和c_d之间的反向过程里建立一个新节点，用来表达c_d给a_d的贡献的中间节点.*/
     std::string GetDPartNodeid(std::string Startid, std::string Endid);
     /**有的时候不是很好起节点名字，先这么起，后续需要节点按照名字解析成图.*/

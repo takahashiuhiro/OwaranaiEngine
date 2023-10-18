@@ -92,7 +92,7 @@ void Tensor::PrintData()
             else break;
         }
     }
-    std::cout<<std::endl;
+    //std::cout<<std::endl;
     ToDevice(ProtoDeviceNum);
 }
 

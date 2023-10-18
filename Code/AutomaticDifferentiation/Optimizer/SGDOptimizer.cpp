@@ -13,5 +13,5 @@ void SGDOptimizer::Update()
 
 void SGDOptimizer::SetDefaultParams()
 {
-    Params.Set("lr", 0.1);
+    Params.Set("lr", 0.001);
 }

@@ -93,7 +93,12 @@ void ComputationalGraph::RegisterOpsAddEdge(std::string OutputNodeid, std::strin
 
 std::string ComputationalGraph::GetDNodeid(std::string id)
 {
-    return id+"_d";
+    return "("+id+"_d)";
+}
+
+std::string ComputationalGraph::GetCopyNode(std::string id)
+{
+    return "("+id+"_copy)";
 }
 
 std::string ComputationalGraph::GetDPartNodeid(std::string Startid, std::string Endid)
