@@ -646,5 +646,5 @@ void FillRandomValNormalInCPP(float* OutputData, size_t OutputShapeCount, unsign
   curandGenerator_t gen;
   curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
   curandSetPseudoRandomGeneratorSeed(gen, Seed);
-  curandGenerateNormal(gen, OutputData, OutputShapeCount, 0.0f, 1.0f);
+  curandGenerateNormal(gen, OutputData, OutputShapeCount+1, 0.0f, 1.0f);
 }
