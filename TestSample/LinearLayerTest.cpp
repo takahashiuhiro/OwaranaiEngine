@@ -1,3 +1,6 @@
+/**
+一个简单的y=kx拟合，用来展示如何使用本框架
+*/
 #include <memory>
 #include "Code/CommonMathMoudle/Tensor.h"
 #include "Code/AutomaticDifferentiation/ComputationalGraph.h"
