@@ -14,9 +14,9 @@ int main()
 {
 
     std::vector<float> DataSetX = {1,2,3,4,5,6,7,8};//数据集
-    std::vector<float> DataSetY = {7,14,20,28,36,42,50,56};
+    std::vector<float> DataSetY = {7,14,21,28,35,42,50,56};
 
-    LinearSoftmaxLayer *m = new LinearSoftmaxLayer(nullptr, "gachi",1,{1,1}, 0);//声明网络
+    LinearLayer *m = new LinearLayer(nullptr, "gachi",1,{1,1});//声明网络
 
     m->RegisterInputNode("x", {1,1});//注册输入节点
     m->RegisterConstNode("y",{1,1});//注册标签节点
