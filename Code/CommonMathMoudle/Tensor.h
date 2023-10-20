@@ -171,6 +171,9 @@ public:
     Tensor(){}
     Tensor(std::vector<size_t>shape);
     Tensor(std::vector<size_t>shape, size_t DeviceNum);
+    /**小的拷贝用上面这个，大的只读用下面那个，不能是引用，否则只会走上面这个.*/
+    Tensor(std::vector<size_t>shape, size_t DeviceNum, std::vector<float> InputData);
+    Tensor(std::vector<size_t>shape, size_t DeviceNum, std::vector<float>* InputData);
 
     Tensor* CopyNewEmptyTensor();
     Tensor* Copy();

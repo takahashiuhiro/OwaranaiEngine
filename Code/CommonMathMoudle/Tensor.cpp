@@ -10,6 +10,26 @@ Tensor::Tensor(std::vector<size_t>shape, size_t DeviceNum)
     InitTensor(shape,DeviceNum);
 }
 
+Tensor::Tensor(std::vector<size_t>shape, size_t DeviceNum, std::vector<float> InputData)
+{
+    InitTensor(shape,0);
+    for(size_t a = 0;a<InputData.size();a++)
+    {
+        GetDevicePointer()[a] = InputData[a];
+    }
+    if(DeviceNum)ToDevice(DeviceNum);
+}
+
+Tensor::Tensor(std::vector<size_t>shape, size_t DeviceNum, std::vector<float>* InputData)
+{
+    InitTensor(shape,0);
+    for(size_t a = 0;a<(*InputData).size();a++)
+    {
+        GetDevicePointer()[a] = (*InputData)[a];
+    }
+    if(DeviceNum)ToDevice(DeviceNum);
+}
+
 Tensor* Tensor::CreateTensorByLoadPath(std::ifstream& OpenedFile, size_t DeviceNum)
 {
     Tensor* ReturnTensor = Tensor::CreateTensorByLoadPath(OpenedFile);
