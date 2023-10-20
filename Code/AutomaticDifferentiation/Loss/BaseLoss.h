@@ -19,6 +19,9 @@ public:
     void CommonInit(std::shared_ptr<ComputationalGraph>InputCG);
     void SetLossData(std::map<std::string, Tensor*>LossMap);
 
+    /**封装误差反传流程.*/
+    virtual void Backward();
+
     /**在计算图上建立loss节点,返回loss节点*/
     virtual void Build(std::vector<std::string>InputCGNodeList, std::vector<std::string>LabelNodeList) = 0;
 };

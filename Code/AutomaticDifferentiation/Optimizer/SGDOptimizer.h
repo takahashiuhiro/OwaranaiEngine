@@ -4,5 +4,5 @@ class SGDOptimizer:public BaseOptimizer
 {
 public:
     virtual void SetDefaultParams();
-    virtual void Update();
+    virtual void UpdateContent();
 };

@@ -34,6 +34,8 @@ public:
     /**把结果同步向计算图.*/
     void SyncTensorToCG();
 
+    void Update();
+
     /**初始化优化器.*/
     virtual void Init();
     virtual void Init(std::shared_ptr<ComputationalGraph> InputCG);
@@ -44,7 +46,7 @@ public:
     /**需要处理赋值的张量重载这个函数.*/
     virtual void ProcessAssignTensor(std::string TensorName,Tensor* ProtoTensor, Tensor* DTensor){};
     /**通过梯度和预备数据等更新本值.*/
-    virtual void Update() = 0;
+    virtual void UpdateContent(){};
     /**设置优化器默认参数.*/
     virtual void SetDefaultParams(){};
     /**清空结果数据.*/

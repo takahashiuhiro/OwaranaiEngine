@@ -43,6 +43,12 @@ void BaseLayer::RegisterInputNode(std::string InputNodeid,std::vector<size_t>Inp
     CG->GetNode(InputNodeid)->GetContent()->FillRandomValNormal();
 }
 
+void BaseLayer::RegisterConstNode(std::string InputNodeid,std::vector<size_t>InputTensorShape)
+{
+    CG->RegisterConstNode(InputNodeid, InputTensorShape);
+    CG->GetNode(InputNodeid)->AssignContent(new Tensor(InputTensorShape,DeviceNum));
+}
+
 std::string BaseLayer::GetLayerNodeName(std::string InputNodeName)
 {
     return GetLinkName(GetLinkName(PreName, LayerName), InputNodeName);

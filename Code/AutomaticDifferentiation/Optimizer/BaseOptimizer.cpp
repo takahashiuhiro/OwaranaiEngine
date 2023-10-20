@@ -63,3 +63,10 @@ void BaseOptimizer::SyncTensorToCG()
         CG->GetNode(TensorPair.first)->AssignContent(TensorPair.second);
     }
 }
+
+void BaseOptimizer::Update()
+{
+    SyncTensorByCG();
+    UpdateContent();
+    SyncTensorToCG();
+}

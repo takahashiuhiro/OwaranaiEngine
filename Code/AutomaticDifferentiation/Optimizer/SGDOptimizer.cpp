@@ -1,6 +1,6 @@
 #include "SGDOptimizer.h"
 
-void SGDOptimizer::Update()
+void SGDOptimizer::UpdateContent()
 {
     double lr = Params.Get<double>("lr");
     for(auto& TensorPair:TensorMap)

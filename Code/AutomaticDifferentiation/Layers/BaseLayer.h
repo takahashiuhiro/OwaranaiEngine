@@ -39,6 +39,8 @@ public:
     void RegisterWeightNode(std::string InputNodeid,std::vector<size_t>InputTensorShape);
     /**注册输入矩阵.*/
     void RegisterInputNode(std::string InputNodeid,std::vector<size_t>InputTensorShape);
+    /**注册常量矩阵.*/
+    void RegisterConstNode(std::string InputNodeid,std::vector<size_t>InputTensorShape);
     /**根据层内相对名字获取绝对名字.*/
     std::string GetLayerNodeName(std::string InputNodeName);
     /**储存网络权重.*/
