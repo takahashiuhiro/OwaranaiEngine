@@ -393,6 +393,20 @@ __global__ void EleInverseKernel(float* OutputData, size_t OutputShape)
   OutputData[Index] = 1./OutputData[Index];
 }
 
+__global__ void GenerateSignTensorKernel(float* OutputData, size_t OutputShapeCount)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= OutputShapeCount)return;
+  if(OutputData[Index] > 0)OutputData[Index] = 1.;
+  else OutputData[Index] = 0.;
+}
+
+void GenerateSignTensorInCPP(float* OutputData, size_t OutputShapeCount)
+{
+  CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
+  GenerateSignTensorKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, OutputShapeCount);
+}
+
 void EleInverseInCPP(float* OutputData, size_t OutputShape)
 {
   CudaPair CudaPairInput = GetCudaPair(OutputShape);

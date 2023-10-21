@@ -1000,3 +1000,31 @@ void Tensor::FillRandomValNormal(unsigned Seed)
         }
     }
 }
+
+Tensor* Tensor::GenerateSignTensor()
+{
+    Tensor* ReturnTensor = Copy();
+    if(GetDeviceNum())
+    {
+        #ifdef CUDA_USEFUL
+        GenerateSignTensorInCPP(ReturnTensor->GetDevicePointer(), ReturnTensor->ShapeCount);
+        #endif
+    }
+    else
+    {
+        for(size_t a = 0;a<ShapeCount;a++)
+        {
+            if(GetDevicePointer()[a] < 0)ReturnTensor->GetDevicePointer()[a] = 0;
+            else ReturnTensor->GetDevicePointer()[a] = 1.;
+        }
+    }
+    return ReturnTensor;
+}
+
+Tensor* Tensor::ReLU()
+{
+    Tensor* SignTensor = GenerateSignTensor();
+    Tensor* ReturnTensor = EleMul(SignTensor);
+    delete SignTensor;
+    return ReturnTensor;
+}

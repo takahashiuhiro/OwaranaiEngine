@@ -31,7 +31,7 @@ public:
     /**前向计算.*/
     virtual void Forward() = 0;
     /**反向计算图设置.*/
-    virtual void Backward() = 0;
+    virtual void Backward();
     /**初始设置参数权重.*/
     virtual void ParamsDefinition();
     /**算子初始化.*/

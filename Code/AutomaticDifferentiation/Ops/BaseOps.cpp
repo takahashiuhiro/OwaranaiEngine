@@ -22,6 +22,11 @@ void BaseOps::ParamsDefinition()
     this->Params.Set("BroadCastTo", std::make_shared<BroadCastToType>());
 }
 
+void BaseOps::Backward()
+{
+    Log::Assert(0, std::string("This Node's Backward Was Node Implemented: ")+Nodeid);
+}
+
 std::vector<std::string> & BaseOps::GetInputNodeList()
 {
     return this->CG->GetNode(this->Nodeid)->InputNodeidList;

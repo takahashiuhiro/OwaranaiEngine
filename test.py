@@ -2,15 +2,15 @@ import torch
 
 a =torch.zeros(1,1,3)
 a[0,0,0] = 1
-a[0,0,1] = 2
+a[0,0,1] = -1
 a[0,0,2] = 3
 a.requires_grad = True
 
-c = torch.nn.Softmax(2)(a)
+c = torch.nn.ReLU()(a)
 #c = a*b
 d = torch.Tensor(
     [[[
-        1,2,1
+        1,2000,50
     ]]]
 )
 c.backward(d)
@@ -23,5 +23,5 @@ c.backward(d)
 
 #print(torch.exp(a))
 #print(sofxres * (torch.Tensor([1,0,3]) - (sofxres * torch.Tensor([1,0,3])).sum() ))
-print(d.shape)
+print(a)
 print(a.grad)
