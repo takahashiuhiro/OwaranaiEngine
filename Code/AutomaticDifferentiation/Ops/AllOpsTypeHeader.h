@@ -6,3 +6,5 @@
 #include "BroadCastToOps.h"
 #include "SumOps.h"
 #include "SoftmaxOps.h"
+#include "ReLUOps.h"
+#include "GenerateSignOps.h"

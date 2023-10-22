@@ -12,6 +12,16 @@
 #include "Code/AutomaticDifferentiation/Loss/MSELoss.h"
 int main() 
 {
-    Tensor* a = new Tensor({2,2}, 1, {1,2,-1,3});
-    a->ReLU()->PrintData();
+    ComputationalGraph* w = new ComputationalGraph();
+
+    w->RegisterVariableNode("x", {2,2});
+    w->GetNode("x")->AssignContent(new Tensor({2,2}, 0, {1,-1,3,-4}));
+    w->RegisterVariableNode("x1", {2,2});
+    w->RegisterOpsCompleted("x1", {"x"}, OpsType::ReLU, Dict());
+    w->BackwardMultiBuildGraph(1);
+
+    w->GetNode(w->GetDNodeid("x1"))->AssignContent(new Tensor({2,2}, 0, {999,99,8888,7777}));
+
+    w->ForwardDfs(w->GetDNodeid("x"));
+    w->GetNode(w->GetDNodeid("x"))->PrintData();
 }

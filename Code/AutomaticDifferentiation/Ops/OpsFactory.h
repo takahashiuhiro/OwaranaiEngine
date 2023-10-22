@@ -39,6 +39,14 @@ public:
         {
             return std::make_shared<SoftmaxOps>(OpsTypeid, Params, CG);
         }
+        if(OpsTypeid == OpsType::ReLU)
+        {
+            return std::make_shared<ReLUOps>(OpsTypeid, Params, CG);
+        }
+        if(OpsTypeid == OpsType::GenerateSign)
+        {
+            return std::make_shared<GenerateSignOps>(OpsTypeid, Params, CG);
+        }
         Log::Assert(0, std::string("No Ops Be Set"));
     }
 };

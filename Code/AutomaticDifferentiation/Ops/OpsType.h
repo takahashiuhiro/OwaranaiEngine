@@ -10,5 +10,7 @@ struct OpsType
     static const size_t MatMul = 4;//矩阵乘
     static const size_t BroadCastTo = 5;//矩阵广播
     static const size_t Sum = 6;//矩阵求和
-    static const size_t Softmax = 7;//Softmax
+    static const size_t Softmax = 7;
+    static const size_t ReLU = 8;
+    static const size_t GenerateSign = 9;//生成符号矩阵，没有反向
 };
