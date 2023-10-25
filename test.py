@@ -1,27 +1,9 @@
 import torch
+import torch.nn as nn
 
-a =torch.zeros(1,1,3)
-a[0,0,0] = 1
-a[0,0,1] = -1
-a[0,0,2] = 3
-a.requires_grad = True
-
-c = torch.nn.ReLU()(a)
-#c = a*b
-d = torch.Tensor(
-    [[[
-        1,2000,50
-    ]]]
-)
-c.backward(d)
-#b = torch.nn.Softmax(dim = 0)(a)
-
-
-#b.backward(torch.Tensor([1,0,3]))
-
-
-
-#print(torch.exp(a))
-#print(sofxres * (torch.Tensor([1,0,3]) - (sofxres * torch.Tensor([1,0,3])).sum() ))
-print(a)
-print(a.grad)
+N, C, H, W = 20, 5, 10, 10
+input = torch.randn(N, C, H, W)
+# Normalize over the last three dimensions (i.e. the channel and spatial dimensions)
+# as shown in the image below
+layer_norm = nn.LayerNorm([N, H, W])
+output = layer_norm(input)
