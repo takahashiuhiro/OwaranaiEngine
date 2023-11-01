@@ -13,5 +13,7 @@
 #include "Code/AutomaticDifferentiation/Loss/MSELoss.h"
 int main() 
 {
-    LayerNormLayer *m = new LayerNormLayer(nullptr, "gachi",0,{2,3}, 1,0);//声明网络
+    LayerNormLayer *m = new LayerNormLayer(nullptr, "gachi",0,{2,3}, 1,1);//声明网络
+    BaseLayer* t = m;
+    t->Forward({"a"});
 }
