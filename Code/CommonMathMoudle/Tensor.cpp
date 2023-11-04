@@ -116,6 +116,16 @@ void Tensor::PrintData()
     ToDevice(ProtoDeviceNum);
 }
 
+void Tensor::PrintShape()
+{
+    std::cout<<"Shape:{";
+    for(size_t a=0;a<shape.size();a++)
+    {
+        std::cout<<" "<<shape[a];
+    }
+    std::cout<<" }"<<std::endl;
+}
+
 void Tensor::FillArray(float Scalar)
 {
 
@@ -531,6 +541,19 @@ Tensor* Tensor::Minimum(size_t InputDim)
 Tensor* Tensor::Maximum(size_t InputDim)
 {
     return MaximumOrMinimum(InputDim, true);
+}
+
+Tensor* Tensor::Mean(std::vector<size_t>InputDims)
+{
+    Tensor* TMPTensor = Sum(InputDims);
+    float SumDimRes = 1;
+    for(size_t a = 0;a<InputDims.size();a++)
+    {
+        SumDimRes*=shape[InputDims[a]];
+    }
+    Tensor* ResTensor = TMPTensor->MulScalar(1./SumDimRes);
+    delete TMPTensor;
+    return ResTensor;
 }
 
 Tensor* Tensor::Sum(std::vector<size_t>InputDims)

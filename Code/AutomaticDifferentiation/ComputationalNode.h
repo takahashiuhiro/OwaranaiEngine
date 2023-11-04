@@ -31,4 +31,8 @@ public:
     Tensor* GetContent();
     /**打印数据.*/
     void PrintData();
+    /**打印形态.*/
+    void PrintShape();
+    /**打印节点应该出现的形态.*/
+    void PrintNodeContentShape();
 };

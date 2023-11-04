@@ -209,6 +209,8 @@ public:
     }
     /**print data of this tensor*/
     void PrintData();
+    /**打印维度.*/
+    void PrintShape();
     /**make a scalar fill array of the tensor*/
     void FillArray(float Scalar);
     /**get index of a vector like std::vector<size_t>{a,b,..}*/
@@ -237,6 +239,8 @@ public:
     Tensor* T();
     /**对标定维度求Sum.*/
     Tensor* Sum(std::vector<size_t>InputDims);
+    /**对标定维度求mean.*/
+    Tensor* Mean(std::vector<size_t>InputDims);
     /**Get a sum tensor by specifying dimensions*/
     Tensor* SumTensorDim(size_t InputDim);
     /**Get a average tensor by specifying dimensions*/

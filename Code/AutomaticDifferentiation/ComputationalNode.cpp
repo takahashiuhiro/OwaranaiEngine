@@ -41,3 +41,18 @@ void ComputationalNode::PrintData()
 {
     GetContent()->PrintData();
 }
+
+void ComputationalNode::PrintShape()
+{
+    GetContent()->PrintShape();
+}
+
+void ComputationalNode::PrintNodeContentShape()
+{
+    std::cout<<"NodeContentShape:{";
+    for(size_t a=0;a<NodeContentShape.size();a++)
+    {
+        std::cout<<" "<<NodeContentShape[a];
+    }
+    std::cout<<" }"<<std::endl;
+}

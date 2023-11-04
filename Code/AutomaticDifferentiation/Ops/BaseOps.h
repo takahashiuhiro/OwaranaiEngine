@@ -2,6 +2,7 @@
 #include "../../CommonMathMoudle/Tensor.h"
 #include "../../CommonDataStructure/Dict.h"
 #include "OpsType.h"
+#include "../ForwardFunction.h"
 
 class ComputationalGraph;
 class BaseOps

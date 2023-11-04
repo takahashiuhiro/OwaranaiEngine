@@ -15,5 +15,6 @@ LayerNormLayer::LayerNormLayer(BaseLayer* ParentThis,std::string ThisLayerName, 
 
 std::vector<std::string> LayerNormLayer::Forward(std::vector<std::string>InputNodeArray)
 {
+    //todo
     return {};
 }

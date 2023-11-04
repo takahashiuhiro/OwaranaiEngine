@@ -9,6 +9,7 @@
 #include "../../CommonDataStructure/Dict.h"
 #include "../ComputationalGraph.h"
 #include "../Ops/OpsType.h"
+#include "../ForwardFunction.h"
 
 class BaseLayer
 {
@@ -18,7 +19,7 @@ public:
     /**该层的名字.*/
     std::string LayerName = "";
     /**子节点们.*/
-    std::map<std::string, std::shared_ptr<BaseLayer>>SubLayers;//todo::别忘了这里要释放内存
+    std::map<std::string, std::shared_ptr<BaseLayer>>SubLayers;
     /**本层所属的权重矩阵.*/
     std::vector<std::string>WeightNodeArray;
     /**root的计算图，只允许root是非nullptr.*/
