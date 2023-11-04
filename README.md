@@ -1,12 +1,34 @@
 # README
-## 本项目的配置  
+## 关于项目内容介绍  
+
+项目内容为纯C++手写深度学习框架项目, 目前其中主要包含几个模块:  
+1. 张量的基本操作  
+2. 计算图与自动微分(前向与反向)  
+3. 神经网络层(类似nn.module, 对计算图进行封装, 以达到方便使用, 复用逻辑的目的)  
+4. 优化器(更新神经网络)  
+5. Loss  
+
+作者并不太会GPU编程, 因此该部分的运行效率应该是不堪入目, 只能说是勉强能跑? 等日后项目基本完成后可能会回来优化或者重写, 但是现在并不会做这件事.  
+项目为作者单人进行制作的独立项目, 对于深度学习, C++和数学的了解都非常浅显, 因此本项目实际运行起来效率应该不会很高, 麻雀虽小但五脏俱全就是作者本人的目标.  
+
+## 关于项目完成度和目标  
+
+项目的release 0.1目标为完成一个完整的transformer, 因此项目的进行会随着transformer需要的方向进行搭建, 会先写transformer所需要的部分.  
+
+## 关于快速上手  
+
+可以看TestSample\LinearLayerTest.cpp, 这个文件是一个y = kx的基本拟合用法, 复制你内容到main.cpp即可运行。
+文档部分还没开始动手, 但是注释写的自认为还是比较用心的. 
+
+## 关于本项目的配置  
 
 Cuda Version:11.8  
 Cuda Drive Version:522.25  
 C++ 11  
-理论上来说，只要装了nvcc/g++/cuda驱动版本合理就应该能跑起来  
 
-##  项目运行方法  
+只要装了g++就能跑起来,无所谓是否有cuda,如果机器里没有英伟达显卡会编成CPU版. 
+
+## 关于项目运行方法  
 
 git clone https://github.com/takahashiuhiro/OwaranaiEngine.git  
 cd build  
@@ -14,16 +36,20 @@ cmake ../
 make  
 ./OwaranaiEngineMain  
 
-## 项目目录  
+## 关于项目目录  
 
 OwaranaiEngine  项目根目录  
 ----Code  代码  
 --------AutomaticDifferentiation  自动微分  
+------------Layers  神经网络层  
+------------Loss  误差层  
 ------------Ops  算子  
+------------Optimizer  优化器  
 ------------其他  计算图相关  
 --------CommonDataStructure  通用数据结构  
 --------CommonMathMoudle  通用数学  
 ------------Cuda  一些cuda的基础操作实现  
 ------------其他  张量相关  
+----DOC  接口文档  
 ----TestSample  测试模块用的各种main文件  
 
