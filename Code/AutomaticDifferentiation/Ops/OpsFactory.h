@@ -47,6 +47,10 @@ public:
         {
             return std::make_shared<GenerateSignOps>(OpsTypeid, Params, CG);
         }
+        if(OpsTypeid == OpsType::Pow)
+        {
+            return std::make_shared<PowOps>(OpsTypeid, Params, CG);
+        }
         Log::Assert(0, std::string("No Ops Be Set"));
     }
 };

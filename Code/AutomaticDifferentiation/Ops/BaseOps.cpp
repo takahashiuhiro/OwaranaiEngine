@@ -116,3 +116,13 @@ std::vector<size_t> BaseOps::GetSelectDims(std::string InputNodeid)
     Log::Assert(OutDNodeOpsParamsSelectDims.find(InputNodeid)!=OutDNodeOpsParamsSelectDims.end(), std::string("This Node Is Not Set SelectDims Node id:")+InputNodeid);
     return OutDNodeOpsParamsSelectDims[InputNodeid];
 }
+
+void BaseOps::SetEleExponent(float Exponent)
+{
+    Params.Set("EleExponent", Exponent);
+}
+
+float BaseOps::GetEleExponent()
+{
+    return Params.Get<float>("EleExponent");
+}

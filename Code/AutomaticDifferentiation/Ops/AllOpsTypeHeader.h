@@ -8,3 +8,4 @@
 #include "SoftmaxOps.h"
 #include "ReLUOps.h"
 #include "GenerateSignOps.h"
+#include "PowOps.h"

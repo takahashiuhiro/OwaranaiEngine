@@ -22,7 +22,10 @@ def ln(inpt):
 #print(((output - ln(input1))**2).sum())
 
 
-a = torch.tensor([[[1.,2,3],[4,5,6]],[[7,8,9],[10,11,12]]],requires_grad = True)
-b= a.mean([-2,-1],keepdim = True)
-b.backward(torch.tensor([[[777]],[[666]]]))
+a = torch.tensor([[1.,2,3]],requires_grad = True)
+b= a.pow(7)
+c = b.pow(2)
+c.backward(torch.tensor([[1.,1,16]]))
+
+print(c)
 print(a.grad)

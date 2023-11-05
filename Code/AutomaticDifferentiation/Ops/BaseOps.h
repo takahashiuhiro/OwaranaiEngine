@@ -63,6 +63,9 @@ public:
     void SetBroadCastTo(BroadCastToType BroadCastToShape);
     /**获取该张量使用的输入维度.*/
     std::vector<size_t> GetBroadCastTo(std::string InputNodeid);
-
+    /**设置元素指数.*/
+    void SetEleExponent(float Exponent);
+    /**获取元素指数.*/
+    float GetEleExponent();
 
 };
