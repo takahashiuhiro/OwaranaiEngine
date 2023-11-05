@@ -31,6 +31,7 @@ void ComputationalGraph::RegisterDefaultProperty(std::string Nodeid)
 
 void ComputationalGraph::RegisterNode(std::string id)
 {
+    Log::Assert(!HasNode(id), "This Node Has Been Registered!!!: " + id);
     AddNode(new ComputationalNode(id));
     RegisterDefaultProperty(id);
 }
@@ -114,6 +115,12 @@ std::string ComputationalGraph::GetNodeidByOps(size_t OpsName, std::vector<std::
     {
         PreStr += InputNodeNameArray[a] + std::string(",");
     }
+    unsigned Seed = std::chrono::system_clock::now().time_since_epoch().count();
+    PreStr += std::string("},{RandomID:");
+    std::default_random_engine Gen(Seed);
+    std::normal_distribution<> Dist(0.0, 1.0);
+    size_t RandomID = Dist(Gen)*1e7;
+    PreStr += NumberToString(RandomID);
     PreStr += std::string("})");
     return PreStr;
 }
