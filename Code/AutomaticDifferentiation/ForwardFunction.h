@@ -13,5 +13,9 @@ public:
     /**平均数.*/
     static std::vector<std::string> Mean(ComputationalGraph*CG,std::vector<std::string>InputNodes, std::vector<size_t>InputDims);
     static std::vector<std::string> Mean(std::shared_ptr<ComputationalGraph>CG,std::vector<std::string>InputNodes, std::vector<size_t>InputDims);
+    /**方差.*/
+    static std::vector<std::string> Var(ComputationalGraph*CG,std::vector<std::string>InputNodes, std::vector<size_t>InputDims);
+    static std::vector<std::string> Var(std::shared_ptr<ComputationalGraph>CG,std::vector<std::string>InputNodes, std::vector<size_t>InputDims);
+
 };
 

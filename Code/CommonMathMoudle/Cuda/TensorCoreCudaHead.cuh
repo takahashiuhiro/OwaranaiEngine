@@ -44,6 +44,7 @@ extern "C" void EleInverseInCPP(float* OutputData, size_t OutputShape);
 extern "C" void BroadCastToInCPP(float* OutputData, float* InputData, size_t* OutputShape, size_t* InputShape, size_t ShapeLen, size_t OutputShapeCount);
 extern "C" void FillRandomValNormalInCPP(float* OutputData, size_t OutputShapeCount, unsigned Seed);
 extern "C" void GenerateSignTensorInCPP(float* OutputData, size_t OutputShapeCount);
+extern "C" void PowInCPP(float* OutputData, size_t OutputShapeCount,float Exponent);
 
 struct CudaPair 
 {

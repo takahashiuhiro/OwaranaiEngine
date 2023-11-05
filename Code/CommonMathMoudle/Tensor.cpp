@@ -556,6 +556,12 @@ Tensor* Tensor::Mean(std::vector<size_t>InputDims)
     return ResTensor;
 }
 
+Tensor* Tensor::Var(std::vector<size_t>InputDims)
+{
+    Tensor* MeanTensor = Mean(InputDims);
+    //todo
+}
+
 Tensor* Tensor::Sum(std::vector<size_t>InputDims)
 {
     Tensor* ResTensor = SumTensorDim(InputDims[0]);
@@ -1049,5 +1055,24 @@ Tensor* Tensor::ReLU()
     Tensor* SignTensor = GenerateSignTensor();
     Tensor* ReturnTensor = EleMul(SignTensor);
     delete SignTensor;
+    return ReturnTensor;
+}
+
+Tensor* Tensor::Pow(float Exponent)
+{
+    Tensor* ReturnTensor = Copy();
+    if(GetDeviceNum())
+    {
+        #ifdef CUDA_USEFUL
+        PowInCPP(ReturnTensor->GetDevicePointer(), ReturnTensor->ShapeCount, Exponent);
+        #endif
+    }
+    else
+    {
+        for(size_t a = 0;a<ShapeCount;a++)
+        {
+            ReturnTensor->GetDevicePointer()[a] = pow(ReturnTensor->GetDevicePointer()[a], Exponent);
+        }
+    }
     return ReturnTensor;
 }

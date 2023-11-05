@@ -27,3 +27,13 @@ std::vector<std::string> OEAutoDiff::Mean(std::shared_ptr<ComputationalGraph>CG,
 {
     return Mean(CG.get(),InputNodes, InputDims);
 }
+
+std::vector<std::string> OEAutoDiff::Var(ComputationalGraph*CG,std::vector<std::string>InputNodes, std::vector<size_t>InputDims)
+{
+    //todo
+}
+
+std::vector<std::string> OEAutoDiff::Var(std::shared_ptr<ComputationalGraph>CG,std::vector<std::string>InputNodes, std::vector<size_t>InputDims)
+{
+    return Var(CG.get(),InputNodes, InputDims);
+}

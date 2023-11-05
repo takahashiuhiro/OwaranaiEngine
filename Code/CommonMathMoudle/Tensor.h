@@ -47,6 +47,7 @@ extern "C" void EleInverseInCPP(float* OutputData, size_t OutputShape);
 extern "C" void BroadCastToInCPP(float* OutputData, float* InputData, size_t* OutputShape, size_t* InputShape, size_t ShapeLen, size_t OutputShapeCount);
 extern "C" void FillRandomValNormalInCPP(float* OutputData, size_t OutputShapeCount, unsigned Seed);
 extern "C" void GenerateSignTensorInCPP(float* OutputData, size_t OutputShapeCount);
+extern "C" void PowInCPP(float* OutputData, size_t OutputShapeCount,float Exponent);
 #endif
 
 struct CudaDimVec
@@ -239,8 +240,10 @@ public:
     Tensor* T();
     /**对标定维度求Sum.*/
     Tensor* Sum(std::vector<size_t>InputDims);
-    /**对标定维度求mean.*/
+    /**对标定维度求平均数.*/
     Tensor* Mean(std::vector<size_t>InputDims);
+    /**对标定维度求方差.*/
+    Tensor* Var(std::vector<size_t>InputDims);
     /**Get a sum tensor by specifying dimensions*/
     Tensor* SumTensorDim(size_t InputDim);
     /**Get a average tensor by specifying dimensions*/
@@ -281,4 +284,6 @@ public:
     /**生成符号矩阵.*/
     Tensor* GenerateSignTensor();
     Tensor* ReLU();
+    /**元素幂次.*/
+    Tensor* Pow(float Exponent);
 };

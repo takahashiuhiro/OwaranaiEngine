@@ -401,6 +401,19 @@ __global__ void GenerateSignTensorKernel(float* OutputData, size_t OutputShapeCo
   else OutputData[Index] = 0.;
 }
 
+__global__ void PowKernel(float* OutputData, size_t OutputShapeCount,float Exponent)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= OutputShapeCount)return;
+  OutputData[Index] = pow(OutputData[Index], Exponent);
+}
+
+void PowInCPP(float* OutputData, size_t OutputShapeCount,float Exponent)
+{
+  CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
+  PowKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, OutputShapeCount,Exponent);
+}
+
 void GenerateSignTensorInCPP(float* OutputData, size_t OutputShapeCount)
 {
   CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
