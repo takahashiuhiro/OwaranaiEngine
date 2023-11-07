@@ -22,7 +22,10 @@ int main()
     m->GetNode(x)->AssignContent(new Tensor(sp, 0, {0.2035,  1.2959,  1.8101, -0.4644,1.5027, -0.3270,  0.5905,  0.6538,-1.5745,  1.3330, -0.5596, -0.6548,0.1264, -0.5080,  1.6420,  0.1992}));
     auto q = OEAutoDiff::Var(m,x,{0,1},false);
 
-    m->ForwardDfs(q);
-    m->GetNode(q)->PrintData();
+    //m->ForwardDfs(q);
+    m->BackwardMultiBuildGraph(1);
+    m->GetNode(m->GetDNodeid(q))->AssignContent(new Tensor({1,1}, 0, {1.}));
+    m->ForwardDfs(m->GetDNodeid(x));
+    m->GetNode(m->GetDNodeid(x))->PrintData();
 
 }
