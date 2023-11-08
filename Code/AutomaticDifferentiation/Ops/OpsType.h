@@ -13,5 +13,5 @@ struct OpsType
     static const size_t Softmax = 7;
     static const size_t ReLU = 8;
     static const size_t GenerateSign = 9;//生成符号矩阵，没有反向
-    static const size_t Pow = 10;//生成符号矩阵，没有反向
+    static const size_t Pow = 10;//幂次
 };

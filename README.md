@@ -55,3 +55,7 @@ OwaranaiEngine  项目根目录
 ----DOC  接口文档  
 ----TestSample  测试模块用的各种main文件  
 
+## TODO  
+
+1.Add的接口有些繁琐记得改，改之前先别用  
+2.把其他的算子也改写成方便的接口  

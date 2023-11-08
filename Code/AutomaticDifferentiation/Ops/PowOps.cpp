@@ -22,11 +22,7 @@ void PowOps::Backward()
     if(this->CG->GetNode(NodeidList[0])->Property.Get<bool>("RequireGrad"))
     {
         std::string ThisDNodeid = this->CG->GetDNodeid(Nodeid);
-        std::string PowNode = this->CG->GetNodeidByOps(OpsType::Pow, {NodeidList[0]});
-        this->CG->RegisterVariableNode(PowNode);
-        this->CG->RegisterOpsCompleted(PowNode, {NodeidList[0]}, OpsType::Pow, Dict());
-        this->CG->GetCGOps(PowNode)->SetEleExponent(GetEleExponent()-1);
-        this->CG->GetCGOps(PowNode)->AfterSettingShapeComputing();
+        std::string PowNode = OEAutoDiff::Pow(this->CG, NodeidList[0], GetEleExponent()-1);
         std::string NewDNode = this->CG->GetDPartNodeid(NodeidList[0], Nodeid);
         this->CG->RegisterVariableNode(NewDNode);
         this->CG->RegisterOpsCompleted(NewDNode, {ThisDNodeid, PowNode}, OpsType::EleMul, Dict());
