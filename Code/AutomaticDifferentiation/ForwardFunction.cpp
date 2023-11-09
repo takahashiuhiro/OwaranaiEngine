@@ -1,8 +1,10 @@
 #include "ForwardFunction.h"
 #include "ComputationalGraph.h"
 
-std::string OEAutoDiff::Add(ComputationalGraph*CG,std::vector<std::string> InputNodes, std::map<std::string, float> InputWeight)
+std::string OEAutoDiff::Add(ComputationalGraph*CG,std::map<std::string, float> InputWeight)
 {
+    std::vector<std::string> InputNodes;
+    for(auto & InputPair:InputWeight)InputNodes.push_back(InputPair.first);
     std::string AddNode = CG->GetNodeidByOps(OpsType::Add, InputNodes);
     CG->RegisterVariableNode(AddNode);
     CG->RegisterOpsCompleted(AddNode, InputNodes, OpsType::Add, Dict());
@@ -10,9 +12,9 @@ std::string OEAutoDiff::Add(ComputationalGraph*CG,std::vector<std::string> Input
     CG->GetCGOps(AddNode)->AfterSettingShapeComputing();
     return AddNode;
 }
-std::string OEAutoDiff::Add(std::shared_ptr<ComputationalGraph>CG,std::vector<std::string> InputNodes, std::map<std::string, float> InputWeight)
+std::string OEAutoDiff::Add(std::shared_ptr<ComputationalGraph>CG,std::map<std::string, float> InputWeight)
 {
-    return Add(CG.get(), InputNodes, InputWeight);
+    return Add(CG.get(), InputWeight);
 }
 
 std::string OEAutoDiff::Pow(ComputationalGraph*CG,std::string InputNode,float Exponent)
@@ -66,7 +68,7 @@ std::string OEAutoDiff::Mean(ComputationalGraph*CG,std::string InputNode, std::v
     }
     SumDimRes = 1./SumDimRes;
     std::string SumNodeName = Sum(CG, InputNode, InputDims);
-    std::string NewNodeName = Add(CG, {SumNodeName},{{SumNodeName,SumDimRes}});
+    std::string NewNodeName = Add(CG, {{SumNodeName,SumDimRes}});
     return NewNodeName;
 }
 
@@ -79,7 +81,7 @@ std::string OEAutoDiff::Var(ComputationalGraph*CG,std::string InputNode, std::ve
 {
     std::string MeanSlimNode = Mean(CG, InputNode, InputDims);
     std::string BCNode = BroadCastTo(CG,MeanSlimNode,CG->GetNode(InputNode)->NodeContentShape);
-    std::string MinusNode = Add(CG, {InputNode, BCNode},{{InputNode,1.},{BCNode,-1.}});
+    std::string MinusNode = Add(CG, {{InputNode,1.},{BCNode,-1.}});
     std::string PowNode = Pow(CG, MinusNode, 2.);
     std::string SumNode = Sum(CG, PowNode, InputDims);
     float SumDimRes = 1;
@@ -89,7 +91,7 @@ std::string OEAutoDiff::Var(ComputationalGraph*CG,std::string InputNode, std::ve
     }
     SumDimRes -= Unbiased;
     SumDimRes = 1./SumDimRes;
-    std::string DivideNode = Add(CG, {SumNode},{{SumNode,SumDimRes}});
+    std::string DivideNode = Add(CG, {{SumNode,SumDimRes}});
     return DivideNode;
 }
 

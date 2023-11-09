@@ -57,5 +57,4 @@ OwaranaiEngine  项目根目录
 
 ## TODO  
 
-1.Add的接口有些繁琐记得改，改之前先别用  
-2.把其他的算子也改写成方便的接口  
+ 1.把其他的算子也改写成方便的接口 (softmax,elemul,matmul,relu)
