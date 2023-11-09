@@ -45,6 +45,22 @@ std::string OEAutoDiff::BroadCastTo(std::shared_ptr<ComputationalGraph>CG,std::s
     return BroadCastTo(CG.get(), InputNode, InputDims);
 }
 
+std::string OEAutoDiff::EleMul(ComputationalGraph*CG,std::map<std::string, float> InputWeight)
+{
+    std::vector<std::string> InputNodes;
+    for(auto & InputPair:InputWeight)InputNodes.push_back(InputPair.first);
+    std::string EleMulNode = CG->GetNodeidByOps(OpsType::EleMul, InputNodes);
+    CG->RegisterVariableNode(EleMulNode);
+    CG->RegisterOpsCompleted(EleMulNode, InputNodes, OpsType::EleMul, Dict());
+    CG->GetCGOps(EleMulNode)->SetAddWeight(InputWeight);
+    CG->GetCGOps(EleMulNode)->AfterSettingShapeComputing();
+    return EleMulNode;
+}
+std::string OEAutoDiff::EleMul(std::shared_ptr<ComputationalGraph>CG,std::map<std::string, float> InputWeight)
+{
+    return EleMul(CG.get(), InputWeight);
+}
+
 std::string OEAutoDiff::Sum(ComputationalGraph*CG,std::string InputNode, std::vector<size_t>InputDims)
 {
     std::string SumNodeName = CG->GetNodeidByOps(OpsType::Sum, {InputNode});

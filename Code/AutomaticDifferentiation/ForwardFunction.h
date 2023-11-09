@@ -21,6 +21,8 @@ public:
     static std::string BroadCastTo(ComputationalGraph*CG,std::string InputNode,std::vector<size_t>InputDims);
     static std::string BroadCastTo(std::shared_ptr<ComputationalGraph>CG,std::string InputNode,std::vector<size_t>InputDims);
     /**元素乘法.*/
+    static std::string EleMul(ComputationalGraph*CG,std::map<std::string, float> InputWeight);
+    static std::string EleMul(std::shared_ptr<ComputationalGraph>CG,std::map<std::string, float> InputWeight);
     /**求和.*/
     static std::string Sum(ComputationalGraph*CG,std::string InputNode, std::vector<size_t>InputDims);
     static std::string Sum(std::shared_ptr<ComputationalGraph>CG,std::string InputNode, std::vector<size_t>InputDims);

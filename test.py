@@ -45,7 +45,10 @@ def varr(q):
     return r
 
 #h = torch.var(a, dim=[0,1], keepdim=True, unbiased = False)
-h = varr(a)
-h.backward(torch.tensor([[1.]]))
+#h = varr(a)
+#h.backward(torch.tensor([[1.]]))
+
+h = a*a
+h.backward(a)
 
 print(a.grad)
