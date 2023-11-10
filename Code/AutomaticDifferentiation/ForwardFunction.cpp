@@ -45,20 +45,34 @@ std::string OEAutoDiff::BroadCastTo(std::shared_ptr<ComputationalGraph>CG,std::s
     return BroadCastTo(CG.get(), InputNode, InputDims);
 }
 
-std::string OEAutoDiff::EleMul(ComputationalGraph*CG,std::map<std::string, float> InputWeight)
+std::string OEAutoDiff::EleMul(ComputationalGraph*CG,std::string FirstNode, std::string SecondNode,float FirstAddWeight, float SecondAddWeight)
 {
-    std::vector<std::string> InputNodes;
-    for(auto & InputPair:InputWeight)InputNodes.push_back(InputPair.first);
+    std::vector<std::string> InputNodes = {FirstNode, SecondNode};
     std::string EleMulNode = CG->GetNodeidByOps(OpsType::EleMul, InputNodes);
     CG->RegisterVariableNode(EleMulNode);
     CG->RegisterOpsCompleted(EleMulNode, InputNodes, OpsType::EleMul, Dict());
-    CG->GetCGOps(EleMulNode)->SetAddWeight(InputWeight);
+    CG->GetCGOps(EleMulNode)->SetAddWeight({{FirstNode, FirstAddWeight}, {SecondNode, SecondAddWeight}});
     CG->GetCGOps(EleMulNode)->AfterSettingShapeComputing();
     return EleMulNode;
 }
-std::string OEAutoDiff::EleMul(std::shared_ptr<ComputationalGraph>CG,std::map<std::string, float> InputWeight)
+std::string OEAutoDiff::EleMul(std::shared_ptr<ComputationalGraph>CG,std::string FirstNode, std::string SecondNode,float FirstAddWeight, float SecondAddWeight)
 {
-    return EleMul(CG.get(), InputWeight);
+    return EleMul(CG.get(), FirstNode,SecondNode,FirstAddWeight,SecondAddWeight);
+}
+
+std::string OEAutoDiff::MatMul(ComputationalGraph*CG, std::string FirstNode, std::string SecondNode, bool FirstTFlag, bool SecondTFlag, float FirstAddWeight, float SecondAddWeight)
+{
+    std::string MatMulNodeName = CG->GetNodeidByOps(OpsType::MatMul, {FirstNode, SecondNode});
+    CG->RegisterVariableNode(MatMulNodeName);
+    CG->RegisterOpsCompleted(MatMulNodeName, {FirstNode, SecondNode}, OpsType::MatMul, Dict());
+    CG->GetCGOps(MatMulNodeName)->SetT({{FirstNode, FirstTFlag},{SecondNode, SecondTFlag}});
+    CG->GetCGOps(MatMulNodeName)->SetAddWeight({{FirstNode, FirstAddWeight},{SecondNode, SecondAddWeight}});
+    CG->GetCGOps(MatMulNodeName)->AfterSettingShapeComputing();
+    return MatMulNodeName;
+}
+std::string OEAutoDiff::MatMul(std::shared_ptr<ComputationalGraph>CG,std::string FirstNode, std::string SecondNode, bool FirstTFlag, bool SecondTFlag, float FirstAddWeight, float SecondAddWeight)
+{
+    return MatMul(CG.get(),FirstNode,SecondNode, FirstTFlag,SecondTFlag, FirstAddWeight, SecondAddWeight);
 }
 
 std::string OEAutoDiff::Sum(ComputationalGraph*CG,std::string InputNode, std::vector<size_t>InputDims)

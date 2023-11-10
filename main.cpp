@@ -23,7 +23,7 @@ int main()
     m->RegisterVariableNode(x+x,sp);
     m->GetNode(x)->AssignContent(new Tensor(sp, 0, {0.2035,  1.2959,  1.8101, -0.4644,1.5027, -0.3270,  0.5905,  0.6538,-1.5745,  1.3330, -0.5596, -0.6548,0.1264, -0.5080,  1.6420,  0.1992}));
     m->GetNode(x+x)->AssignContent(new Tensor(sp, 0, {0.2035,  1.2959,  1.8101, -0.4644,1.5027, -0.3270,  0.5905,  0.6538,-1.5745,  1.3330, -0.5596, -0.6548,0.1264, -0.5080,  1.6420,  0.1992}));
-    auto q = OEAutoDiff::EleMul(m,{{x,1.},{x+x,2.}});
+    auto q = OEAutoDiff::MatMul(m,x,x+x,true,true);
 
     //m->ForwardDfs(q);
     m->BackwardMultiBuildGraph(1);

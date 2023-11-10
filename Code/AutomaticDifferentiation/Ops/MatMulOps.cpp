@@ -31,6 +31,7 @@ void MatMulOps::Backward()
     bool TFlagFirst = GetT(NodeidList[0]);
     bool TFlagSecond = GetT(NodeidList[1]);
     float AddWeightDot = GetAddWeight(NodeidList[0])*GetAddWeight(NodeidList[1]);
+    //bug::这里没考虑一开始就俩都有TFLAG应该怎么办
     if(this->CG->GetNode(NodeidList[0])->Property.Get<bool>("RequireGrad"))
     {
         std::string NewDNode = this->CG->GetDPartNodeid(NodeidList[0], Nodeid);
