@@ -62,6 +62,7 @@ std::string OEAutoDiff::EleMul(std::shared_ptr<ComputationalGraph>CG,std::string
 
 std::string OEAutoDiff::MatMul(ComputationalGraph*CG, std::string FirstNode, std::string SecondNode, bool FirstTFlag, bool SecondTFlag, float FirstAddWeight, float SecondAddWeight)
 {
+    //std::cout<<FirstNode<<" "<<SecondNode<<" "<<FirstTFlag<<" "<<SecondTFlag<<std::endl;
     std::string MatMulNodeName = CG->GetNodeidByOps(OpsType::MatMul, {FirstNode, SecondNode});
     CG->RegisterVariableNode(MatMulNodeName);
     CG->RegisterOpsCompleted(MatMulNodeName, {FirstNode, SecondNode}, OpsType::MatMul, Dict());
