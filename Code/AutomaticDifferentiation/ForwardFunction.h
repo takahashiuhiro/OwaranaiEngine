@@ -35,6 +35,8 @@ public:
     /**方差.*/
     static std::string Var(ComputationalGraph*CG,std::string InputNode, std::vector<size_t>InputDims,bool Unbiased = true);
     static std::string Var(std::shared_ptr<ComputationalGraph>CG,std::string InputNode, std::vector<size_t>InputDims,bool Unbiased = true);
-
+    /**ReLU.*/
+    static std::string ReLU(ComputationalGraph*CG,std::string InputNode);
+    static std::string ReLU(std::shared_ptr<ComputationalGraph>CG,std::string InputNode);
 };
 

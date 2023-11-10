@@ -129,3 +129,16 @@ std::string OEAutoDiff::Var(std::shared_ptr<ComputationalGraph>CG,std::string In
 {
     return Var(CG.get(),InputNode, InputDims,Unbiased);
 }
+
+std::string OEAutoDiff::ReLU(ComputationalGraph*CG,std::string InputNode)
+{
+    std::string ReLUNodeName = CG->GetNodeidByOps(OpsType::ReLU, {InputNode});
+    CG->RegisterVariableNode(ReLUNodeName);
+    CG->RegisterOpsCompleted(ReLUNodeName, {InputNode}, OpsType::ReLU, Dict());
+    CG->GetCGOps(ReLUNodeName)->AfterSettingShapeComputing();
+    return ReLUNodeName;
+}
+std::string OEAutoDiff::ReLU(std::shared_ptr<ComputationalGraph>CG,std::string InputNode)
+{
+    return ReLU(CG.get(), InputNode);
+}
