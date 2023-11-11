@@ -1,20 +1,14 @@
 import torch
 import torch.nn as nn
 
-N, H,W = 2, 2,3
-input1 = torch.rand(N, H,W)
-# Normalize over the last three dimensions (i.e. the channel and spatial dimensions)
-# as shown in the image below
-layer_norm = nn.LayerNorm([W])
-output = layer_norm(input1)
 
 def ln(inpt):
     im = inpt.mean((-1))#
-    im = im.reshape((N,H,1))
+    im = im.reshape((4,1))
     fz = inpt - im#
     var = (inpt - im)**2#
     var = var.mean((-1))#
-    var = var.reshape((N,H,1))
+    var = var.reshape((4,1))
     return fz/((torch.Tensor([1e-5]) + var)**0.5)#
 
 #print(ln(input1))
@@ -60,9 +54,13 @@ def varr(q):
 #h = varr(a)
 #h.backward(torch.tensor([[1.]]))
 
-h = torch.nn.Softmax(1)(a)
+tt = torch.nn.LayerNorm([4],elementwise_affine  = True)
+h = tt(a)
 h.backward(c)
 
 print(a.grad)
-print(n.grad)
+#print(n.grad)
 print(h)
+#print(ln(a))
+#print(tt.bias)
+#print(tt.weight)

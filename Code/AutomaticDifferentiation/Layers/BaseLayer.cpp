@@ -45,8 +45,8 @@ void BaseLayer::RegisterInputNode(std::string InputNodeid,std::vector<size_t>Inp
 
 void BaseLayer::RegisterConstNode(std::string InputNodeid,std::vector<size_t>InputTensorShape)
 {
-    CG->RegisterConstNode(InputNodeid, InputTensorShape);
-    CG->GetNode(InputNodeid)->AssignContent(new Tensor(InputTensorShape,DeviceNum));
+    CG->RegisterConstNode(GetLayerNodeName(InputNodeid), InputTensorShape);
+    CG->GetNode(GetLayerNodeName(InputNodeid))->AssignContent(new Tensor(InputTensorShape,DeviceNum));
 }
 
 std::string BaseLayer::GetLayerNodeName(std::string InputNodeName)

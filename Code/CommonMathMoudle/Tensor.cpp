@@ -95,7 +95,7 @@ void Tensor::PrintData()
     float* DataPointer = GetDevicePointer();
     for(int a=0;a<ShapeCount;a++)
     {
-        std::cout<< std::fixed << std::setprecision(3) <<DataPointer[a]<<" ";
+        std::cout<< std::fixed << std::setprecision(12) <<DataPointer[a]<<" ";
         std::vector<size_t>DimIndex = GetDim(a);
         for(int b=shape.size() - 1;b>=0;b--)
         {
