@@ -38,5 +38,8 @@ public:
     /**ReLU.*/
     static std::string ReLU(ComputationalGraph*CG,std::string InputNode);
     static std::string ReLU(std::shared_ptr<ComputationalGraph>CG,std::string InputNode);
+    /**Softmax.*/
+    static std::string Softmax(ComputationalGraph*CG,std::string InputNode, size_t InputDim);
+    static std::string Softmax(std::shared_ptr<ComputationalGraph>CG,std::string InputNode, size_t InputDim);
 };
 

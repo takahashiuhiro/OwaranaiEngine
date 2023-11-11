@@ -142,3 +142,17 @@ std::string OEAutoDiff::ReLU(std::shared_ptr<ComputationalGraph>CG,std::string I
 {
     return ReLU(CG.get(), InputNode);
 }
+
+std::string OEAutoDiff::Softmax(ComputationalGraph*CG,std::string InputNode, size_t InputDim)
+{
+    std::string SoftmaxNodeName = CG->GetNodeidByOps(OpsType::Softmax, {InputNode});
+    CG->RegisterVariableNode(SoftmaxNodeName);
+    CG->RegisterOpsCompleted(SoftmaxNodeName, {InputNode}, OpsType::Softmax, Dict());
+    CG->GetCGOps(SoftmaxNodeName)->SetSelectDim({{InputNode, InputDim}});
+    CG->GetCGOps(SoftmaxNodeName)->AfterSettingShapeComputing();
+    return SoftmaxNodeName;
+}
+std::string OEAutoDiff::Softmax(std::shared_ptr<ComputationalGraph>CG,std::string InputNode, size_t InputDim)
+{
+    return Softmax(CG.get(), InputNode, InputDim);
+}

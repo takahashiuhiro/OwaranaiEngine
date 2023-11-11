@@ -60,7 +60,7 @@ def varr(q):
 #h = varr(a)
 #h.backward(torch.tensor([[1.]]))
 
-h = torch.nn.ReLU()(a)
+h = torch.nn.Softmax(1)(a)
 h.backward(c)
 
 print(a.grad)
