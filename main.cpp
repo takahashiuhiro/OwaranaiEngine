@@ -22,14 +22,14 @@ int main()
 
     std::string x = "x";
     std::vector<size_t>sp = {4,4};
-    LayerNormLayer* ln = new LayerNormLayer(nullptr, "LayerNormTest", 0, sp,0);
+    LayerNormLayer* ln = new LayerNormLayer(nullptr, "LayerNormTest", 1, sp,0);
     ln->RegisterInputNode(x,sp);
     std::string q = ln->Forward({x})[0];
     ComputationalGraph*m = ln->CG.get();
     m->BackwardMultiBuildGraph(1);
 
-    m->GetNode(x)->AssignContent(new Tensor(sp, 0, {0.2035,  1.2959,  1.8101, -0.4644,1.5027, -0.3270,  0.5905,  0.6538,-1.5745,  1.3330, -0.5596, -0.6548,0.1264, -0.5080,  1.6420,  0.1992}));
-    m->GetNode(m->GetDNodeid(q))->AssignContent(new Tensor(sp, 0, {0.2035,  1.2959,  1.8101, -0.4644,1.5027, -0.3270,  0.5905,  0.6538,-1.5745,  1.3330, -0.5596, -0.6548,1,1,1,1}));
+    m->GetNode(x)->AssignContent(new Tensor(sp, 1, {0.2035,  1.2959,  1.8101, -0.4644,1.5027, -0.3270,  0.5905,  0.6538,-1.5745,  1.3330, -0.5596, -0.6548,0.1264, -0.5080,  1.6420,  0.1992}));
+    m->GetNode(m->GetDNodeid(q))->AssignContent(new Tensor(sp, 1, {0.2035,  1.2959,  1.8101, -0.4644,1.5027, -0.3270,  0.5905,  0.6538,-1.5745,  1.3330, -0.5596, -0.6548,1,1,1,1}));
 
     m->ForwardDfs(m->GetDNodeid(x));
     m->ForwardDfs(q);

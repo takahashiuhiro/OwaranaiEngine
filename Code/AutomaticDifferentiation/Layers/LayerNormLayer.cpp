@@ -23,9 +23,6 @@ std::vector<std::string> LayerNormLayer::Forward(std::vector<std::string>InputNo
     std::vector<size_t>MeanDims;
     for(size_t a = UseNum+1;a<WeightShape.size();a++)MeanDims.push_back(a);
     std::string MeanNode = OEAutoDiff::Mean(this->CG, InputNodeArray[0], MeanDims);
-    /***********debug*/
-    //return {MeanNode};
-    /***********debug*/
     std::string BCNode = OEAutoDiff::BroadCastTo(this->CG, MeanNode, WeightShape);
     std::string MinusNode = OEAutoDiff::Add(this->CG, {{InputNodeArray[0], 1.}, {BCNode, -1.}});
     std::string VarNode = OEAutoDiff::Var(this->CG, InputNodeArray[0],MeanDims,false);
