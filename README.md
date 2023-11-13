@@ -56,5 +56,5 @@ OwaranaiEngine  项目根目录
 ----TestSample  测试模块用的各种main文件  
 
 ## TODO  
-
- 1.把其他的算子也改写成方便的接口 (softmax,elemul,matmul,relu)
+ 1.GPT2  
+ 2.文档  
