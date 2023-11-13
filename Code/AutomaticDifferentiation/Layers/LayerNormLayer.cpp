@@ -1,20 +1,24 @@
 #include "LayerNormLayer.h"
 
-LayerNormLayer::LayerNormLayer(BaseLayer* ParentThis,std::string ThisLayerName, size_t ThisDeviceNum,std::vector<size_t>WeightShape,size_t UseNum, bool ElementwiseAffine, float eps)
+LayerNormLayer::LayerNormLayer(BaseLayer* ParentThis,std::string ThisLayerName, size_t ThisDeviceNum,std::vector<size_t>WeightShape,size_t UseNum, bool ElementwiseAffine,bool HasBias, float eps)
 {
     this->CommonInit(ParentThis,ThisLayerName,ThisDeviceNum);
     this->ElementwiseAffine = ElementwiseAffine;
     this->WeightShape = WeightShape;
     this->UseNum = UseNum;
     this->eps = eps;
+    this->HasBias = HasBias;
     this->RegisterConstNode("eps", WeightShape);
     CG->GetNode(this->GetLayerNodeName("eps"))->GetContent()->FillArray(eps);
     if(ElementwiseAffine)
     {
         this->RegisterWeightNode("Weight", WeightShape);
         CG->GetNode(this->GetLayerNodeName("Weight"))->GetContent()->FillArray(1.);
-        this->RegisterWeightNode("Bias", WeightShape);
-        CG->GetNode(this->GetLayerNodeName("Bias"))->GetContent()->FillArray(0);
+        if(HasBias)
+        {
+            this->RegisterWeightNode("Bias", WeightShape);
+            CG->GetNode(this->GetLayerNodeName("Bias"))->GetContent()->FillArray(0);
+        }
     }
 }
 
@@ -32,6 +36,7 @@ std::vector<std::string> LayerNormLayer::Forward(std::vector<std::string>InputNo
     std::string EleMulNode = OEAutoDiff::EleMul(this->CG, MinusNode, PowNode);
     if(!ElementwiseAffine)return {EleMulNode};
     std::string WeightEleMulNode = OEAutoDiff::EleMul(this->CG, this->GetLayerNodeName("Weight"), EleMulNode);
+    if(!HasBias)return {WeightEleMulNode};
     std::string BiasAddNode = OEAutoDiff::Add(this->CG, {{WeightEleMulNode,1}, {this->GetLayerNodeName("Bias"),1}});
     return {BiasAddNode};
 }

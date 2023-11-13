@@ -22,7 +22,7 @@ int main()
 
     std::string x = "x";
     std::vector<size_t>sp = {4,4};
-    LayerNormLayer* ln = new LayerNormLayer(nullptr, "LayerNormTest", 1, sp,0);
+    LayerNormLayer* ln = new LayerNormLayer(nullptr, "LayerNormTest", 1, sp,0,false,true,1e-5);
     ln->RegisterInputNode(x,sp);
     std::string q = ln->Forward({x})[0];
     ComputationalGraph*m = ln->CG.get();
