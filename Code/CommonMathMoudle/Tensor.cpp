@@ -1038,6 +1038,7 @@ void Tensor::FillRandomValBernoulli(float P)
 
 void Tensor::FillRandomValBernoulli(float P, unsigned Seed)
 {
+    P = 1-P;
     if(GetDeviceNum())
     {
         #ifdef CUDA_USEFUL

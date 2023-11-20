@@ -17,7 +17,7 @@
 #include "Code/AutomaticDifferentiation/Layers/LayerNormLayer.h"
 int main() 
 {
-    Tensor* g = new Tensor({4,5},0);
-    g->FillRandomValBernoulli(0.4);
+    Tensor* g = new Tensor({4,5},1);
+    g->FillRandomValBernoulli(0.9);
     g->PrintData();
 }
