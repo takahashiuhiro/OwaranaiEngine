@@ -57,4 +57,8 @@ OwaranaiEngine  项目根目录
 
 ## TODO  
  1.GPT2  
+    0.nn.Dropout  
+    1.nn.GELU  
+    2.nn.Linear  
+    3.nn.Embedding  
  2.文档  

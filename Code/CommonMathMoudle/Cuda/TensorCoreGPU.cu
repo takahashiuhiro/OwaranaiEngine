@@ -393,11 +393,11 @@ __global__ void EleInverseKernel(float* OutputData, size_t OutputShape)
   OutputData[Index] = 1./OutputData[Index];
 }
 
-__global__ void GenerateSignTensorKernel(float* OutputData, size_t OutputShapeCount)
+__global__ void GenerateSignTensorKernel(float* OutputData, size_t OutputShapeCount, float SwitchValue)
 {
   size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
   if(Index >= OutputShapeCount)return;
-  if(OutputData[Index] > 0)OutputData[Index] = 1.;
+  if(OutputData[Index] > SwitchValue)OutputData[Index] = 1.;
   else OutputData[Index] = 0.;
 }
 
@@ -417,7 +417,7 @@ void PowInCPP(float* OutputData, size_t OutputShapeCount,float Exponent)
 void GenerateSignTensorInCPP(float* OutputData, size_t OutputShapeCount)
 {
   CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
-  GenerateSignTensorKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, OutputShapeCount);
+  GenerateSignTensorKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, OutputShapeCount, 0);
 }
 
 void EleInverseInCPP(float* OutputData, size_t OutputShape)
@@ -674,4 +674,14 @@ void FillRandomValNormalInCPP(float* OutputData, size_t OutputShapeCount, unsign
   curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
   curandSetPseudoRandomGeneratorSeed(gen, Seed);
   curandGenerateNormal(gen, OutputData, OutputShapeCount+1, 0.0f, 1.0f);
+}
+
+void FillRandomValBernoulliInCPP(float* OutputData, size_t OutputShapeCount, float P, unsigned Seed)
+{
+  curandGenerator_t gen;
+  curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
+  curandSetPseudoRandomGeneratorSeed(gen, Seed);
+  curandGenerateUniform(gen, OutputData, OutputShapeCount + 1);
+  CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
+  GenerateSignTensorKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, OutputShapeCount, P);
 }

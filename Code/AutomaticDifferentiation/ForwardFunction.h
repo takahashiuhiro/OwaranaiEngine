@@ -41,5 +41,8 @@ public:
     /**Softmax.*/
     static std::string Softmax(ComputationalGraph*CG,std::string InputNode, size_t InputDim);
     static std::string Softmax(std::shared_ptr<ComputationalGraph>CG,std::string InputNode, size_t InputDim);
+    /**Dropout.*/
+    static std::string Dropout(ComputationalGraph*CG,std::string InputNode,bool InPlace);
+    static std::string Dropout(std::shared_ptr<ComputationalGraph>CG,std::string InputNode,bool InPlace);
 };
 

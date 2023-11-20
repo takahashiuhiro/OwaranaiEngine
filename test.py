@@ -56,6 +56,7 @@ def varr(q):
 
 tt = torch.nn.LayerNorm([4],elementwise_affine  = True)
 h = tt(a)
+h = torch.nn.Dropout(0.5)(h)
 h.backward(c)
 
 print(a.grad)

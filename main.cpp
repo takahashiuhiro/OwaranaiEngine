@@ -17,23 +17,7 @@
 #include "Code/AutomaticDifferentiation/Layers/LayerNormLayer.h"
 int main() 
 {
-
-
-
-    std::string x = "x";
-    std::vector<size_t>sp = {4,4};
-    LayerNormLayer* ln = new LayerNormLayer(nullptr, "LayerNormTest", 1, sp,0,false,true,1e-5);
-    ln->RegisterInputNode(x,sp);
-    std::string q = ln->Forward({x})[0];
-    ComputationalGraph*m = ln->CG.get();
-    m->BackwardMultiBuildGraph(1);
-
-    m->GetNode(x)->AssignContent(new Tensor(sp, 1, {0.2035,  1.2959,  1.8101, -0.4644,1.5027, -0.3270,  0.5905,  0.6538,-1.5745,  1.3330, -0.5596, -0.6548,0.1264, -0.5080,  1.6420,  0.1992}));
-    m->GetNode(m->GetDNodeid(q))->AssignContent(new Tensor(sp, 1, {0.2035,  1.2959,  1.8101, -0.4644,1.5027, -0.3270,  0.5905,  0.6538,-1.5745,  1.3330, -0.5596, -0.6548,1,1,1,1}));
-
-    m->ForwardDfs(m->GetDNodeid(x));
-    m->ForwardDfs(q);
-//
-    m->GetNode(m->GetDNodeid(x))->PrintData();
-    m->GetNode(q)->PrintData();
+    Tensor* g = new Tensor({4,5},0);
+    g->FillRandomValBernoulli(0.4);
+    g->PrintData();
 }

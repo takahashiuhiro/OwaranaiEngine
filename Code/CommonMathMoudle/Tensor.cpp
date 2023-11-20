@@ -1030,6 +1030,32 @@ void Tensor::FillRandomValNormal(unsigned Seed)
     }
 }
 
+void Tensor::FillRandomValBernoulli(float P)
+{
+    unsigned Seed = std::chrono::system_clock::now().time_since_epoch().count();
+    FillRandomValBernoulli(P,Seed);
+}
+
+void Tensor::FillRandomValBernoulli(float P, unsigned Seed)
+{
+    if(GetDeviceNum())
+    {
+        #ifdef CUDA_USEFUL
+        FillRandomValBernoulliInCPP(GetDevicePointer(), ShapeCount,P, Seed);
+        #endif
+    }
+    else
+    {
+        std::default_random_engine Gen(Seed);
+        std::uniform_real_distribution<float> distribution(0.0, 1.0);
+        for(size_t a = 0;a<ShapeCount;a++)
+        {
+            float RandomValue = distribution(Gen);
+            GetDevicePointer()[a] = RandomValue > P;
+        }
+    }
+}
+
 Tensor* Tensor::GenerateSignTensor()
 {
     Tensor* ReturnTensor = Copy();

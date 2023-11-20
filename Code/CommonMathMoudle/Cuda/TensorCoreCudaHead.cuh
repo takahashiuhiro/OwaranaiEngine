@@ -45,6 +45,7 @@ extern "C" void BroadCastToInCPP(float* OutputData, float* InputData, size_t* Ou
 extern "C" void FillRandomValNormalInCPP(float* OutputData, size_t OutputShapeCount, unsigned Seed);
 extern "C" void GenerateSignTensorInCPP(float* OutputData, size_t OutputShapeCount);
 extern "C" void PowInCPP(float* OutputData, size_t OutputShapeCount,float Exponent);
+extern "C" void FillRandomValBernoulliInCPP(float* OutputData, size_t OutputShapeCount, float P, unsigned Seed);
 
 struct CudaPair 
 {
