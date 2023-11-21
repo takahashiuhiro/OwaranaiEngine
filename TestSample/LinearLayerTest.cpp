@@ -22,7 +22,8 @@ int main()
     LinearLayer *m = new LinearLayer(nullptr, "gachi",1,{1,1});//声明网络
 
     m->RegisterInputNode("x", {1,1});//注册输入节点
-    m->RegisterConstNode("y",{1,1});//注册标签节点
+    m->CG->RegisterConstNode("y",{1,1});//注册标签节点
+
     auto ForwardRes = m->Forward({"x"});//建立forward部分的计算图，获取输出节点
 
     MSELoss* mse = new MSELoss();//注册mseloss.

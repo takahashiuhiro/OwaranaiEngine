@@ -18,6 +18,8 @@ public:
     std::map<std::string, size_t>CurrentBackwardFlag;
     /**当前的求导编号*/
     size_t CurrentBackwardFlagIndex = 0;
+    /**计算图模式，true为训练模式，false为推理模式.*/
+    bool CGMode  = true;
 
     ComputationalGraph();
     ~ComputationalGraph();
@@ -92,4 +94,7 @@ public:
     std::vector<std::string> GetNodesByProperty(std::vector<std::string>IncludeList, std::vector<std::string>ExcludeList);
     /**运算需要求导的节点.*/
     void ComputeWeightNodesDForward();
+    /**设置计算图模式.*/
+    void SetTrainMode();
+    void SetEvalMode();
 };

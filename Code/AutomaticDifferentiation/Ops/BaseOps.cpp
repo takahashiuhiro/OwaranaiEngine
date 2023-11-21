@@ -126,3 +126,27 @@ float BaseOps::GetEleExponent()
 {
     return Params.Get<float>("EleExponent");
 }
+
+void BaseOps::CGForwardProcess()
+{
+    CGForwardProcessDropout();
+}
+
+void BaseOps::CGForwardProcessDropout()
+{
+    if(!CG->CGMode)return;
+    if(!CG->GetNode(Nodeid)->Property.Get<bool>("Dropout"))return;
+    float P = 1.- CG->GetNode(Nodeid)->Property.Get<float>("DropoutP");
+    Tensor* DropoutTensor = CG->GetNode(Nodeid)->GetContent()->Copy();
+    DropoutTensor->FillRandomValBernoulli(P);
+    Tensor* DropoutTensorDotP = DropoutTensor->MulScalar(1/P);
+    delete DropoutTensor;
+    CG->GetNode(Nodeid)->AssignContent(DropoutTensorDotP->EleMul(CG->GetNode(Nodeid)->GetContent()));
+    delete DropoutTensorDotP;
+}
+
+void BaseOps::ForwardProcess()
+{
+    Forward();
+    CGForwardProcess();
+}

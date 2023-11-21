@@ -27,6 +27,8 @@ void ComputationalGraph::RegisterDefaultProperty(std::string Nodeid)
     GetNode(Nodeid)->Property.Set("Const", false);//是否是常量
     GetNode(Nodeid)->Property.Set("Weight", false);//是否是权重
     GetNode(Nodeid)->Property.Set("Freeze", false);//是否是冻结参数
+    GetNode(Nodeid)->Property.Set("Dropout", false);//是否需要dropout
+    GetNode(Nodeid)->Property.Set("DropoutP", 0.);//dropout的时候节点停止工作的概率
 }
 
 void ComputationalGraph::RegisterNode(std::string id)
@@ -206,7 +208,7 @@ bool ComputationalGraph::CheckOps(std::string CheckNodeid)
 void ComputationalGraph::NodeOpsForward(std::string Nodeid)
 {
     if(!CheckOps(Nodeid))return;
-    GetCGOps(Nodeid)->Forward();
+    GetCGOps(Nodeid)->ForwardProcess();
 }
 
 void ComputationalGraph::ForwardDfs(std::string DfsStartNodeid)
@@ -360,4 +362,13 @@ void ComputationalGraph::ComputeWeightNodesDForward()
     {
         ForwardDfs(GetDNodeid(NodeList[a]));
     }
+}
+
+void ComputationalGraph::SetTrainMode()
+{
+    CGMode = true;
+}
+void ComputationalGraph::SetEvalMode()
+{
+    CGMode = false;
 }

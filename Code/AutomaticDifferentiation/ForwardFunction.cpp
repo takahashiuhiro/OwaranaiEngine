@@ -157,11 +157,13 @@ std::string OEAutoDiff::Softmax(std::shared_ptr<ComputationalGraph>CG,std::strin
     return Softmax(CG.get(), InputNode, InputDim);
 }
 
-std::string Dropout(ComputationalGraph*CG,std::string InputNode,bool InPlace)
+std::string OEAutoDiff::Dropout(ComputationalGraph*CG,std::string InputNode, float P ,bool InPlace)
 {
-    //todo
+    CG->GetNode(InputNode)->Property.Set("Dropout", true);//是否需要dropout
+    CG->GetNode(InputNode)->Property.Set("DropoutP", P);
+    return InputNode;
 }
-std::string Dropout(std::shared_ptr<ComputationalGraph>CG,std::string InputNode,bool InPlace)
+std::string OEAutoDiff::Dropout(std::shared_ptr<ComputationalGraph>CG,std::string InputNode,float P ,bool InPlace)
 {
-    return Dropout(CG.get(),InputNode,InPlace);
+    return Dropout(CG.get(),InputNode,P,InPlace);
 }

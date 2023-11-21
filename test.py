@@ -56,12 +56,14 @@ def varr(q):
 
 tt = torch.nn.LayerNorm([4],elementwise_affine  = True)
 h = tt(a)
-h = torch.nn.Dropout(0.5)(h)
+print(h)
+g = torch.nn.Dropout(0.2)(h)
+print(g)
 h.backward(c)
 
 print(a.grad)
 #print(n.grad)
-print(h)
+#print(h)
 #print(ln(a))
 #print(tt.bias)
 #print(tt.weight)
