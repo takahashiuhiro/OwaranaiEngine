@@ -38,26 +38,9 @@ cmake ../
 make  
 ./OwaranaiEngineMain  
 
-## 关于项目目录  
-
-OwaranaiEngine  项目根目录  
-----Code  代码  
---------AutomaticDifferentiation  自动微分  
-------------Layers  神经网络层  
-------------Loss  误差层  
-------------Ops  算子  
-------------Optimizer  优化器  
-------------其他  计算图相关  
---------CommonDataStructure  通用数据结构  
---------CommonMathMoudle  通用数学  
-------------Cuda  一些cuda的基础操作实现  
-------------其他  张量相关  
-----DOC  接口文档  
-----TestSample  测试模块用的各种main文件  
 
 ## TODO  
  1.GPT2  
-    0.nn.Dropout  
     1.nn.GELU  
     2.nn.Linear  
     3.nn.Embedding  
