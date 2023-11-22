@@ -34,8 +34,12 @@ OwaranaiEngine  项目根目录
 ```
 std::shared_ptr<DevicePointerManager> DPMgr
 用于数据管理的智能指针，在释放Tensor类的时候该指针负责释放申请的一切Device或Host资源
+```
+```
 std::vector<size_t>shape
 用于记录Tensor的shape
+```
+```
 size_t ShapeCount
 用于记录Tensor内的元素数量
 ```
@@ -53,7 +57,7 @@ Tensor(std::vector<size_t>shape, size_t DeviceNum, std::vector<float>* InputData
 
 ```
 Tensor* Copy();
-拷贝一个与当前张量完全相同的张量
+函数说明：拷贝一个与当前张量完全相同的张量
 ```
 
 ```
@@ -300,4 +304,33 @@ Tensor* Pow(float Exponent);
 ### 2.2. ComputationalGraph 
 本节主要说明计算图部分的主要成员，接口与逻辑。 
 #### 2.2.1. Member Variables
+```
+using OpsMap = std::map<std::string, std::shared_ptr<BaseOps>>;
+OpsMap Opss;
+一个用来记录每个节点对应的算子的map
+```
+```
+std::map<std::string, bool>ComputeFlag;
+用于给dfs进行记忆化剪枝，且每个算子的反向建图只会执行一次，永不清空.
+```
+```
+std::map<std::string, bool>BackwardFlag;
+用于记录当前哪些节点需要被求导，本轮新增节点不求导.
+```
+```
+std::map<std::string, size_t>CurrentBackwardFlag;
+每个节点当前的求导轮数编号，用于在反向建图中区别不同阶的导数节点
+size_t CurrentBackwardFlagIndex = 0;
+计算图当前的求导轮数编号，用于在反向建图中区别不同阶的导数节点
+```
+```
+bool CGMode  = true;
+计算图模式，true为训练模式，false为推理模式.
+```
 #### 2.2.3. Member Functions
+```
+ComputationalNode* GetNode(std::string Nodeid);
+函数说明：返回一个指定名字的ComputationalNode
+参数说明：
+    std::string Nodeid 指定的节点名字
+```
