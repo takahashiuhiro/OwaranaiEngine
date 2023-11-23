@@ -27,7 +27,7 @@ OwaranaiEngine  项目根目录
 
 ### 2.1. Tensor
 
-本节主要说明张量部分的主要成员，接口与逻辑。
+本节主要说明Tensor类的主要成员，接口与逻辑。
 
 #### 2.1.1. Member Variables
 
@@ -44,7 +44,7 @@ size_t ShapeCount
 用于记录Tensor内的元素数量
 ```
 
-#### 2.1.3. Member Functions
+#### 2.1.2. Member Functions
 
 ```
 Tensor(){}
@@ -302,8 +302,12 @@ Tensor* Pow(float Exponent);
 ```
 
 ### 2.2. ComputationalGraph 
-本节主要说明计算图部分的主要成员，接口与逻辑。 
-#### 2.2.1. Member Variables
+本节主要说明ComputationalGraph类的主要成员，接口与逻辑。 
+#### 2.2.1. Overview
+ComputationalGraph类继承了BaseGraph类，拥有显式的图结构，因此在使用时也遵循普通有向图的用法，图中的node为需要特定id注册的ComputationalNode类，图中的edge在该结构中体现为node之间的邻接关系，并无权重体现。\
+在进行前向使用时，需要对入度为0的node进行手动赋值，在需要输出的node执行dfs。在进行反向使用时，需要先对图进行反向建图，然后在反向图中的目标输出node执行前向dfs，因而该类中并无明确的反向计算流程。\
+由于该类的结构设计，可以对图结构进行多次求导，直到在图中不存在对应阶导数的算子。
+#### 2.2.2. Member Variables
 ```
 using OpsMap = std::map<std::string, std::shared_ptr<BaseOps>>;
 OpsMap Opss;
@@ -333,4 +337,12 @@ ComputationalNode* GetNode(std::string Nodeid);
 函数说明：返回一个指定名字的ComputationalNode
 参数说明：
     std::string Nodeid 指定的节点名字
+```
+```
+void RegisterNode(std::string id);
+void RegisterNode(std::string id,std::vector<size_t>ThisNodeShape);
+函数说明：注册一个指定id的ComputationalNode
+参数说明：
+    std::string id 指定id
+    std::vector<size_t>ThisNodeShape 指定节点对应的张量维度
 ```
