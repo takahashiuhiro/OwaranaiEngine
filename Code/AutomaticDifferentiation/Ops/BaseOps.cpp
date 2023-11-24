@@ -127,6 +127,16 @@ float BaseOps::GetEleExponent()
     return Params.Get<float>("EleExponent");
 }
 
+void BaseOps::SetEleBaseNum(float BaseNum)
+{
+    Params.Set("EleBaseNum", BaseNum);
+}
+
+float BaseOps::GetEleBaseNum()
+{
+    return Params.Get<float>("EleBaseNum");
+}
+
 void BaseOps::CGForwardProcess()
 {
     CGForwardProcessDropout();

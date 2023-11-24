@@ -9,3 +9,4 @@
 #include "ReLUOps.h"
 #include "GenerateSignOps.h"
 #include "PowOps.h"
+#include "EleExpOps.h"

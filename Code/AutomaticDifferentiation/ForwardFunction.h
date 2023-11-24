@@ -44,5 +44,8 @@ public:
     /**Dropout.*/
     static std::string Dropout(ComputationalGraph*CG,std::string InputNode,float P ,bool InPlace = false);
     static std::string Dropout(std::shared_ptr<ComputationalGraph>CG,std::string InputNode,float P ,bool InPlace= false);
+    /**指数函数.*/
+    static std::string EleExp(ComputationalGraph*CG,std::string InputNode,float BaseNum);
+    static std::string EleExp(std::shared_ptr<ComputationalGraph>CG,std::string InputNode,float BaseNum);
 };
 

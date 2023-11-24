@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import math
 
 
 def ln(inpt):
@@ -30,11 +31,7 @@ a = torch.tensor(
      [-1.5745,  1.3330, -0.5596, -0.6548],
      [ 0.1264, -0.5080,  1.6420,  0.1992]],requires_grad = True)
 
-n = torch.tensor(
-    [[ 0.2035,  1.2959,  1.8101, 1.],
-     [ 1.5027, -0.3270,  0.5905, 1.],
-     [-1.5745,  1.3330, -0.5596, 1.],
-     [ 0.1264, -0.5080,  1.6420, 1.]],requires_grad = True)
+
 
 c= torch.tensor(
     [[ 0.2035,  1.2959,  1.8101, -0.4644],
@@ -53,15 +50,16 @@ def varr(q):
 #h = torch.var(a, dim=[0,1], keepdim=True, unbiased = False)
 #h = varr(a)
 #h.backward(torch.tensor([[1.]]))
+#c = torch.ones((4,4))
 
 tt = torch.nn.LayerNorm([4],elementwise_affine  = True)
-h = tt(a)
-print(h)
-g = torch.nn.Dropout(0.2)(h)
-print(g)
+h = math.e**a
+
+
 h.backward(c)
 
 print(a.grad)
+print(h)
 #print(n.grad)
 #print(h)
 #print(ln(a))

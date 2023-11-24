@@ -167,3 +167,17 @@ std::string OEAutoDiff::Dropout(std::shared_ptr<ComputationalGraph>CG,std::strin
 {
     return Dropout(CG.get(),InputNode,P,InPlace);
 }
+
+std::string OEAutoDiff::EleExp(ComputationalGraph*CG,std::string InputNode,float BaseNum)
+{
+    std::string EleExpNodeName = CG->GetNodeidByOps(OpsType::EleExp, {InputNode});
+    CG->RegisterVariableNode(EleExpNodeName);
+    CG->RegisterOpsCompleted(EleExpNodeName, {InputNode}, OpsType::EleExp, Dict());
+    CG->GetCGOps(EleExpNodeName)->SetEleBaseNum(BaseNum);
+    CG->GetCGOps(EleExpNodeName)->AfterSettingShapeComputing();
+    return EleExpNodeName;
+}
+std::string OEAutoDiff::EleExp(std::shared_ptr<ComputationalGraph>CG,std::string InputNode,float BaseNum)
+{
+    return EleExp(CG.get(),InputNode,BaseNum);
+}

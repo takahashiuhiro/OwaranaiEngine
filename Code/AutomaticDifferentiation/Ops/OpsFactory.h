@@ -7,11 +7,9 @@
 #include "AllOpsTypeHeader.h"
 #include "../../CommonDataStructure/Dict.h"
 
-
 class OpsFactory
 {
 public:
-
     static std::shared_ptr<BaseOps> GetOps(size_t OpsTypeid, Dict Params, ComputationalGraph* CG)
     {
         Log::Assert(OpsTypeid != OpsType::Base, std::string("Do Not Set Base Ops, id:"));
@@ -50,6 +48,10 @@ public:
         if(OpsTypeid == OpsType::Pow)
         {
             return std::make_shared<PowOps>(OpsTypeid, Params, CG);
+        }
+        if(OpsTypeid == OpsType::EleExp)
+        {
+            return std::make_shared<EleExpOps>(OpsTypeid, Params, CG);
         }
         Log::Assert(0, std::string("No Ops Be Set"));
     }

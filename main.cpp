@@ -17,22 +17,36 @@
 #include "Code/AutomaticDifferentiation/Layers/LayerNormLayer.h"
 int main() 
 {
-    Tensor* g = new Tensor({3,5},1);
-    g->FillRandomValNormal();
-    g->PrintData();
+    Tensor* g = new Tensor({4,4},1,{
+0.2035,  1.2959,  1.8101, -0.4644,
+ 1.5027, -0.3270,  0.5905,  0.6538,
+-1.5745,  1.3330, -0.5596, -0.6548,
+ 0.1264, -0.5080,  1.6420,  0.1992
+    });
+
+    Tensor* yi = new Tensor({4,4},1,{
+0.2035,  1.2959,  1.8101, -0.4644,
+ 1.5027, -0.3270,  0.5905,  0.6538,
+-1.5745,  1.3330, -0.5596, -0.6548,
+1,1,1,1.
+    });
 
     ComputationalGraph * m = new ComputationalGraph();
-    m->RegisterVariableNode("x",{3,5});
+    m->RegisterVariableNode("x",{4,4});
     m->GetNode("x")->AssignContent(g);
 
-    std::string gg = OEAutoDiff::Add(m,{{"x",1}});
+    std::string ss = OEAutoDiff::EleExp(m,"x",M_E);
 
-    std::string ss = OEAutoDiff::Dropout(m,gg,0.5);
+    m->BackwardMultiBuildGraph(1);
 
-    m->SetEvalMode();
+    //Tensor* yi = new Tensor({4,4},1);
+    //yi->FillArray(1.);
+    m->GetNode(m->GetDNodeid(ss))->AssignContent(yi);
 
     m->ForwardDfs(ss);
+    m->ForwardDfs(m->GetDNodeid("x"));
     //std::cout<<ss<<std::endl;
+    m->GetNode(m->GetDNodeid("x"))->PrintData();
     m->GetNode(ss)->PrintData();
 
 }

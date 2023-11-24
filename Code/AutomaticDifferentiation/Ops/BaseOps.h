@@ -3,6 +3,7 @@
 #include "../../CommonDataStructure/Dict.h"
 #include "OpsType.h"
 #include "../ForwardFunction.h"
+#include <cmath>
 
 class ComputationalGraph;
 class BaseOps
@@ -73,5 +74,8 @@ public:
     void SetEleExponent(float Exponent);
     /**获取元素指数.*/
     float GetEleExponent();
-
+    /**设置底数.*/
+    void SetEleBaseNum(float BaseNum);
+    /**获取底数.*/
+    float GetEleBaseNum();
 };

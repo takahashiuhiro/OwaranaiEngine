@@ -723,3 +723,10 @@ static std::string Dropout(ComputationalGraph*CG,std::string InputNode,float P ,
     float P 神经元停止工作概率P
     bool InPlace = false 未实现
 ```
+```
+static std::string EleExp(ComputationalGraph*CG,std::string InputNode,float BaseNum);
+函数说明：输入一个底数给出以矩阵元素为指数的张量
+参数说明：
+    std::string InputNode 输入节点
+    float BaseNum 输入底数
+```
