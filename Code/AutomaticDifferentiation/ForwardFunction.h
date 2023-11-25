@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <map>
+#include <cmath>
 #include "Ops/OpsType.h"
 
 class ComputationalGraph;
@@ -47,5 +48,8 @@ public:
     /**指数函数.*/
     static std::string EleExp(ComputationalGraph*CG,std::string InputNode,float BaseNum);
     static std::string EleExp(std::shared_ptr<ComputationalGraph>CG,std::string InputNode,float BaseNum);
+    /**双曲正切.*/
+    static std::string Tanh(ComputationalGraph*CG,std::string InputNode);
+    static std::string Tanh(std::shared_ptr<ComputationalGraph>CG,std::string InputNode);
 };
 

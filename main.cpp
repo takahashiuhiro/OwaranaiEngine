@@ -35,7 +35,7 @@ int main()
     m->RegisterVariableNode("x",{4,4});
     m->GetNode("x")->AssignContent(g);
 
-    std::string ss = OEAutoDiff::EleExp(m,"x",M_E);
+    std::string ss = OEAutoDiff::Tanh(m, "x");
 
     m->BackwardMultiBuildGraph(1);
 

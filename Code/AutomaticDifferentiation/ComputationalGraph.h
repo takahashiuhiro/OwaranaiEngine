@@ -44,6 +44,9 @@ public:
     /**注册常量.*/
     void RegisterConstNode(std::string Nodeid);
     void RegisterConstNode(std::string Nodeid, std::vector<size_t>ThisNodeShape);
+    /**注册无溯源常量节点.*/
+    std::string RegisterConstNodeWithoutSource();
+    std::string RegisterConstNodeWithoutSource(std::vector<size_t>ThisNodeShape);
     /**注册算子.*/
     void RegisterOps(std::string OutputNodeid, std::vector<std::string> InputNodeid, size_t OpsTypeid, Dict OpsParams);
     /**注册算子增边.*/

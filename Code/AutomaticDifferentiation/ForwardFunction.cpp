@@ -181,3 +181,19 @@ std::string OEAutoDiff::EleExp(std::shared_ptr<ComputationalGraph>CG,std::string
 {
     return EleExp(CG.get(),InputNode,BaseNum);
 }
+
+std::string OEAutoDiff::Tanh(ComputationalGraph*CG,std::string InputNode)
+{
+    std::string OnesNode = Pow(CG, InputNode, 0.);
+    std::string MulSNode = Add(CG,{{InputNode, -2.}});
+    std::string EleExpNode = EleExp(CG, MulSNode, M_E);
+    std::string OnesMinusNode = Add(CG, {{OnesNode,1.},{EleExpNode,-1.}});
+    std::string OnesAddNode = Add(CG, {{OnesNode,1.},{EleExpNode,1.}});
+    std::string PowNode = Pow(CG, OnesAddNode, -1.);
+    std::string DotNode = EleMul(CG, OnesMinusNode, PowNode);
+    return DotNode;
+}  
+std::string OEAutoDiff::Tanh(std::shared_ptr<ComputationalGraph>CG,std::string InputNode)
+{
+    return Tanh(CG.get(), InputNode);
+}

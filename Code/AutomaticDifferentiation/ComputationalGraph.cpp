@@ -82,6 +82,19 @@ void ComputationalGraph::RegisterConstNode(std::string Nodeid, std::vector<size_
     GetNode(Nodeid)->NodeContentShape = ThisNodeShape;
 }
 
+std::string ComputationalGraph::RegisterConstNodeWithoutSource()
+{
+    std::string ThisNodeNameWithoutSource = GetNodeidByOps(OpsType::Base,{});
+    RegisterConstNode(ThisNodeNameWithoutSource);
+    return ThisNodeNameWithoutSource;
+}
+std::string ComputationalGraph::RegisterConstNodeWithoutSource(std::vector<size_t>ThisNodeShape)
+{
+    std::string ThisNodeNameWithoutSource = GetNodeidByOps(OpsType::Base,{});
+    RegisterConstNode(ThisNodeNameWithoutSource, ThisNodeShape);
+    return ThisNodeNameWithoutSource;
+}
+
 ComputationalNode* ComputationalGraph::GetNode(std::string Nodeid)
 {
     Log::Assert(HasNode(Nodeid), std::string("This Graph has not this Nodeid :") + Nodeid);

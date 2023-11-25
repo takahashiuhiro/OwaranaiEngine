@@ -730,3 +730,9 @@ static std::string EleExp(ComputationalGraph*CG,std::string InputNode,float Base
     std::string InputNode 输入节点
     float BaseNum 输入底数
 ```
+```
+static std::string Tanh(ComputationalGraph*CG,std::string InputNode);
+函数说明：双曲正切激活函数
+参数说明：
+    std::string InputNode 输入节点
+```
