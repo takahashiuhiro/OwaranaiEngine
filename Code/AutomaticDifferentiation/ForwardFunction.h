@@ -51,5 +51,8 @@ public:
     /**双曲正切.*/
     static std::string Tanh(ComputationalGraph*CG,std::string InputNode);
     static std::string Tanh(std::shared_ptr<ComputationalGraph>CG,std::string InputNode);
+    /**GELU.*/
+    static std::string GELU(ComputationalGraph*CG,std::string InputNode);
+    static std::string GELU(std::shared_ptr<ComputationalGraph>CG,std::string InputNode);
 };
 

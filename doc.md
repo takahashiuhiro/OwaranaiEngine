@@ -736,3 +736,9 @@ static std::string Tanh(ComputationalGraph*CG,std::string InputNode);
 参数说明：
     std::string InputNode 输入节点
 ```
+```
+static std::string GELU(ComputationalGraph*CG,std::string InputNode);
+函数说明：GELU激活函数
+参数说明：
+    std::string InputNode 输入节点
+```

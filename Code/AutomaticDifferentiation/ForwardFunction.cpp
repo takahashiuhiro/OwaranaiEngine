@@ -197,3 +197,18 @@ std::string OEAutoDiff::Tanh(std::shared_ptr<ComputationalGraph>CG,std::string I
 {
     return Tanh(CG.get(), InputNode);
 }
+
+std::string OEAutoDiff::GELU(ComputationalGraph*CG,std::string InputNode)
+{
+    std::string PowNode = Pow(CG,InputNode,3.);
+    float Kdot = std::pow(2./M_PI,0.5);
+    std::string AddInTanhNode = Add(CG, {{InputNode, Kdot},{PowNode,0.044715*Kdot}});
+    std::string TanhNode = Tanh(CG, AddInTanhNode);
+    std::string DotNode = EleMul(CG, InputNode, TanhNode,0.5,1);
+    std::string AddNode = Add(CG, {{InputNode, 0.5}, {DotNode,1}});
+    return AddNode;
+}
+std::string OEAutoDiff::GELU(std::shared_ptr<ComputationalGraph>CG,std::string InputNode)
+{
+    return GELU(CG.get(), InputNode);
+}

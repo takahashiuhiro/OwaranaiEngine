@@ -53,7 +53,7 @@ def varr(q):
 #c = torch.ones((4,4))
 
 tt = torch.nn.LayerNorm([4],elementwise_affine  = True)
-h = torch.nn.Tanh()(a)
+h = torch.nn.GELU()(a)
 
 
 h.backward(c)
