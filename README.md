@@ -44,8 +44,7 @@ make
 
 
 ## TODO  
- 1.GPT2  
-    1.nn.GELU  
-    2.nn.Linear  
-    3.nn.Embedding  
- 2.文档  
+1.GPT2  \
+   1.1.nn.Linear  
+   1.2.nn.Embedding  
+2.文档  

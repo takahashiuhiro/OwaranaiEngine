@@ -668,12 +668,12 @@ void cudaMallocInCPP(float** Input, size_t Size, size_t DeviceNum)
   cudaMalloc(Input, Size*sizeof(float));
 }
 
-void FillRandomValNormalInCPP(float* OutputData, size_t OutputShapeCount, unsigned Seed)
+void FillRandomValNormalInCPP(float* OutputData, size_t OutputShapeCount,float MeanV, float VarianceV, unsigned Seed)
 {
   curandGenerator_t gen;
   curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
   curandSetPseudoRandomGeneratorSeed(gen, Seed);
-  curandGenerateNormal(gen, OutputData, OutputShapeCount+OutputShapeCount%2, 0.0f, 1.0f);
+  curandGenerateNormal(gen, OutputData, OutputShapeCount+OutputShapeCount%2, MeanV, VarianceV);
 }
 
 void FillRandomValBernoulliInCPP(float* OutputData, size_t OutputShapeCount, float P, unsigned Seed)

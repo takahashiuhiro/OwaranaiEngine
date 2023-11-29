@@ -1007,22 +1007,27 @@ void Tensor::LoadFromFile(std::string FilePath)
 
 void Tensor::FillRandomValNormal()
 {
-    unsigned Seed = std::chrono::system_clock::now().time_since_epoch().count();
-    FillRandomValNormal(Seed);
+    FillRandomValNormal(0.,1.);
 }
 
-void Tensor::FillRandomValNormal(unsigned Seed)
+void Tensor::FillRandomValNormal(float MeanV, float VarianceV)
+{
+    unsigned Seed = std::chrono::system_clock::now().time_since_epoch().count();
+    FillRandomValNormal(MeanV,VarianceV,Seed);
+}
+
+void Tensor::FillRandomValNormal(float MeanV, float VarianceV,unsigned Seed)
 {
     if(GetDeviceNum())
     {
         #ifdef CUDA_USEFUL
-        FillRandomValNormalInCPP(GetDevicePointer(), ShapeCount, Seed);
+        FillRandomValNormalInCPP(GetDevicePointer(), ShapeCount,MeanV, VarianceV, Seed);
         #endif
     }
     else
     {
         std::default_random_engine Gen(Seed);
-        std::normal_distribution<> Dist(0.0, 1.0);
+        std::normal_distribution<> Dist(MeanV, VarianceV);
         for(size_t a = 0;a<ShapeCount;a++)
         {
             GetDevicePointer()[a] = Dist(Gen);
