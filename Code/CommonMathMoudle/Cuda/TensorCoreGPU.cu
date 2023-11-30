@@ -678,10 +678,19 @@ void FillRandomValNormalInCPP(float* OutputData, size_t OutputShapeCount,float M
 
 void FillRandomValBernoulliInCPP(float* OutputData, size_t OutputShapeCount, float P, unsigned Seed)
 {
+  FillRandomValUniformInCPP(OutputData, OutputShapeCount,0,1, Seed);
+  CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
+  GenerateSignTensorKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, OutputShapeCount, P);
+}
+
+void FillRandomValUniformInCPP(float* OutputData, size_t OutputShapeCount,float MinV, float MaxV, unsigned Seed)
+{
   curandGenerator_t gen;
   curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
   curandSetPseudoRandomGeneratorSeed(gen, Seed);
-  curandGenerateUniform(gen, OutputData, OutputShapeCount + 1);
+  curandGenerateUniform(gen, OutputData, OutputShapeCount);
+  if(MinV*MinV < 1e-7 && (MaxV*MaxV-2*MaxV+1)<1e-7)return;
   CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
-  GenerateSignTensorKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, OutputShapeCount, P);
+  MulScalarKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData,OutputData, MaxV-MinV, OutputShapeCount);
+  AddScalarKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData,OutputData, MinV, OutputShapeCount);
 }

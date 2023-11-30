@@ -49,6 +49,7 @@ extern "C" void FillRandomValNormalInCPP(float* OutputData, size_t OutputShapeCo
 extern "C" void GenerateSignTensorInCPP(float* OutputData, size_t OutputShapeCount);
 extern "C" void PowInCPP(float* OutputData, size_t OutputShapeCount,float Exponent);
 extern "C" void FillRandomValBernoulliInCPP(float* OutputData, size_t OutputShapeCount, float P, unsigned Seed);
+extern "C" void FillRandomValUniformInCPP(float* OutputData, size_t OutputShapeCount,float MinV, float MaxV, unsigned Seed);
 #endif
 
 struct CudaDimVec
@@ -287,6 +288,10 @@ public:
     /**伯努利分布.*/
     void FillRandomValBernoulli(float P);
     void FillRandomValBernoulli(float P, unsigned Seed);
+    /**均匀分布.*/
+    void FillRandomValUniform();
+    void FillRandomValUniform(float MinV, float MaxV);
+    void FillRandomValUniform(float MinV, float MaxV, unsigned Seed);
     /**生成符号矩阵.*/
     Tensor* GenerateSignTensor();
     Tensor* ReLU();
