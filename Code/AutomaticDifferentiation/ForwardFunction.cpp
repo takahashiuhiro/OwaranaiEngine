@@ -212,3 +212,18 @@ std::string OEAutoDiff::GELU(std::shared_ptr<ComputationalGraph>CG,std::string I
 {
     return GELU(CG.get(), InputNode);
 }
+
+std::string OEAutoDiff::View(ComputationalGraph*CG,std::string InputNode, std::vector<size_t>InputShape, int MinusOneIdx)
+{
+    std::string ViewNodeName = CG->GetNodeidByOps(OpsType::View, {InputNode});
+    CG->RegisterVariableNode(ViewNodeName);
+    CG->RegisterOpsCompleted(ViewNodeName, {InputNode}, OpsType::View, Dict());
+    CG->GetCGOps(ViewNodeName)->SetBroadCastTo({{InputNode, InputShape}});
+    CG->GetCGOps(ViewNodeName)->SetSelectDimSingle(MinusOneIdx);
+    CG->GetCGOps(ViewNodeName)->AfterSettingShapeComputing();
+    return ViewNodeName;
+}
+std::string OEAutoDiff::View(std::shared_ptr<ComputationalGraph>CG,std::string InputNode, std::vector<size_t>InputShape, int MinusOneIdx)
+{
+    return View(CG.get(),InputNode,InputShape,MinusOneIdx);
+}

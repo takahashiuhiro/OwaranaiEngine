@@ -53,6 +53,10 @@ public:
         {
             return std::make_shared<EleExpOps>(OpsTypeid, Params, CG);
         }
+        if(OpsTypeid == OpsType::View)
+        {
+            return std::make_shared<ViewOps>(OpsTypeid, Params, CG);
+        }
         Log::Assert(0, std::string("No Ops Be Set"));
     }
 };

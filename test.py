@@ -52,16 +52,27 @@ def varr(q):
 #h.backward(torch.tensor([[1.]]))
 #c = torch.ones((4,4))
 
-tt = torch.nn.LayerNorm([4],elementwise_affine  = True)
-h = torch.nn.GELU()(a)
+#tt = torch.nn.LayerNorm([4],elementwise_affine  = True)
+#h = torch.nn.GELU()(a)
 
 
-h.backward(c)
+#h.backward(c)
 
-print(a.grad)
-print(h)
+#print(a.grad)
+#print(h)
 #print(n.grad)
 #print(h)
 #print(ln(a))
 #print(tt.bias)
 #print(tt.weight)
+
+
+qwe = torch.nn.Linear(4,3)
+
+d = a.view(8,2)
+
+
+d.backward(c.view(8,2))
+
+print(a.grad)
+print(d)

@@ -15,4 +15,5 @@ struct OpsType
     static const size_t GenerateSign = 9;//生成符号矩阵，没有反向
     static const size_t Pow = 10;//幂次
     static const size_t EleExp = 11;//指数函数
+    static const size_t View = 12;//改变张量shape
 };

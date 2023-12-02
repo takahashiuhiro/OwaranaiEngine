@@ -78,4 +78,8 @@ public:
     void SetEleBaseNum(float BaseNum);
     /**获取底数.*/
     float GetEleBaseNum();
+    /**设置选取维度，允许负数.*/
+    void SetSelectDimSingle(int SelectDimIndex);
+    /**获取选取维度，允许负数.*/
+    int GetSelectDimSingle();
 };

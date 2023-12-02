@@ -1138,3 +1138,22 @@ Tensor* Tensor::Pow(float Exponent)
     }
     return ReturnTensor;
 }
+
+Tensor* Tensor::View(std::vector<size_t> OutputShape, int MinusOneIdx)
+{
+    Tensor* ReturnTensor = Copy();
+    ReturnTensor->shape = OutputShape;
+    if(MinusOneIdx >= 0)
+    {
+        int SpcIdx = 1;
+        for(size_t a =0;a<OutputShape.size();a++)
+        {
+            if(a!=MinusOneIdx)
+            {
+                SpcIdx*=OutputShape[a];
+            }
+        }
+        ReturnTensor->shape[MinusOneIdx] = ReturnTensor->ShapeCount/SpcIdx;
+    }
+    return ReturnTensor;
+}

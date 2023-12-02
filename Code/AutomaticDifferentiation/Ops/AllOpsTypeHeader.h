@@ -10,3 +10,4 @@
 #include "GenerateSignOps.h"
 #include "PowOps.h"
 #include "EleExpOps.h"
+#include "ViewOps.h"

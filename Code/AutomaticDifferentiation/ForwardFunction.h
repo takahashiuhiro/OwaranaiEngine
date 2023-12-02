@@ -54,5 +54,8 @@ public:
     /**GELU.*/
     static std::string GELU(ComputationalGraph*CG,std::string InputNode);
     static std::string GELU(std::shared_ptr<ComputationalGraph>CG,std::string InputNode);
+    /**View.*/
+    static std::string View(ComputationalGraph*CG,std::string InputNode, std::vector<size_t>InputShape, int MinusOneIdx = -1);
+    static std::string View(std::shared_ptr<ComputationalGraph>CG,std::string InputNode, std::vector<size_t>InputShape, int MinusOneIdx = -1);
 };
 

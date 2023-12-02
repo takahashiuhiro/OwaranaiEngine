@@ -27,6 +27,30 @@ void BaseOps::Backward()
     Log::Assert(0, std::string("This Node's Backward Was Node Implemented: ")+Nodeid);
 }
 
+void BaseOps::CGForwardProcess()
+{
+    CGForwardProcessDropout();
+}
+
+void BaseOps::CGForwardProcessDropout()
+{
+    if(!CG->CGMode)return;
+    if(!CG->GetNode(Nodeid)->Property.Get<bool>("Dropout"))return;
+    float P = 1.- CG->GetNode(Nodeid)->Property.Get<float>("DropoutP");
+    Tensor* DropoutTensor = CG->GetNode(Nodeid)->GetContent()->Copy();
+    DropoutTensor->FillRandomValBernoulli(P);
+    Tensor* DropoutTensorDotP = DropoutTensor->MulScalar(1/P);
+    delete DropoutTensor;
+    CG->GetNode(Nodeid)->AssignContent(DropoutTensorDotP->EleMul(CG->GetNode(Nodeid)->GetContent()));
+    delete DropoutTensorDotP;
+}
+
+void BaseOps::ForwardProcess()
+{
+    Forward();
+    CGForwardProcess();
+}
+
 std::vector<std::string> & BaseOps::GetInputNodeList()
 {
     return this->CG->GetNode(this->Nodeid)->InputNodeidList;
@@ -137,26 +161,12 @@ float BaseOps::GetEleBaseNum()
     return Params.Get<float>("EleBaseNum");
 }
 
-void BaseOps::CGForwardProcess()
+void BaseOps::SetSelectDimSingle(int SelectDimIndex)
 {
-    CGForwardProcessDropout();
+    Params.Set("SelectDimIndex", SelectDimIndex);
 }
 
-void BaseOps::CGForwardProcessDropout()
+int BaseOps::GetSelectDimSingle()
 {
-    if(!CG->CGMode)return;
-    if(!CG->GetNode(Nodeid)->Property.Get<bool>("Dropout"))return;
-    float P = 1.- CG->GetNode(Nodeid)->Property.Get<float>("DropoutP");
-    Tensor* DropoutTensor = CG->GetNode(Nodeid)->GetContent()->Copy();
-    DropoutTensor->FillRandomValBernoulli(P);
-    Tensor* DropoutTensorDotP = DropoutTensor->MulScalar(1/P);
-    delete DropoutTensor;
-    CG->GetNode(Nodeid)->AssignContent(DropoutTensorDotP->EleMul(CG->GetNode(Nodeid)->GetContent()));
-    delete DropoutTensorDotP;
-}
-
-void BaseOps::ForwardProcess()
-{
-    Forward();
-    CGForwardProcess();
+    return Params.Get<int>("SelectDimIndex");
 }

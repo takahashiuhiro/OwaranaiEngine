@@ -297,4 +297,7 @@ public:
     Tensor* ReLU();
     /**元素幂次.*/
     Tensor* Pow(float Exponent);
+    /**改变张量的shape.*/
+    Tensor* View(std::vector<size_t> OutputShape, int MinusOneIdx = -1);
+
 };

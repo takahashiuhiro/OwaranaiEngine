@@ -742,3 +742,11 @@ static std::string GELU(ComputationalGraph*CG,std::string InputNode);
 参数说明：
     std::string InputNode 输入节点
 ```
+```
+static std::string View(ComputationalGraph*CG,std::string InputNode, std::vector<size_t>InputShape, int MinusOneIdx = -1);
+函数说明：修改张量的shape，但是元素总量不能变
+参数说明：
+    std::string InputNode 输入节点
+    std::vector<size_t>InputShape 想要张量进行的变形目标shape
+    int MinusOneIdx 记录第几维不想算，如果小于0代表输入已经算好了，否则将用总元素数除以已知元素书填入
+```
