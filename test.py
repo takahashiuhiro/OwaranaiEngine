@@ -67,12 +67,14 @@ def varr(q):
 #print(tt.weight)
 
 
-qwe = torch.nn.Linear(4,3)
+qwe = torch.nn.Linear(4,3, bias=True)
 
-d = a.view(8,2)
+#d = a.view(8,2)
+#
+#
+#d.backward(c.view(8,2))
+#
+#print(a.grad)
+#print(d)
 
-
-d.backward(c.view(8,2))
-
-print(a.grad)
-print(d)
+print(qwe.bias)

@@ -55,7 +55,7 @@ public:
     std::string GetLinkName(std::string PreStr, std::string NxtStr);
 
     /**进行前向构建的.*/
-    virtual std::vector<std::string> Forward(std::vector<std::string>InputNodeArray){{}};
+    virtual std::vector<std::string> Forward(std::vector<std::string>InputNodeArray){};
     /**感觉应该还得有一个启动函数.*/
     virtual void Run(){};
 };
