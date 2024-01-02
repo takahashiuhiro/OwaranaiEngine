@@ -408,6 +408,23 @@ __global__ void PowKernel(float* OutputData, size_t OutputShapeCount,float Expon
   OutputData[Index] = pow(OutputData[Index], Exponent);
 }
 
+__global__ void FillOnehotDataKernel(float* OutputData, size_t BaseShape, size_t OnehotShape, size_t* InputData)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= BaseShape)return;
+  OutputData[Index*OnehotShape+InputData[Index]] = 1.;
+}
+
+void FillOnehotDataInCPP(float* OutputData, size_t BaseShape, size_t OnehotShape, size_t* InputData)
+{
+  CudaPair CudaPairInput = GetCudaPair(BaseShape);
+  size_t *InputDataCuda;
+  cudaMalloc((void**)&InputDataCuda, BaseShape*sizeof(size_t));
+  cudaMemcpy(InputDataCuda,InputData,sizeof(size_t)*BaseShape,cudaMemcpyHostToDevice);
+  FillOnehotDataKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, BaseShape, OnehotShape, InputDataCuda);
+  cudaFree(InputDataCuda);
+}
+
 void PowInCPP(float* OutputData, size_t OutputShapeCount,float Exponent)
 {
   CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);

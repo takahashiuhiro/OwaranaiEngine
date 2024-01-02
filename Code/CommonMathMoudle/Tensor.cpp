@@ -1157,3 +1157,33 @@ Tensor* Tensor::View(std::vector<size_t> OutputShape, int MinusOneIdx)
     }
     return ReturnTensor;
 }
+
+Tensor* Tensor::CreateOnehotTensor(std::vector<size_t> InputShape, std::vector<size_t>InputData,size_t TokenLength, size_t DeviceNum)
+{
+    if(!TokenLength)
+    {
+        for(size_t a = 0;a<InputData.size();a++)
+        {
+            TokenLength = std::max(TokenLength, InputData[a]);
+        }
+        TokenLength += 1;
+    }
+    InputShape.push_back(TokenLength);
+    Tensor* ReturnTensor = new Tensor({InputShape}, DeviceNum);
+    ReturnTensor->FillArray(0);
+    size_t BaseShape = ReturnTensor->ShapeCount/TokenLength;
+    if(ReturnTensor->GetDeviceNum())
+    {
+        #ifdef CUDA_USEFUL
+        FillOnehotDataInCPP(ReturnTensor->GetDevicePointer(), BaseShape, TokenLength, InputData.data());
+        #endif
+    }
+    else
+    {
+        for(size_t a = 0;a<BaseShape;a++)
+        {
+            ReturnTensor->GetDevicePointer()[a*TokenLength + InputData[a]] = 1.;
+        }
+    }
+    return ReturnTensor;
+}

@@ -67,7 +67,7 @@ def varr(q):
 #print(tt.weight)
 
 
-qwe = torch.nn.Linear(4,3, bias=True)
+#qwe = torch.nn.Linear(4,3, bias=True)
 
 #d = a.view(8,2)
 #
@@ -77,4 +77,12 @@ qwe = torch.nn.Linear(4,3, bias=True)
 #print(a.grad)
 #print(d)
 
-print(qwe.bias)
+#print(qwe.bias)
+
+padding_idx = 0
+embedding = torch.nn.Embedding(3, 3, padding_idx=padding_idx)
+print(embedding.weight)
+with torch.no_grad():
+    embedding.weight[padding_idx] = torch.ones(3)
+
+print(embedding.weight)

@@ -42,9 +42,7 @@ cmake ../
 make  
 ./OwaranaiEngineMain  
 
-
 ## TODO  
 1.GPT2  \
-   1.1.nn.Linear  
-   1.2.nn.Embedding  
+   1.1.nn.Embedding  
 2.文档  
