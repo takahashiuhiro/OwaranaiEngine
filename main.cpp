@@ -15,7 +15,7 @@
 #include "Code/AutomaticDifferentiation/Loss/MSELoss.h"
 int main() 
 {
-    size_t dnum = 0;
+    size_t dnum = 1;
 
     Tensor* g = new Tensor({4,4},dnum,{
 0.2035,  1.2959,  1.8101, -0.4644,
