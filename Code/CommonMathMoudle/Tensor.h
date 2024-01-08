@@ -34,21 +34,12 @@ public:
     std::vector<size_t>shape;
     /**all data num*/
     size_t ShapeCount = 1;
-
-    void ToDevice(size_t NewDeviceNum)
-    {
-        DPMgr->SetDevice(NewDeviceNum, ShapeCount);
-    }
-
-    size_t GetDeviceNum()
-    {
-        return DPMgr->DeviceNum;
-    }
-
-    float* GetDevicePointer()
-    {
-        return DPMgr->GetDevicePointer();
-    }
+    /**把张量挪到其他设备上.*/
+    void ToDevice(size_t NewDeviceNum){DPMgr->SetDevice(NewDeviceNum, ShapeCount);}
+    /**获取张量设备.*/
+    size_t GetDeviceNum(){return DPMgr->DeviceNum;}
+    /**获取张量数据指针.*/
+    float* GetDevicePointer(){return DPMgr->GetDevicePointer();}
     /**print data of this tensor*/
     void PrintData();
     /**打印维度.*/

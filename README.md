@@ -44,5 +44,5 @@ make
 
 ## TODO  
 1.GPT2  \
-   1.1.nn.Embedding  
+   1.1.nn.Embedding  （还没测试，暂存）
 2.文档  

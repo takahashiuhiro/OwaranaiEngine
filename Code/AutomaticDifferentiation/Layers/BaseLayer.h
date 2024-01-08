@@ -58,4 +58,5 @@ public:
     virtual std::vector<std::string> Forward(std::vector<std::string>InputNodeArray){};
     /**感觉应该还得有一个启动函数.*/
     virtual void Run(){};
+    //todo::缺一个能一次性冻结整个layer子树的函数
 };
