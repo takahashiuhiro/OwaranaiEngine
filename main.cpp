@@ -16,6 +16,8 @@
 #include "Code/AutomaticDifferentiation/Layers/EmbeddingLayer.h"
 int main() 
 {
-    ComputationalGraph* CG = new ComputationalGraph();
-
+    size_t dm = 1;
+    EmbeddingLayer* emb = new EmbeddingLayer(nullptr,"emb",dm,4,2);
+    emb->AddEmbeddingNode({2,2},{1,2,3,0});
+    emb->Forward({});
 }

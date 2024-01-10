@@ -16,6 +16,24 @@ EmbeddingLayer::EmbeddingLayer(BaseLayer* ParentThis,std::string ThisLayerName, 
     WeightNode = this->SubLayers["linear_layer_1"]->GetLayerNodeName("Weight");
     CG->GetNode(WeightNode)->GetContent()->FillRandomValNormal();
     CG->GetNode(WeightNode)->Property.Set("Freeze", Freeze);
+    if(PaddingIdx.first)
+    {   
+        std::string ConstNode = CG->GetNodeidByOps(OpsType::Base,{});
+        this->RegisterConstNode(ConstNode, {NumEmbeddings,EmbeddingDim});
+        Tensor*AllOneTensor = new Tensor({1,EmbeddingDim},ThisDeviceNum);
+        AllOneTensor->FillArray(1.);
+        std::vector<float>ConstData;
+        for(size_t a = 0;a<NumEmbeddings;a++)ConstData.push_back(a != PaddingIdx.second);
+        Tensor*EmbTensor = new Tensor({NumEmbeddings, 1}, ThisDeviceNum, ConstData);
+        CG->GetNode(ConstNode)->AssignContent(AllOneTensor->Matmul(EmbTensor));
+        PaddingWeightNode = OEAutoDiff::EleMul(CG, WeightNode, ConstNode);
+        delete AllOneTensor;
+        delete EmbTensor;
+    }
+    else
+    {
+        PaddingWeightNode = WeightNode;
+    }
 }
 
 void EmbeddingLayer::AddEmbeddingNode(std::vector<size_t> InputShape, std::vector<size_t> InputData)
@@ -39,7 +57,7 @@ std::vector<std::string> EmbeddingLayer::Forward(std::vector<std::string>InputNo
         std::string OnehotNodeName = CG->GetNodeidByOps(OpsType::Base,{});
         this->RegisterInputNode(OnehotNodeName, OnehotTensor->shape);
         CG->GetNode(OnehotNodeName)->AssignContent(OnehotTensor);
-        std::string ReturnNodeName = OEAutoDiff::MatMul(CG, OnehotNodeName,WeightNode);
+        std::string ReturnNodeName = OEAutoDiff::MatMul(CG, OnehotNodeName,PaddingWeightNode);
         ReturnNodeList.push_back(ReturnNodeName);
     }
     EmbeddingChangeList.clear();

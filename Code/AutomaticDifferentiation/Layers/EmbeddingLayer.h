@@ -20,6 +20,8 @@ public:
     bool Sparse;
     /**嵌入权重变量的名字.*/
     std::string WeightNode;
+    /**嵌入权重与padding.*/
+    std::string PaddingWeightNode;
     /**first记录shape，second是data.*/
     std::vector<std::pair<std::vector<size_t>,std::vector<size_t>>>EmbeddingChangeList;
 
