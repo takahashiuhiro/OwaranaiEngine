@@ -17,7 +17,11 @@
 int main() 
 {
     size_t dm = 1;
-    EmbeddingLayer* emb = new EmbeddingLayer(nullptr,"emb",dm,4,2);
+    EmbeddingLayer* emb = new EmbeddingLayer(nullptr,"emb",dm,4,2,{false,0});
+    Tensor* q = new Tensor({4,2},dm,{1,2,3,4,5,6,7,8.});
+    emb->FromPretrained(q);
     emb->AddEmbeddingNode({2,2},{1,2,3,0});
-    emb->Forward({});
+    auto w = emb->Forward({})[0];
+    emb->CG->ForwardDfs(w);
+    emb->CG->GetNode(w)->PrintData();
 }

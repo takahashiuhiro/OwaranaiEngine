@@ -80,9 +80,14 @@ def varr(q):
 #print(qwe.bias)
 
 padding_idx = 0
-embedding = torch.nn.Embedding(3, 3, padding_idx=padding_idx)
-print(embedding.weight)
-with torch.no_grad():
-    embedding.weight[padding_idx] = torch.ones(3)
-
-print(embedding.weight)
+#embedding = torch.nn.Embedding(4, 2, padding_idx=padding_idx)
+#print(torch.Tensor([[1,2.],[3,4],[5,6],[7,8]]).shape)
+embedding = torch.nn.Embedding.from_pretrained(torch.Tensor([[1,2.],[3,4],[5,6],[7,8]]),False,padding_idx=padding_idx)
+#print(torch.ones(3),torch.Tensor([[[1,2.],[3,4],[5,6],[7,8]]]))
+#with torch.no_grad():
+#    embedding.weight[0] = torch.Tensor([[[1,2.]]])
+#    embedding.weight[1] = torch.Tensor([[[3,4.]]])
+#    embedding.weight[2] = torch.Tensor([[[5,6.]]])
+#    embedding.weight[3] = torch.Tensor([[[7,8.]]])
+input = torch.LongTensor([padding_idx])
+print(embedding(input))

@@ -25,8 +25,8 @@ EmbeddingLayer::EmbeddingLayer(BaseLayer* ParentThis,std::string ThisLayerName, 
         std::vector<float>ConstData;
         for(size_t a = 0;a<NumEmbeddings;a++)ConstData.push_back(a != PaddingIdx.second);
         Tensor*EmbTensor = new Tensor({NumEmbeddings, 1}, ThisDeviceNum, ConstData);
-        CG->GetNode(ConstNode)->AssignContent(AllOneTensor->Matmul(EmbTensor));
-        PaddingWeightNode = OEAutoDiff::EleMul(CG, WeightNode, ConstNode);
+        CG->GetNode(GetLayerNodeName(ConstNode))->AssignContent(EmbTensor->Matmul(AllOneTensor));
+        PaddingWeightNode = OEAutoDiff::EleMul(CG, WeightNode, GetLayerNodeName(ConstNode));
         delete AllOneTensor;
         delete EmbTensor;
     }
@@ -34,6 +34,11 @@ EmbeddingLayer::EmbeddingLayer(BaseLayer* ParentThis,std::string ThisLayerName, 
     {
         PaddingWeightNode = WeightNode;
     }
+}
+
+EmbeddingLayer::EmbeddingLayer(BaseLayer* ParentThis,std::string ThisLayerName, Tensor* PretrainedTensor, std::pair<bool, size_t> PaddingIdx,bool Freeze,std::pair<bool, float> MaxNorm, float NormType, bool ScaleGradByFreq, bool Sparse)
+{
+    
 }
 
 void EmbeddingLayer::AddEmbeddingNode(std::vector<size_t> InputShape, std::vector<size_t> InputData)
