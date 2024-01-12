@@ -38,7 +38,30 @@ EmbeddingLayer::EmbeddingLayer(BaseLayer* ParentThis,std::string ThisLayerName, 
 
 EmbeddingLayer::EmbeddingLayer(BaseLayer* ParentThis,std::string ThisLayerName, Tensor* PretrainedTensor, std::pair<bool, size_t> PaddingIdx,bool Freeze,std::pair<bool, float> MaxNorm, float NormType, bool ScaleGradByFreq, bool Sparse)
 {
-    
+    bool AssertFlag = (PretrainedTensor->shape.size() == 2);
+    Log::Assert(AssertFlag, "Shape of Pretrained Tensor !== 2\n");
+    size_t NumEmbeddings = PretrainedTensor->shape[0];
+    size_t EmbeddingDim = PretrainedTensor->shape[1];
+    size_t ThisDeviceNum = PretrainedTensor->GetDeviceNum();
+    this->CommonInit(ParentThis,ThisLayerName,ThisDeviceNum);
+    this->PaddingIdx = PaddingIdx;
+    this->Freeze = Freeze;
+    this->MaxNorm = MaxNorm;
+    this->NormType = NormType;
+    this->ScaleGradByFreq = ScaleGradByFreq;
+    this->Sparse = Sparse;
+    this->RegisterLayer(std::make_shared<LinearLayer>(this, "linear_layer_1", ThisDeviceNum ,NumEmbeddings,EmbeddingDim));
+    WeightNode = this->SubLayers["linear_layer_1"]->GetLayerNodeName("Weight");
+    CG->GetNode(WeightNode)->AssignContent(PretrainedTensor);
+    CG->GetNode(WeightNode)->Property.Set("Freeze", Freeze);
+    if(PaddingIdx.first)
+    {
+        
+    }
+    else
+    {
+        PaddingWeightNode = WeightNode;
+    }
 }
 
 void EmbeddingLayer::AddEmbeddingNode(std::vector<size_t> InputShape, std::vector<size_t> InputData)
