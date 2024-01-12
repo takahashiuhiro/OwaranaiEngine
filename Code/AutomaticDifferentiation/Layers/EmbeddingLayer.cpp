@@ -56,7 +56,32 @@ EmbeddingLayer::EmbeddingLayer(BaseLayer* ParentThis,std::string ThisLayerName, 
     CG->GetNode(WeightNode)->Property.Set("Freeze", Freeze);
     if(PaddingIdx.first)
     {
-        
+        std::string ConstNode = CG->GetNodeidByOps(OpsType::Base,{});
+        this->RegisterConstNode(ConstNode, {NumEmbeddings,EmbeddingDim});
+        std::string LayerConstNode = GetLayerNodeName(ConstNode);
+        Tensor*AllOneTensor = new Tensor({1,EmbeddingDim},ThisDeviceNum);
+        AllOneTensor->FillArray(1.);
+        std::vector<float>ConstData;
+        for(size_t a = 0;a<NumEmbeddings;a++)ConstData.push_back(a != PaddingIdx.second);
+        Tensor* EmbTensor = new Tensor({NumEmbeddings, 1}, ThisDeviceNum, ConstData);
+        Tensor* EmbZeroTensor = EmbTensor->Matmul(AllOneTensor);
+        delete AllOneTensor;
+        delete EmbTensor;
+        CG->GetNode(LayerConstNode)->AssignContent(EmbZeroTensor);
+        Tensor* EmbAllTensor = EmbZeroTensor->Copy();
+        EmbAllTensor->FillArray(1.);
+        Tensor* NegEmbZeroTensor = EmbZeroTensor->MulScalar(-1.);
+        Tensor* EmbOneTensor = EmbAllTensor->Add(NegEmbZeroTensor);
+        delete NegEmbZeroTensor;
+        delete EmbAllTensor;
+        Tensor* EmbPretrained = EmbOneTensor->EleMul(PretrainedTensor);
+        delete EmbOneTensor;
+        std::string TMPNode = OEAutoDiff::EleMul(CG, WeightNode, GetLayerNodeName(ConstNode));
+        std::string ConstNodeEMB = CG->GetNodeidByOps(OpsType::Base,{});
+        this->RegisterConstNode(ConstNodeEMB, {NumEmbeddings,EmbeddingDim});
+        std::string LayerConstNodeEMB = GetLayerNodeName(ConstNodeEMB);
+        CG->GetNode(LayerConstNodeEMB)->AssignContent(EmbPretrained);
+        PaddingWeightNode = OEAutoDiff::Add(CG, {{TMPNode,1.},{LayerConstNodeEMB,1}}); 
     }
     else
     {
