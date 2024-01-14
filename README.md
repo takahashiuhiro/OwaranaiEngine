@@ -43,6 +43,5 @@ make
 ./OwaranaiEngineMain  
 
 ## TODO  
-1.GPT2  \
-   1.1.nn.Embedding  （还没测试，暂存）
+1.GPT2  
 2.文档  
