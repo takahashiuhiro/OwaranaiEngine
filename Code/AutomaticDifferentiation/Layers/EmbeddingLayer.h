@@ -9,8 +9,6 @@ public:
     /**预训练构造.*/
     EmbeddingLayer(BaseLayer* ParentThis,std::string ThisLayerName, Tensor*PretrainedTensor, std::pair<bool, size_t> PaddingIdx={false, 0},bool Freeze = false,std::pair<bool, float> MaxNorm={false, 0}, float NormType=2.0, bool ScaleGradByFreq=false, bool Sparse=false);
 
-
-
     virtual std::vector<std::string> Forward(std::vector<std::string>InputNodeArray);
 
     /**储存构造信息.*/
@@ -28,10 +26,8 @@ public:
     std::string PaddingWeightNode;
     /**first记录shape，second是data.*/
     std::vector<std::pair<std::vector<size_t>,std::vector<size_t>>>EmbeddingChangeList;
-
     /**输入待转化的数据.*/
     void AddEmbeddingNode(std::vector<size_t> InputShape, std::vector<size_t> InputData);
-
     /**加载预训练权重.*/
     void FromPretrained(Tensor* PretrainedTensor);
 };

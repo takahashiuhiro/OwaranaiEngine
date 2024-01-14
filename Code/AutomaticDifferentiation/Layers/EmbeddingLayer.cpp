@@ -12,21 +12,21 @@ EmbeddingLayer::EmbeddingLayer(BaseLayer* ParentThis,std::string ThisLayerName, 
     this->NormType = NormType;
     this->ScaleGradByFreq = ScaleGradByFreq;
     this->Sparse = Sparse;
-    this->RegisterLayer(std::make_shared<LinearLayer>(this, "linear_layer_1", ThisDeviceNum ,NumEmbeddings,EmbeddingDim));
-    WeightNode = this->SubLayers["linear_layer_1"]->GetLayerNodeName("Weight");
+    this->RegisterWeightNode("Weight",{NumEmbeddings,EmbeddingDim});
+    WeightNode = GetLayerNodeName("Weight");
     CG->GetNode(WeightNode)->GetContent()->FillRandomValNormal();
     CG->GetNode(WeightNode)->Property.Set("Freeze", Freeze);
     if(PaddingIdx.first)
     {   
-        std::string ConstNode = CG->GetNodeidByOps(OpsType::Base,{});
-        this->RegisterConstNode(ConstNode, {NumEmbeddings,EmbeddingDim});
+        this->RegisterConstNode("VecAllOneConst", {NumEmbeddings,EmbeddingDim});
+        std::string LayerConstNode = GetLayerNodeName("VecAllOneConst");
         Tensor*AllOneTensor = new Tensor({1,EmbeddingDim},ThisDeviceNum);
         AllOneTensor->FillArray(1.);
         std::vector<float>ConstData;
         for(size_t a = 0;a<NumEmbeddings;a++)ConstData.push_back(a != PaddingIdx.second);
         Tensor*EmbTensor = new Tensor({NumEmbeddings, 1}, ThisDeviceNum, ConstData);
-        CG->GetNode(GetLayerNodeName(ConstNode))->AssignContent(EmbTensor->Matmul(AllOneTensor));
-        PaddingWeightNode = OEAutoDiff::EleMul(CG, WeightNode, GetLayerNodeName(ConstNode));
+        CG->GetNode(LayerConstNode)->AssignContent(EmbTensor->Matmul(AllOneTensor));
+        PaddingWeightNode = OEAutoDiff::EleMul(CG, WeightNode, LayerConstNode);
         delete AllOneTensor;
         delete EmbTensor;
     }
@@ -44,21 +44,22 @@ EmbeddingLayer::EmbeddingLayer(BaseLayer* ParentThis,std::string ThisLayerName, 
     size_t EmbeddingDim = PretrainedTensor->shape[1];
     size_t ThisDeviceNum = PretrainedTensor->GetDeviceNum();
     this->CommonInit(ParentThis,ThisLayerName,ThisDeviceNum);
+    this->NumEmbeddings = NumEmbeddings;
+    this->EmbeddingDim = EmbeddingDim;
     this->PaddingIdx = PaddingIdx;
     this->Freeze = Freeze;
     this->MaxNorm = MaxNorm;
     this->NormType = NormType;
     this->ScaleGradByFreq = ScaleGradByFreq;
     this->Sparse = Sparse;
-    this->RegisterLayer(std::make_shared<LinearLayer>(this, "linear_layer_1", ThisDeviceNum ,NumEmbeddings,EmbeddingDim));
-    WeightNode = this->SubLayers["linear_layer_1"]->GetLayerNodeName("Weight");
+    this->RegisterWeightNode("Weight",{NumEmbeddings,EmbeddingDim});
+    WeightNode = GetLayerNodeName("Weight");
     CG->GetNode(WeightNode)->AssignContent(PretrainedTensor);
     CG->GetNode(WeightNode)->Property.Set("Freeze", Freeze);
     if(PaddingIdx.first)
     {
-        std::string ConstNode = CG->GetNodeidByOps(OpsType::Base,{});
-        this->RegisterConstNode(ConstNode, {NumEmbeddings,EmbeddingDim});
-        std::string LayerConstNode = GetLayerNodeName(ConstNode);
+        this->RegisterConstNode("VecAllOneConst", {NumEmbeddings,EmbeddingDim});
+        std::string LayerConstNode = GetLayerNodeName("VecAllOneConst");
         Tensor*AllOneTensor = new Tensor({1,EmbeddingDim},ThisDeviceNum);
         AllOneTensor->FillArray(1.);
         std::vector<float>ConstData;
@@ -76,7 +77,7 @@ EmbeddingLayer::EmbeddingLayer(BaseLayer* ParentThis,std::string ThisLayerName, 
         delete EmbAllTensor;
         Tensor* EmbPretrained = EmbOneTensor->EleMul(PretrainedTensor);
         delete EmbOneTensor;
-        std::string TMPNode = OEAutoDiff::EleMul(CG, WeightNode, GetLayerNodeName(ConstNode));
+        std::string TMPNode = OEAutoDiff::EleMul(CG, WeightNode, LayerConstNode);
         std::string ConstNodeEMB = CG->GetNodeidByOps(OpsType::Base,{});
         this->RegisterConstNode(ConstNodeEMB, {NumEmbeddings,EmbeddingDim});
         std::string LayerConstNodeEMB = GetLayerNodeName(ConstNodeEMB);
@@ -110,8 +111,11 @@ std::vector<std::string> EmbeddingLayer::Forward(std::vector<std::string>InputNo
         std::string OnehotNodeName = CG->GetNodeidByOps(OpsType::Base,{});
         this->RegisterInputNode(OnehotNodeName, OnehotTensor->shape);
         CG->GetNode(OnehotNodeName)->AssignContent(OnehotTensor);
-        std::string ReturnNodeName = OEAutoDiff::MatMul(CG, OnehotNodeName,PaddingWeightNode);
-        ReturnNodeList.push_back(ReturnNodeName);
+        std::vector<size_t>PreView = CG->GetNode(OnehotNodeName)->NodeContentShape;
+        std::string ViewNode = OEAutoDiff::View(CG, OnehotNodeName, {OnehotTensor->ShapeCount/NumEmbeddings, NumEmbeddings});
+        std::string ReturnNodeName = OEAutoDiff::MatMul(CG, ViewNode,PaddingWeightNode);
+        PreView[PreView.size() - 1] = EmbeddingDim;
+        ReturnNodeList.push_back(OEAutoDiff::View(CG, ReturnNodeName, PreView));
     }
     EmbeddingChangeList.clear();
     return ReturnNodeList;

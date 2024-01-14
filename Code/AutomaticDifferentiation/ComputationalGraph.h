@@ -20,6 +20,9 @@ public:
     size_t CurrentBackwardFlagIndex = 0;
     /**计算图模式，true为训练模式，false为推理模式.*/
     bool CGMode  = true;
+    /**是否打开debug模式.*/
+    bool DebugMode = false;
+    size_t DebugNodeName = 0;
 
     ComputationalGraph();
     ~ComputationalGraph();

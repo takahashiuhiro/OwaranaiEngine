@@ -136,6 +136,7 @@ std::string ComputationalGraph::GetNodeidByOps(size_t OpsName, std::vector<std::
     std::normal_distribution<> Dist(0.0, 1.0);
     size_t RandomID = Dist(Gen)*1e7;
     PreStr += NumberToString(RandomID);
+    if(DebugMode){return NumberToString(DebugNodeName+=1);}
     PreStr += std::string("})");
     return PreStr;
 }

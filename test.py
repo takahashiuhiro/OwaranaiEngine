@@ -79,7 +79,7 @@ def varr(q):
 
 #print(qwe.bias)
 
-padding_idx = 0
+padding_idx = 1
 #embedding = torch.nn.Embedding(4, 2, padding_idx=padding_idx)
 #print(torch.Tensor([[1,2.],[3,4],[5,6],[7,8]]).shape)
 embedding = torch.nn.Embedding.from_pretrained(torch.Tensor([[1,2.],[3,4],[5,6],[7,8]]),False,padding_idx=padding_idx)
@@ -89,5 +89,8 @@ embedding = torch.nn.Embedding.from_pretrained(torch.Tensor([[1,2.],[3,4],[5,6],
 #    embedding.weight[1] = torch.Tensor([[[3,4.]]])
 #    embedding.weight[2] = torch.Tensor([[[5,6.]]])
 #    embedding.weight[3] = torch.Tensor([[[7,8.]]])
-input = torch.LongTensor([padding_idx])
-print(embedding(input))
+wai_input = torch.LongTensor([2,1,0,3])
+s = embedding(wai_input)
+print(s)
+s.backward(torch.Tensor([[1,1],[1,1],[1,1],[1,1]]))
+print(embedding.weight.grad)
