@@ -11,23 +11,16 @@
 #include "Code/AutomaticDifferentiation/Optimizer/SGDOptimizer.h"
 #include "Code/AutomaticDifferentiation/Loss/MSELoss.h"
 #include "Code/AutomaticDifferentiation/Layers/EmbeddingLayer.h"
+#include "Code/CommonDataStructure/HyperElement.h"
+#include <functional>
 int main() 
 {
-    size_t dm = 1;
-    Tensor* q = new Tensor({4,2},dm,{1,2,3,4,5,6,7,8.});
-    EmbeddingLayer* emb = new EmbeddingLayer(nullptr,"emb",dm,4,2,{true,2});
-    emb->AddEmbeddingNode({2},{1,2});
-    auto w = emb->Forward({})[0];
-    emb->CG->BackwardMultiBuildGraph(1);
-    Tensor* ee = new Tensor({2,2}, dm);
-    ee->FillArray(1.);
-    emb->CG->GetNode(emb->CG->GetDNodeid(w))->AssignContent(ee);
-    emb->CG->ForwardDfs(w);
-    emb->CG->ForwardDfs(emb->CG->GetDNodeid(emb->WeightNode));
+    HEB a(4.567);
+    float w;
+    a.r(w);
+    std::cout<<w<<std::endl;
 
-    std::cout<<"-----------debug"<<std::endl;
-    emb->CG->GetNode(emb->WeightNode)->PrintData();
-    emb->CG->ForwardDfs(emb->CG->GetDNodeid(emb->WeightNode));
-    emb->CG->GetNode(w)->PrintData();
-    emb->CG->GetNode(emb->CG->GetDNodeid(emb->WeightNode))->PrintData();
+    std::hash<std::string> tt;
+
+    std::cout<<tt("987987asdasd")<<std::endl;
 }

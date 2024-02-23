@@ -89,7 +89,7 @@ embedding = torch.nn.Embedding.from_pretrained(torch.Tensor([[1,2.],[3,4],[5,6],
 #    embedding.weight[1] = torch.Tensor([[[3,4.]]])
 #    embedding.weight[2] = torch.Tensor([[[5,6.]]])
 #    embedding.weight[3] = torch.Tensor([[[7,8.]]])
-wai_input = torch.LongTensor([2,1,0,3])
+wai_input = torch.LongTensor([2,2,0,3])
 s = embedding(wai_input)
 print(s)
 s.backward(torch.Tensor([[1,1],[1,1],[1,1],[1,1]]))
