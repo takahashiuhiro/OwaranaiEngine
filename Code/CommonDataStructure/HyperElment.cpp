@@ -1,8 +1,8 @@
 #include "HyperElement.h"
 
-void HE::r(int& Input){};
-void HE::r(std::string& Input){};
-void HE::r(float& Input){};
+int HE::ri(){return 0;}
+std::string HE::rs(){return "";}
+float HE::rf(){return 0;}
 void HE::w(int Input){};
 void HE::w(std::string Input){};
 void HE::w(float Input){};
@@ -31,20 +31,20 @@ HEB::HEB(double Input)
 }
 void HEB::HEBInit(){ClassType = HEType::SHEB;}
 bool HEB::CheckType(size_t InputType){return InputType == ElementType;}
-void HEB::r(int& Input)
+int HEB::ri()
 {
-    Log::Assert(CheckType(ElementType), std::string("HEB TYPE ERROR, V TYPE IS NOT INT"));
-    Input = InterVint;
+    Log::Assert(CheckType(HEBType::INT), std::string("HEB TYPE ERROR, V TYPE IS NOT INT"));
+    return InterVint;
 }
-void HEB::r(std::string& Input)
+std::string HEB::rs()
 {
-    Log::Assert(CheckType(ElementType), std::string("HEB TYPE ERROR, V TYPE IS NOT STRING"));
-    Input = InterVstring;
+    Log::Assert(CheckType(HEBType::STRING), std::string("HEB TYPE ERROR, V TYPE IS NOT STRING"));
+    return InterVstring;
 }
-void HEB::r(float& Input)
+float HEB::rf()
 {
-    Log::Assert(CheckType(ElementType), std::string("HEB TYPE ERROR, V TYPE IS NOT STRING"));
-    Input = InterVfloat;
+    Log::Assert(CheckType(HEBType::FLOAT), std::string("HEB TYPE ERROR, V TYPE IS NOT FLOAT"));
+    return InterVfloat;
 }
 void HEB::w(int Input)
 {
@@ -65,4 +65,13 @@ void HEB::w(double Input)
 {
     InterVfloat = Input;
     ElementType = HEBType::FLOAT;
+}
+HEB HEB::operator + (const HEB& Other)const
+{
+    if((Other.ElementType==HEBType::STRING)||(ElementType==HEBType::STRING))Log::Assert((ElementType == Other.ElementType),"HEB + TYPE ERROR, SREING CAN NOT + INT OR FLOAT");
+    if(ElementType == HEBType::STRING)return HEB(InterVstring + Other.InterVstring);
+    if(ElementType == HEBType::INT&&Other.ElementType==HEBType::INT)return HEB(InterVint + Other.InterVint);
+    if(ElementType == HEBType::INT&&Other.ElementType==HEBType::FLOAT)return HEB(InterVint + Other.InterVfloat);
+    if(ElementType == HEBType::FLOAT&&Other.ElementType==HEBType::INT)return HEB(InterVfloat + Other.InterVint);
+    if(ElementType == HEBType::FLOAT&&Other.ElementType==HEBType::FLOAT)return HEB(InterVfloat + Other.InterVfloat);
 }

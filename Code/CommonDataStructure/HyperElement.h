@@ -14,9 +14,9 @@ struct HE
 {
     size_t ClassType = HEType::SHE;
     /**↓是HEB函数.*/
-    virtual void r(int& Input);
-    virtual void r(std::string& Input);
-    virtual void r(float& Input);
+    virtual int ri();
+    virtual std::string rs();
+    virtual float rf();
     virtual void w(int Input);
     virtual void w(std::string Input);
     virtual void w(float Input);
@@ -47,11 +47,14 @@ struct HEB:public HE
 
     void HEBInit();
     bool CheckType(size_t InputType);
-    virtual void r(int& Input);
-    virtual void r(std::string& Input);
-    virtual void r(float& Input);
+    virtual int ri();
+    virtual std::string rs();
+    virtual float rf();
     virtual void w(int Input);
     virtual void w(std::string Input);
     virtual void w(float Input);
     virtual void w(double Input);
+
+    HEB operator + (const HEB& Other)const;
+    //HEB operator * (int Other)const;
 };

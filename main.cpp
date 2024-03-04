@@ -15,12 +15,13 @@
 #include <functional>
 int main() 
 {
-    HEB a(4.567);
-    float w;
-    a.r(w);
-    std::cout<<w<<std::endl;
+    //HEB a(4.567);
+    //float w;
+    //a.r(w);
+    //std::cout<<w<<std::endl;
+    //std::hash<std::string> tt;
+    //std::cout<<tt("987987asdasd")<<std::endl;
 
-    std::hash<std::string> tt;
-
-    std::cout<<tt("987987asdasd")<<std::endl;
+    HEB a(5),b(7);
+    std::cout<<(a+b+a+a+a+a).ri()<<std::endl;
 }
