@@ -13,6 +13,7 @@
 #include "Code/AutomaticDifferentiation/Layers/EmbeddingLayer.h"
 #include "Code/CommonDataStructure/HyperElement.h"
 #include <functional>
+#include <stack>
 int main() 
 {
     //HEB a(4.567);
@@ -21,7 +22,4 @@ int main()
     //std::cout<<w<<std::endl;
     //std::hash<std::string> tt;
     //std::cout<<tt("987987asdasd")<<std::endl;
-
-    HEB a(5),b(7);
-    std::cout<<(a+b+a+a+a+a).ri()<<std::endl;
 }

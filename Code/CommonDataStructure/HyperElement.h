@@ -4,27 +4,8 @@
 #include "Log.h"
 #include "CommonFuncHelpers.h"
 
-struct HEType
-{
-    static const size_t SHE = 0;
-    static const size_t SHEB = 1;
-};
 
-struct HE
-{
-    size_t ClassType = HEType::SHE;
-    /**↓是HEB函数.*/
-    virtual int ri();
-    virtual std::string rs();
-    virtual float rf();
-    virtual void w(int Input);
-    virtual void w(std::string Input);
-    virtual void w(float Input);
-    virtual void w(double Input);
-    /**↑是HEB函数.*/
-};
-
-struct HEBType
+struct heType
 {
     static const size_t NONE = 0;
     static const size_t INT = 1;
@@ -32,29 +13,34 @@ struct HEBType
     static const size_t FLOAT = 3;
 };
 
-struct HEB:public HE
+struct he
 {
     size_t ElementType = 0;
     int InterVint;
     std::string InterVstring;
     float InterVfloat;
 
-    HEB();
-    HEB(int Input);
-    HEB(std::string Input);
-    HEB(float Input);
-    HEB(double Input);
+    he();
+    he(int Input);
+    he(std::string Input);
+    he(float Input);
+    he(double Input);
 
-    void HEBInit();
+    void heInit();
     bool CheckType(size_t InputType);
-    virtual int ri();
-    virtual std::string rs();
-    virtual float rf();
-    virtual void w(int Input);
-    virtual void w(std::string Input);
-    virtual void w(float Input);
-    virtual void w(double Input);
+    int i();
+    std::string s();
+    float f();
+    void w(int Input);
+    void w(std::string Input);
+    void w(float Input);
+    void w(double Input);
 
-    HEB operator + (const HEB& Other)const;
-    //HEB operator * (int Other)const;
+    he operator + (he Other)const;
+    he operator - (he Other)const;
+    he operator * (he Other)const;
+    he operator * (int Other)const;
+    he operator * (double Other)const;
+    he operator * (float Other)const;
+    he operator / (he Other)const;
 };

@@ -1,77 +1,172 @@
 #include "HyperElement.h"
 
-int HE::ri(){return 0;}
-std::string HE::rs(){return "";}
-float HE::rf(){return 0;}
-void HE::w(int Input){};
-void HE::w(std::string Input){};
-void HE::w(float Input){};
-void HE::w(double Input){};
-
-HEB::HEB(){HEBInit();}
-HEB::HEB(int Input)
+he::he(){heInit();}
+he::he(int Input)
 {
-    HEBInit();
+    heInit();
     w(Input);
 }
-HEB::HEB(std::string Input)
+he::he(std::string Input)
 {
-    HEBInit();
+    heInit();
     w(Input);
 }
-HEB::HEB(float Input)
+he::he(float Input)
 {
-    HEBInit();
+    heInit();
     w(Input);
 }
-HEB::HEB(double Input)
+he::he(double Input)
 {
-    HEBInit();
+    heInit();
     w(Input);
 }
-void HEB::HEBInit(){ClassType = HEType::SHEB;}
-bool HEB::CheckType(size_t InputType){return InputType == ElementType;}
-int HEB::ri()
+void he::heInit(){}
+bool he::CheckType(size_t InputType){return InputType == ElementType;}
+int he::i()
 {
-    Log::Assert(CheckType(HEBType::INT), std::string("HEB TYPE ERROR, V TYPE IS NOT INT"));
+    Log::Assert(CheckType(heType::INT), std::string("he TYPE ERROR, V TYPE IS NOT INT"));
     return InterVint;
 }
-std::string HEB::rs()
+std::string he::s()
 {
-    Log::Assert(CheckType(HEBType::STRING), std::string("HEB TYPE ERROR, V TYPE IS NOT STRING"));
+    Log::Assert(CheckType(heType::STRING), std::string("he TYPE ERROR, V TYPE IS NOT STRING"));
     return InterVstring;
 }
-float HEB::rf()
+float he::f()
 {
-    Log::Assert(CheckType(HEBType::FLOAT), std::string("HEB TYPE ERROR, V TYPE IS NOT FLOAT"));
+    Log::Assert(CheckType(heType::FLOAT), std::string("he TYPE ERROR, V TYPE IS NOT FLOAT"));
     return InterVfloat;
 }
-void HEB::w(int Input)
+void he::w(int Input)
 {
     InterVint = Input;
-    ElementType = HEBType::INT;
+    ElementType = heType::INT;
 }
-void HEB::w(std::string Input)
+void he::w(std::string Input)
 {
     InterVstring = Input;
-    ElementType = HEBType::STRING;
+    ElementType = heType::STRING;
 }
-void HEB::w(float Input)
+void he::w(float Input)
 {
     InterVfloat = Input;
-    ElementType = HEBType::FLOAT;
+    ElementType = heType::FLOAT;
 }
-void HEB::w(double Input)
+void he::w(double Input)
 {
     InterVfloat = Input;
-    ElementType = HEBType::FLOAT;
+    ElementType = heType::FLOAT;
 }
-HEB HEB::operator + (const HEB& Other)const
+he he::operator + (he Other)const
 {
-    if((Other.ElementType==HEBType::STRING)||(ElementType==HEBType::STRING))Log::Assert((ElementType == Other.ElementType),"HEB + TYPE ERROR, SREING CAN NOT + INT OR FLOAT");
-    if(ElementType == HEBType::STRING)return HEB(InterVstring + Other.InterVstring);
-    if(ElementType == HEBType::INT&&Other.ElementType==HEBType::INT)return HEB(InterVint + Other.InterVint);
-    if(ElementType == HEBType::INT&&Other.ElementType==HEBType::FLOAT)return HEB(InterVint + Other.InterVfloat);
-    if(ElementType == HEBType::FLOAT&&Other.ElementType==HEBType::INT)return HEB(InterVfloat + Other.InterVint);
-    if(ElementType == HEBType::FLOAT&&Other.ElementType==HEBType::FLOAT)return HEB(InterVfloat + Other.InterVfloat);
+    if(ElementType==heType::INT)
+    {
+        if(Other.ElementType==heType::INT)return he(InterVint + Other.InterVint);
+        if(Other.ElementType==heType::STRING)return he(NumberToString(InterVint))+he(Other.InterVstring);
+        if(Other.ElementType==heType::FLOAT)return he(InterVint + Other.InterVfloat);
+    }
+    if(ElementType==heType::STRING)
+    {
+        if(Other.ElementType==heType::STRING)return he(InterVstring + Other.InterVstring);
+        if(Other.ElementType==heType::INT)return he(InterVstring + NumberToString(Other.InterVint));
+    }
+    if(ElementType == heType::FLOAT)
+    {
+        if(Other.ElementType==heType::INT)return he(InterVfloat + Other.InterVint);
+        if(Other.ElementType==heType::FLOAT)return he(InterVfloat + Other.InterVfloat);
+    }
+    Log::Assert(false,std::string("he + TYPE ERROR, type tuple is ")+NumberToString(ElementType)+std::string(" ")+NumberToString(Other.ElementType));
+    return he();
+}
+he he::operator * (int Other)const
+{
+    if(ElementType == heType::INT)return he(InterVint * Other);
+    if(ElementType == heType::STRING)
+    {
+        std::string Res = "";
+        for(int a=0;a<Other;a++)Res += InterVstring;
+        return he(Res);
+    }
+    if(ElementType == heType::FLOAT)return he(InterVfloat * Other);
+    Log::Assert(false,std::string("he *int TYPE ERROR, type tuple is ")+NumberToString(ElementType)+std::string(" ")+NumberToString(heType::INT));
+    return he();
+}
+he he::operator * (double Other)const
+{
+    float tmp = Other;
+    if(ElementType == heType::INT)return he(InterVint)*tmp;
+    if(ElementType == heType::STRING)return he(InterVstring)*tmp;
+    if(ElementType == heType::FLOAT)return he(InterVfloat)*tmp;
+    Log::Assert(false,std::string("he *double TYPE ERROR, type tuple is ")+NumberToString(ElementType)+std::string(" ")+std::string(" double"));
+    return he();
+}
+he he::operator * (float Other)const
+{
+    if(ElementType == heType::INT)return he(InterVint * Other);
+    if(ElementType == heType::STRING)
+    {
+        std::string Res = "";
+        int IntOther = Other;
+        float FloatOther = Other - IntOther;
+        int StrIndex = FloatOther*InterVstring.size();
+        for(int a=0;a<IntOther;a++)Res += InterVstring;
+        for(int a=0;a<StrIndex;a++)Res += InterVstring[a];
+        return he(Res);
+    }
+    if(ElementType == heType::FLOAT)return he(InterVfloat * Other);
+    Log::Assert(false,std::string("he *float TYPE ERROR, type tuple is ")+NumberToString(ElementType)+std::string(" ")+NumberToString(heType::FLOAT));
+    return he();
+}
+he he::operator * (he Other)const
+{
+    if(ElementType==heType::INT)
+    {
+        if(Other.ElementType==heType::INT)return he(InterVint * Other.InterVint);
+        if(Other.ElementType == heType::STRING)return he(Other.InterVstring)*InterVint;
+        if(Other.ElementType==heType::FLOAT)return he(InterVint * Other.InterVfloat);
+    }
+    if(ElementType==heType::STRING)
+    {
+        if(Other.ElementType==heType::INT)return he(InterVstring)*Other.InterVint;
+        if(Other.ElementType==heType::FLOAT)return he(InterVstring)*Other.InterVfloat;
+    }
+    if(ElementType == heType::FLOAT)
+    {
+        if(Other.ElementType==heType::INT)return he(InterVfloat * Other.InterVint);
+        if(Other.ElementType == heType::STRING)return he(Other.InterVstring)*InterVfloat;
+        if(Other.ElementType==heType::FLOAT)return he(InterVfloat * Other.InterVfloat);
+    }
+    Log::Assert(false,std::string("he * TYPE ERROR, type tuple is ")+NumberToString(ElementType)+std::string(" ")+NumberToString(Other.ElementType));
+    return he();
+}
+he he::operator - (he Other)const
+{
+    if(ElementType==heType::INT)
+    {
+        if(Other.ElementType==heType::INT)return he(InterVint - Other.InterVint);
+        if(Other.ElementType==heType::FLOAT)return he(InterVint - Other.InterVfloat);
+    }
+    if(ElementType == heType::FLOAT)
+    {
+        if(Other.ElementType==heType::INT)return he(InterVfloat - Other.InterVint);
+        if(Other.ElementType==heType::FLOAT)return he(InterVfloat - Other.InterVfloat);
+    }
+    Log::Assert(false,std::string("he - TYPE ERROR, type tuple is ")+NumberToString(ElementType)+std::string(" ")+NumberToString(Other.ElementType));
+    return he();
+}
+he he::operator / (he Other)const
+{
+    if(ElementType==heType::INT)
+    {
+        if(Other.ElementType==heType::INT)return he(InterVint / Other.InterVint);
+        if(Other.ElementType==heType::FLOAT)return he(InterVint / Other.InterVfloat);
+    }
+    if(ElementType == heType::FLOAT)
+    {
+        if(Other.ElementType==heType::INT)return he(InterVfloat / Other.InterVint);
+        if(Other.ElementType==heType::FLOAT)return he(InterVfloat / Other.InterVfloat);
+    }
+    Log::Assert(false,std::string("he / TYPE ERROR, type tuple is ")+NumberToString(ElementType)+std::string(" ")+NumberToString(Other.ElementType));
+    return he();
 }
