@@ -170,3 +170,16 @@ he he::operator / (he Other)const
     Log::Assert(false,std::string("he / TYPE ERROR, type tuple is ")+NumberToString(ElementType)+std::string(" ")+NumberToString(Other.ElementType));
     return he();
 }
+he he::operator = (he Other)const
+{
+    return Other;
+}
+bool he::operator == (he Other)const
+{
+    if(ElementType!=Other.ElementType)return false;
+    if(ElementType==heType::INT)return InterVint == Other.InterVint;
+    if(ElementType==heType::STRING)return InterVstring == Other.InterVstring;
+    if(ElementType==heType::FLOAT)return (InterVfloat - Other.InterVfloat)*(InterVfloat - Other.InterVfloat) < 1e-9;
+    Log::Assert(false,std::string("he == is not define, type tuple : ")+NumberToString(ElementType)+std::string(" ")+NumberToString(Other.ElementType));
+    return false;
+}

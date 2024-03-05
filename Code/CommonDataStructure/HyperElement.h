@@ -43,4 +43,6 @@ struct he
     he operator * (double Other)const;
     he operator * (float Other)const;
     he operator / (he Other)const;
+    he operator = (he Other)const;
+    bool operator == (he Other)const;
 };

@@ -22,4 +22,7 @@ int main()
     //std::cout<<w<<std::endl;
     //std::hash<std::string> tt;
     //std::cout<<tt("987987asdasd")<<std::endl;
+    he a(4.2);
+    he b(4.3);
+    std::cout<<(a==b)<<std::endl;
 }
