@@ -16,13 +16,18 @@
 #include <stack>
 int main() 
 {
-    //HEB a(4.567);
     //float w;
     //a.r(w);
     //std::cout<<w<<std::endl;
     //std::hash<std::string> tt;
     //std::cout<<tt("987987asdasd")<<std::endl;
-    he a(4.2);
-    he b(4.3);
-    std::cout<<(a==b)<<std::endl;
+    he a = he::NewList(3);
+    a[0] = he(3);
+    a[2] = he("abc");
+    he b = he::NewList(3);
+    b[0] = a;
+    b[2] = a;
+    b[2][0] = he(4);
+    std::cout<<(b[2][0]<=he(4))<<std::endl;
+    std::cout<<(b[2][0]*b[2][2]).s()<<std::endl;
 }

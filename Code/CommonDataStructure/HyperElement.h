@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string>
 #include <functional>
+#include <vector>
 #include "Log.h"
 #include "CommonFuncHelpers.h"
-
 
 struct heType
 {
@@ -11,6 +11,7 @@ struct heType
     static const size_t INT = 1;
     static const size_t STRING = 2;
     static const size_t FLOAT = 3;
+    static const size_t LIST = 3;
 };
 
 struct he
@@ -36,6 +37,13 @@ struct he
     void w(float Input);
     void w(double Input);
 
+    std::vector<he>MemoryArray;
+    int MemoryArrayUsefulLength = 0;
+
+    ~he();
+
+    void Set(he* ThisOther,he Other);
+
     he operator + (he Other)const;
     he operator - (he Other)const;
     he operator * (he Other)const;
@@ -44,5 +52,16 @@ struct he
     he operator * (float Other)const;
     he operator / (he Other)const;
     he operator = (he Other)const;
+    he& operator = (he Other);
     bool operator == (he Other)const;
+    he& operator [] (int Other);
+    he& operator [] (he Other);
+    bool operator < (he Other)const;
+    bool operator <= (he Other)const;
+    bool operator > (he Other)const;
+    bool operator >= (he Other)const;
+
+    static he NewList(int InputLength = 0);
+
+    he size();
 };
