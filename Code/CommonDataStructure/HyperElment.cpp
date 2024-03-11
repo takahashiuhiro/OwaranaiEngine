@@ -245,6 +245,34 @@ bool he::operator >= (he Other)const
     return !operator<(Other);
 }
 
+he he::size()
+{
+    if(ElementType == heType::LIST)
+    {
+        return MemoryArrayUsefulLength;
+    }
+    Log::Assert(false,std::string("he size is not define, type tuple : ")+NumberToString(ElementType));
+    return he(0);
+}
+
+int he::hash(he Other)
+{
+    if(Other.ElementType == heType::INT)
+    {
+        return HashInt(Other.InterVint);
+    }
+    if(Other.ElementType == heType::STRING)
+    {
+        return HashString(Other.InterVstring);
+    }
+    if(Other.ElementType == heType::FLOAT)
+    {
+        return HashFloat(Other.InterVfloat);
+    }
+    Log::Assert(false,std::string("he hash is not define, type tuple : ")+NumberToString(Other.ElementType));
+    return 0;
+}
+
 he he::NewList(int InputLength)
 {
     he Res;
@@ -254,12 +282,80 @@ he he::NewList(int InputLength)
     return Res;
 }
 
-he he::size()
+void he::append(he Other)
 {
     if(ElementType == heType::LIST)
     {
-        return MemoryArrayUsefulLength;
+        MemoryArray.push_back(Other);
+        MemoryArrayUsefulLength +=1;
+        return;
     }
-    Log::Assert(false,std::string("he size is not define, type tuple : ")+NumberToString(ElementType));
-    return he(0);
+    Log::Assert(false,std::string("he append is not define, type tuple : ")+NumberToString(ElementType));
+}
+
+he he::NewDict()
+{
+    he Res;
+    Res.ElementType = heType::DICT;
+    return Res;
+}
+
+void he::DictApplyNewBlock(int BlockNum)
+{
+    for(int a=0;a<BlockNum;a++)
+    {
+        MemoryArray.emplace_back();
+        MemoryArray.emplace_back();
+        MemoryArray.emplace_back(-1);
+        MemoryArray.emplace_back(-1);
+    }
+}
+
+int he::DictGetNextIndex()
+{
+    if(DictMemoryIndexManager.empty())
+    {
+        DictApplyNewBlock(1);
+        return MemoryArray.size()/4 - 1;
+    }
+    int res = DictMemoryIndexManager.top();
+    DictMemoryIndexManager.pop();
+    return res;
+}
+
+void he::DictSetMemoryBlockByIndex(int InputIndex,he InputKey, he InputValue)
+{
+    MemoryArray[DictGetIndexKey(InputIndex)] = InputKey;
+    MemoryArray[DictGetIndexValue(InputIndex)] = InputValue;
+    MemoryArray[DictGetIndexLeft(InputIndex)] = -1;
+    MemoryArray[DictGetIndexRight(InputIndex)] = -1;
+}
+
+int he::DictGetIndexKey(int InputIndex){return 4*InputIndex;}
+int he::DictGetIndexValue(int InputIndex){return 4*InputIndex+1;}
+int he::DictGetIndexLeft(int InputIndex){return 4*InputIndex+2;}
+int he::DictGetIndexRight(int InputIndex){return 4*InputIndex+3;}
+
+int he::SplayInputFindDfs(int RootIndex, int InputKey)
+{
+    int NowKey = hash(DictGetIndexKey(RootIndex));
+    if(NowKey == InputKey)return RootIndex;
+    if(InputKey < NowKey)
+    {
+        if(DictGetIndexLeft(RootIndex)==-1)return -1;
+        return SplayInputFindDfs(DictGetIndexLeft(RootIndex),InputKey);
+    }
+    if(InputKey > NowKey)
+    {
+        if(DictGetIndexRight(RootIndex)==-1)return -1;
+        return SplayInputFindDfs(DictGetIndexRight(RootIndex),InputKey);
+    }
+    return -1;
+}
+
+int he::SplayFind(he InputKey)
+{
+    if(!MemoryArrayUsefulLength)return -1;
+    int InputKeyHashV = hash(InputKey);
+    return SplayInputFindDfs(0, InputKeyHashV);
 }

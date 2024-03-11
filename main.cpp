@@ -21,13 +21,8 @@ int main()
     //std::cout<<w<<std::endl;
     //std::hash<std::string> tt;
     //std::cout<<tt("987987asdasd")<<std::endl;
-    he a = he::NewList(3);
-    a[0] = he(3);
-    a[2] = he("abc");
-    he b = he::NewList(3);
-    b[0] = a;
-    b[2] = a;
-    b[2][0] = he(4);
-    std::cout<<(b[2][0]<=he(4))<<std::endl;
-    std::cout<<(b[2][0]*b[2][2]).s()<<std::endl;
+    he s = he(1);
+    std::cout<<s.i()<<std::endl;
+    s = he("asd");
+    std::cout<<s.s()<<std::endl;
 }
