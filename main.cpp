@@ -16,13 +16,15 @@
 #include <stack>
 int main() 
 {
-    //float w;
-    //a.r(w);
-    //std::cout<<w<<std::endl;
-    //std::hash<std::string> tt;
-    //std::cout<<tt("987987asdasd")<<std::endl;
-    he s = he(1);
-    std::cout<<s.i()<<std::endl;
-    s = he("asd");
-    std::cout<<s.s()<<std::endl;
+    he s = he::NewDict();
+    he d = he::NewDict();
+    s[he("a")] = he(56.77000);
+    s[he("b")] = he(58);
+    s[he("c")] = he("asdasd");
+    s[he(1)] = he("ttt");
+    s[he(6.77)] = he(-999);
+    d[he("yy")] = s;
+    d[he(1)] = he::NewDict();
+    d[he(1)][he("tt")] = he(987);
+    std::cout<<(d[he(1)][he("tt")] + s[he("b")]).DumpToString()<<std::endl;
 }

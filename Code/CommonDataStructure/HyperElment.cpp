@@ -179,6 +179,7 @@ void he::Set(he* ThisOther,he Other)
     ThisOther->InterVfloat = Other.InterVfloat;
     ThisOther->MemoryArray = Other.MemoryArray;
     ThisOther->MemoryArrayUsefulLength = Other.MemoryArrayUsefulLength;
+    ThisOther->SplayRoot = SplayRoot;
 }
 he he::operator = (he Other)const
 {
@@ -220,6 +221,13 @@ he& he::operator [] (he Other)
             return MemoryArray[Other.i()];
         }
     }
+    if(ElementType==heType::DICT)
+    {
+        if(Other.ElementType == heType::INT || Other.ElementType == heType::STRING ||Other.ElementType == heType::FLOAT)
+        {
+            return DictFromKtoV(Other);
+        }
+    }
     Log::Assert(false,std::string("he [] is not define, type tuple : ")+NumberToString(ElementType)+std::string(" ")+NumberToString(Other.ElementType));
     return MemoryArray[0];
 }
@@ -243,6 +251,55 @@ bool he::operator <= (he Other)const
 bool he::operator >= (he Other)const
 {
     return !operator<(Other);
+}
+
+std::string he::DumpToString()
+{
+    if(ElementType==heType::INT)
+    {
+        int NPFlag;
+        int ABV;
+        if(InterVint < 0)
+        {
+            NPFlag = 1;
+            ABV = -InterVint;
+        }
+        else
+        {
+            NPFlag = 0;
+            ABV = InterVint;
+        }
+        if(ABV==0)return std::string("0");
+        if(NPFlag)return std::string("-") + NumberToString(ABV);
+        else return NumberToString(ABV);
+    }
+    if(ElementType==heType::STRING)
+    {
+        return InterVstring;
+    }
+    if(ElementType == heType::FLOAT)
+    {
+        int NPFlag;
+        float ABV;
+        if(InterVfloat < 0)
+        {
+            NPFlag = 1;
+            ABV = -InterVfloat;
+        }
+        else
+        {
+            NPFlag = 0;
+            ABV = InterVfloat;
+        }
+        int IntPart = ABV;
+        float FloatPart = ABV - IntPart;
+        int FloatPartInt = FloatPart*1000000;
+        while(FloatPartInt%10==0&&FloatPartInt>0)FloatPartInt/=10;
+        if(NPFlag)return std::string("-") +NumberToString(IntPart)+'.'+ NumberToString(FloatPartInt);
+        else return NumberToString(IntPart)+'.'+ NumberToString(FloatPartInt);
+    }
+    Log::Assert(false,std::string("he DumpToString is not define, type tuple : ")+NumberToString(ElementType));
+    return "";
 }
 
 he he::size()
@@ -308,54 +365,240 @@ void he::DictApplyNewBlock(int BlockNum)
         MemoryArray.emplace_back();
         MemoryArray.emplace_back(-1);
         MemoryArray.emplace_back(-1);
+        MemoryArray.emplace_back(-1);
     }
 }
 
 int he::DictGetNextIndex()
 {
+    MemoryArrayUsefulLength ++;
     if(DictMemoryIndexManager.empty())
     {
         DictApplyNewBlock(1);
-        return MemoryArray.size()/4 - 1;
+        return MemoryArray.size()/5 - 1;
     }
     int res = DictMemoryIndexManager.top();
     DictMemoryIndexManager.pop();
     return res;
 }
 
-void he::DictSetMemoryBlockByIndex(int InputIndex,he InputKey, he InputValue)
+void he::DictSetMemoryBlockByIndex(int InputIndex,he InputKey, he InputValue, bool IsInit)
 {
     MemoryArray[DictGetIndexKey(InputIndex)] = InputKey;
     MemoryArray[DictGetIndexValue(InputIndex)] = InputValue;
-    MemoryArray[DictGetIndexLeft(InputIndex)] = -1;
-    MemoryArray[DictGetIndexRight(InputIndex)] = -1;
+    if(!IsInit)return;
+    MemoryArray[DictGetIndexLeft(InputIndex)] = he(-1);
+    MemoryArray[DictGetIndexRight(InputIndex)] = he(-1);
+    MemoryArray[DictGetIndexPre(InputIndex)] = he(-1);
 }
 
-int he::DictGetIndexKey(int InputIndex){return 4*InputIndex;}
-int he::DictGetIndexValue(int InputIndex){return 4*InputIndex+1;}
-int he::DictGetIndexLeft(int InputIndex){return 4*InputIndex+2;}
-int he::DictGetIndexRight(int InputIndex){return 4*InputIndex+3;}
+int he::DictGetIndexKey(int InputIndex){return 5*InputIndex;}
+int he::DictGetIndexValue(int InputIndex){return 5*InputIndex+1;}
+int he::DictGetIndexLeft(int InputIndex){return 5*InputIndex+3;}
+int he::DictGetIndexRight(int InputIndex){return 5*InputIndex+4;}
+int he::DictGetIndexPre(int InputIndex){return 5*InputIndex+2;}
 
-int he::SplayInputFindDfs(int RootIndex, int InputKey)
+DictFindDfsInfo he::SplayInputFindDfs(int RootIndex, int InputKey)
 {
-    int NowKey = hash(DictGetIndexKey(RootIndex));
-    if(NowKey == InputKey)return RootIndex;
+    //std::cout<<"gogo::"<<RootIndex<<std::endl;
+    int NowKey = hash(MemoryArray[DictGetIndexKey(RootIndex)]);
+    //std::cout<<"gogo2::"<<MemoryArray[DictGetIndexKey(RootIndex)].DumpToString()<<std::endl;
+    if(NowKey == InputKey)
+    {
+        return {1,RootIndex,-1};
+    }
     if(InputKey < NowKey)
     {
-        if(DictGetIndexLeft(RootIndex)==-1)return -1;
-        return SplayInputFindDfs(DictGetIndexLeft(RootIndex),InputKey);
+        if(MemoryArray[DictGetIndexLeft(RootIndex)].i()==-1)return {0, RootIndex, 0};
+        return SplayInputFindDfs(MemoryArray[DictGetIndexLeft(RootIndex)].i(),InputKey);
     }
     if(InputKey > NowKey)
     {
-        if(DictGetIndexRight(RootIndex)==-1)return -1;
-        return SplayInputFindDfs(DictGetIndexRight(RootIndex),InputKey);
+        if(MemoryArray[DictGetIndexRight(RootIndex)].i()==-1)return {0, RootIndex, 1};
+        return SplayInputFindDfs(MemoryArray[DictGetIndexRight(RootIndex)].i(),InputKey);
     }
-    return -1;
+    return {0,0,0};
 }
 
-int he::SplayFind(he InputKey)
+DictFindDfsInfo he::SplayFind(he InputKey)
 {
-    if(!MemoryArrayUsefulLength)return -1;
+    if(!MemoryArrayUsefulLength)return{0,-1,-1};
     int InputKeyHashV = hash(InputKey);
-    return SplayInputFindDfs(0, InputKeyHashV);
+    DictFindDfsInfo ResIndex = SplayInputFindDfs(SplayRoot, InputKeyHashV);
+    return ResIndex;
+}
+
+he& he::DictFromKtoV(he InputKey)
+{
+    DictFindDfsInfo Res = SplayFind(InputKey);
+    if(Res.HasResult)
+    {
+        return MemoryArray[DictGetIndexValue(Res.MemoryIndex)];
+    }
+    else
+    {
+        int NewBlock = SplayInsert(InputKey, he());
+        return MemoryArray[DictGetIndexValue(NewBlock)];
+    }
+}
+
+int he::SplayInsert(he InputKey, he InputValue)
+{
+    DictFindDfsInfo FindRes = SplayFind(InputKey);
+    if(FindRes.HasResult)
+    {
+        DictSetMemoryBlockByIndex(FindRes.MemoryIndex, InputKey, InputValue);
+        return FindRes.MemoryIndex;
+    }
+    int NewBlock = DictGetNextIndex();
+    DictSetMemoryBlockByIndex(NewBlock, InputKey, InputValue, 1);
+    if(FindRes.MemoryIndex == -1)
+    {
+        SplayRoot = NewBlock;
+        return NewBlock;
+    }
+    MemoryArray[DictGetIndexPre(NewBlock)] = he(FindRes.MemoryIndex);
+    if(FindRes.IsLeft == 0)
+    {
+        MemoryArray[DictGetIndexLeft(FindRes.MemoryIndex)] = he(NewBlock);
+    }
+    if(FindRes.IsLeft == 1)
+    {
+        MemoryArray[DictGetIndexRight(FindRes.MemoryIndex)] = he(NewBlock);
+    }
+    Splay(NewBlock);
+    return NewBlock;
+}
+
+void he::Splay(int InputIndex)
+{
+    //todo::旋转
+}
+
+void he::SplayPrintForDebug()
+{
+    std::cout<<"Root:: "<<SplayRoot<<std::endl;
+    for(int a=0;a<MemoryArray.size()/5;a++)
+    {
+        std::cout<<"Index:: "<<a<<" ,Key:: "<<MemoryArray[DictGetIndexKey(a)].DumpToString()<<" ,Hash:: "<<hash(MemoryArray[DictGetIndexKey(a)])<<" ,Left:: ";
+        if(MemoryArray[DictGetIndexLeft(a)].DumpToString() == "-1")std::cout<<"Null";
+        else std::cout<<MemoryArray[DictGetIndexLeft(a)].DumpToString();
+        std::cout<<" ,Right:: ";
+        if(MemoryArray[DictGetIndexRight(a)].DumpToString() == "-1")std::cout<<"Null";
+        else std::cout<<MemoryArray[DictGetIndexRight(a)].DumpToString();
+        std::cout<<std::endl;
+    }
+}
+
+void he::SplayDelete(he InputKey)
+{
+    DictFindDfsInfo FindRes = SplayFind(InputKey);
+    Log::Assert(FindRes.HasResult, std::string("Key is Not Existed::")+InputKey.DumpToString());
+    int CurNode = FindRes.MemoryIndex;//待删节点
+    int PreNodeIndex = MemoryArray[DictGetIndexPre(CurNode)].i();//待删节点的父节点
+    int LeftNode = MemoryArray[DictGetIndexLeft(CurNode)].i();//待删节点的左子树
+    int RightNode = MemoryArray[DictGetIndexRight(CurNode)].i();//待删节点的右子树
+    bool IsDelRoot = PreNodeIndex == -1;//删除的节点是根节点吗
+    if(IsDelRoot || MemoryArray[DictGetIndexLeft(PreNodeIndex)].i() == CurNode)//被删掉的节点是父节点的左子树
+    {
+        if(LeftNode == -1 && RightNode == -1)//被删的是叶子节点
+        {
+            if(IsDelRoot)SplayRoot = -1;//如果删除的是根节点，那树就删没了
+            else MemoryArray[DictGetIndexLeft(PreNodeIndex)] = he(-1);//如果不是根节点，父节点的左子树得变为空
+        }
+        if(LeftNode != -1 && RightNode == -1)//待删节点的左子树非空，右子树空
+        {
+            if(IsDelRoot)//如果待删节点只有一边，那就直接删了换根
+            {
+                SplayRoot = LeftNode;
+                MemoryArray[DictGetIndexPre(LeftNode)] = he(-1);
+            }
+            else
+            {
+                MemoryArray[DictGetIndexLeft(PreNodeIndex)] = he(LeftNode);
+                MemoryArray[DictGetIndexPre(LeftNode)] = he(PreNodeIndex);
+            }
+        }
+        if(LeftNode == -1 && RightNode != -1)//待删节点的左子树空，右子树非空
+        {
+            if(IsDelRoot)//如果待删节点只有一边，那就直接删了换根
+            {
+                SplayRoot = RightNode;
+                MemoryArray[DictGetIndexPre(RightNode)] = he(-1);
+            }
+            else
+            {
+                MemoryArray[DictGetIndexLeft(PreNodeIndex)] = he(RightNode);
+                MemoryArray[DictGetIndexPre(RightNode)] = he(PreNodeIndex);
+            }
+        }
+        if(LeftNode != -1 && RightNode != -1)
+        {
+            //寻找右侧子树中的第一个左侧节点
+            int RightRoot = RightNode;
+            int FindRightLeft = -1;
+            while(true)
+            {
+                if(RightRoot==-1)break;
+                else
+                {
+                    FindRightLeft = RightRoot;
+                    RightRoot = MemoryArray[DictGetIndexLeft(RightRoot)].i();
+                }
+            }
+            //把删掉节点的左孩子的父节点设为右侧最左节点
+            MemoryArray[DictGetIndexPre(LeftNode)] = he(FindRightLeft);
+            MemoryArray[DictGetIndexLeft(FindRightLeft)] = he(LeftNode);
+            //把删掉的右孩子代替删掉的节点
+            if(IsDelRoot)
+            {
+                SplayRoot = RightNode;
+                MemoryArray[DictGetIndexPre(RightNode)] = he(-1);
+            }
+            else
+            {
+                MemoryArray[DictGetIndexLeft(PreNodeIndex)] = he(RightNode);
+                MemoryArray[DictGetIndexPre(RightNode)] = he(PreNodeIndex);
+            }
+        }
+    }
+    else
+    {
+        if(LeftNode == -1 && RightNode == -1)//被删的是叶子节点
+        {
+            MemoryArray[DictGetIndexRight(PreNodeIndex)] = he(-1);//如果不是根节点，父节点的右子树得变为空
+        }
+        if(LeftNode != -1 && RightNode == -1)//待删节点的左子树非空，右子树空
+        {
+            MemoryArray[DictGetIndexRight(PreNodeIndex)] = he(LeftNode);
+            MemoryArray[DictGetIndexPre(LeftNode)] = he(PreNodeIndex);
+        }
+        if(LeftNode == -1 && RightNode != -1)//待删节点的左子树空，右子树非空
+        {
+            MemoryArray[DictGetIndexRight(PreNodeIndex)] = he(RightNode);
+            MemoryArray[DictGetIndexPre(RightNode)] = he(PreNodeIndex);
+        }
+        if(LeftNode != -1 && RightNode != -1)
+        {
+            //寻找右侧子树中的第一个左侧节点
+            int RightRoot = RightNode;
+            int FindRightLeft = -1;
+            while(true)
+            {
+                if(RightRoot==-1)break;
+                else
+                {
+                    FindRightLeft = RightRoot;
+                    RightRoot = MemoryArray[DictGetIndexLeft(RightRoot)].i();
+                }
+            }
+            //把删掉节点的左孩子的父节点设为右侧最左节点
+            MemoryArray[DictGetIndexPre(LeftNode)] = he(FindRightLeft);
+            MemoryArray[DictGetIndexLeft(FindRightLeft)] = he(LeftNode);
+            MemoryArray[DictGetIndexRight(PreNodeIndex)] = he(RightNode);
+            MemoryArray[DictGetIndexPre(RightNode)] = he(PreNodeIndex);
+        }
+    }
+    DictMemoryIndexManager.push(FindRes.MemoryIndex);
+    MemoryArrayUsefulLength--;
 }
