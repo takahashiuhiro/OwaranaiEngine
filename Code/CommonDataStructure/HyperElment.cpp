@@ -267,6 +267,17 @@ std::string he::DumpToString()
     {
         return NumberToString(InterVfloat);
     }
+    if(ElementType == heType::LIST)
+    {
+        std::string ReturnString = "[";
+        for(int a=0;a<MemoryArrayUsefulLength;a++)
+        {
+            ReturnString += MemoryArray[a].DumpToString();
+            if(a<MemoryArrayUsefulLength-1)ReturnString += ",";
+        }
+        ReturnString += "]";
+        return ReturnString;
+    }
     Log::Assert(false,std::string("he DumpToString is not define, type tuple : ")+heType::ToString(ElementType));
     return "";
 }
@@ -444,19 +455,33 @@ void he::Splay(int InputIndex)
     //todo::旋转
 }
 
-void he::SplayPrintForDebug()
+void he::SplayPrintForDebugArray()
 {
     std::cout<<"Root:: "<<SplayRoot<<std::endl;
-    for(int a=0;a<MemoryArray.size()/5;a++)
-    {
-        std::cout<<"Index:: "<<a<<" ,Key:: "<<MemoryArray[DictGetIndexKey(a)].DumpToString()<<" ,Hash:: "<<hash(MemoryArray[DictGetIndexKey(a)])<<" ,Left:: ";
-        if(MemoryArray[DictGetIndexLeft(a)].DumpToString() == "-1")std::cout<<"Null";
-        else std::cout<<MemoryArray[DictGetIndexLeft(a)].DumpToString();
-        std::cout<<" ,Right:: ";
-        if(MemoryArray[DictGetIndexRight(a)].DumpToString() == "-1")std::cout<<"Null";
-        else std::cout<<MemoryArray[DictGetIndexRight(a)].DumpToString();
-        std::cout<<std::endl;
-    }
+    for(int a=0;a<MemoryArray.size()/5;a++)SplayPrintForDebugSingleNode(a);
+}
+
+void he::SplayPrintForDebugTree()
+{
+    std::cout<<"Root:: "<<SplayRoot<<std::endl;
+    SplayPrintForDebugDfs(SplayRoot);
+}
+void he::SplayPrintForDebugDfs(int Root)
+{
+    SplayPrintForDebugSingleNode(Root);
+    if(MemoryArray[DictGetIndexLeft(Root)].i() != -1)SplayPrintForDebugDfs(MemoryArray[DictGetIndexLeft(Root)].i());
+    if(MemoryArray[DictGetIndexRight(Root)].i() != -1)SplayPrintForDebugDfs(MemoryArray[DictGetIndexRight(Root)].i());
+}
+
+void he::SplayPrintForDebugSingleNode(int Root)
+{
+    std::cout<<"Index:: "<<Root<<" ,Key:: "<<MemoryArray[DictGetIndexKey(Root)].DumpToString()<<" ,Hash:: "<<hash(MemoryArray[DictGetIndexKey(Root)])<<" ,Left:: ";
+    if(MemoryArray[DictGetIndexLeft(Root)].i() == -1)std::cout<<"Null";
+    else std::cout<<MemoryArray[DictGetIndexLeft(Root)].DumpToString();
+    std::cout<<" ,Right:: ";
+    if(MemoryArray[DictGetIndexRight(Root)].i() == -1)std::cout<<"Null";
+    else std::cout<<MemoryArray[DictGetIndexRight(Root)].DumpToString();
+    std::cout<<std::endl;
 }
 
 void he::SplayDelete(he InputKey)

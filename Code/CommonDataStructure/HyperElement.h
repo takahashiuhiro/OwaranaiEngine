@@ -130,7 +130,10 @@ struct he
     DictFindDfsInfo SplayFind(he InputKey);//在splay上查询一个key在哪个内存块上，如果查不到返回-1
     DictFindDfsInfo SplayInputFindDfs(int RootIndex, int InputKey);//具体的dfs查询
     int SplayInsert(he InputKey, he InputValue);//在splay上插入一对k-v,返回内存块
-    void SplayPrintForDebug();
+    void SplayPrintForDebugArray();//debug用
+    void SplayPrintForDebugTree();
+    void SplayPrintForDebugDfs(int Root);
+    void SplayPrintForDebugSingleNode(int Root);
     void Splay(int InputIndex);//通过内存块的index把输入的index的节点rotate到根上去
     void SplayDelete(he InputKey);//通过key删除节点
 };

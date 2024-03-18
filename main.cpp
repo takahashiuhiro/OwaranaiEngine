@@ -16,20 +16,16 @@
 #include <stack>
 int main() 
 {
-    //std::cout<<NumberToString(-0.000)<<std::endl;
     he s = he::NewDict();
-    he d = he::NewDict();
-    std::cout<<he().DumpToString()<<std::endl;
-    s[he("a")] = he(56.77000);
-    s[he("b")] = he(58);
-    s[he("c")] = he("asdasd");
-    s[he(1)] = he("ttt");
-    s[he(6.77)] = he(-999);
-    d[he("yy")] = s;
-    d[he(1)] = he::NewDict();
-    d[he(1)][he("tt")] = he(987);
-    std::cout<<(d[he(1)][he("tt")] + s[he("b")]).DumpToString()<<std::endl;
-    d[he(1)].SplayDelete(he("tt"));
-    //std::cout<<(d[he(1)][he("tt")]).DumpToString()<<std::endl;
-    d.SplayPrintForDebug();
+    s[he(5)] = he("888");
+    s[he("qw")] = he(15.77);
+    s[he(654)] = he(15.77);
+    s.SplayPrintForDebugTree();
+    std::cout<<"----------------------"<<std::endl;
+    s.SplayPrintForDebugArray();
+    s.SplayDelete(he(5));
+    std::cout<<std::endl<<std::endl;
+    s.SplayPrintForDebugTree();
+    std::cout<<"----------------------"<<std::endl;
+    s.SplayPrintForDebugArray();
 }

@@ -45,12 +45,36 @@ std::string NumberToString(T Input)
 template<typename T>
 T StringToNumber(std::string Input)
 {
+    bool NPFlag = 0;
+    if(Input[0] == '-')
+    {
+        NPFlag = 1;
+        Input = Input.substr(1, Input.size()-1);
+    }
+    int PointIndex = -1;
+    for(int a=0;a<Input.size();a++)
+    {
+        if(Input[a] == '.')
+        {
+            PointIndex = a;
+            break;
+        }
+    }
+    if((typeid(T)==typeid(double)||typeid(T)==typeid(float))&&PointIndex!=-1)
+    {
+        std::string IntPart = Input.substr(0,PointIndex);
+        std::string FloatPart = Input.substr(PointIndex + 1, Input.size()-1-PointIndex);
+        float IntPartFloat = StringToNumber<int>(IntPart);
+        float FloatPartFloat = StringToNumber<int>(FloatPart);
+        for(int a=0;a<FloatPart.size();a++)FloatPartFloat/=10.;
+        return (IntPartFloat + FloatPartFloat)*(1-2*NPFlag);
+    }
     T ReturnV = 0;
     for(size_t a = 0;a < Input.size();a++)
     {
         ReturnV = ReturnV*10 + Input[a] - '0';
     }
-    return ReturnV;
+    return ReturnV*(1-2*NPFlag);
 }
 
 /**把字符串存入文件.*/
