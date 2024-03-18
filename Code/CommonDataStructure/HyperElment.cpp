@@ -77,7 +77,7 @@ he he::operator + (he Other)const
         if(Other.ElementType==heType::INT)return he(InterVfloat + Other.InterVint);
         if(Other.ElementType==heType::FLOAT)return he(InterVfloat + Other.InterVfloat);
     }
-    Log::Assert(false,std::string("he + TYPE ERROR, type tuple is ")+NumberToString(ElementType)+std::string(" ")+NumberToString(Other.ElementType));
+    Log::Assert(false,std::string("he + TYPE ERROR, type tuple is ")+heType::ToString(ElementType)+std::string(" ")+heType::ToString(Other.ElementType));
     return he();
 }
 he he::operator * (int Other)const
@@ -90,7 +90,7 @@ he he::operator * (int Other)const
         return he(Res);
     }
     if(ElementType == heType::FLOAT)return he(InterVfloat * Other);
-    Log::Assert(false,std::string("he *int TYPE ERROR, type tuple is ")+NumberToString(ElementType)+std::string(" ")+NumberToString(heType::INT));
+    Log::Assert(false,std::string("he *int TYPE ERROR, type tuple is ")+heType::ToString(ElementType)+std::string(" ")+NumberToString(heType::INT));
     return he();
 }
 he he::operator * (double Other)const
@@ -99,7 +99,7 @@ he he::operator * (double Other)const
     if(ElementType == heType::INT)return he(InterVint)*tmp;
     if(ElementType == heType::STRING)return he(InterVstring)*tmp;
     if(ElementType == heType::FLOAT)return he(InterVfloat)*tmp;
-    Log::Assert(false,std::string("he *double TYPE ERROR, type tuple is ")+NumberToString(ElementType)+std::string(" ")+std::string(" double"));
+    Log::Assert(false,std::string("he *double TYPE ERROR, type tuple is ")+heType::ToString(ElementType)+std::string(" ")+std::string(" double"));
     return he();
 }
 he he::operator * (float Other)const
@@ -116,7 +116,7 @@ he he::operator * (float Other)const
         return he(Res);
     }
     if(ElementType == heType::FLOAT)return he(InterVfloat * Other);
-    Log::Assert(false,std::string("he *float TYPE ERROR, type tuple is ")+NumberToString(ElementType)+std::string(" ")+NumberToString(heType::FLOAT));
+    Log::Assert(false,std::string("he *float TYPE ERROR, type tuple is ")+heType::ToString(ElementType)+std::string(" ")+heType::ToString(heType::FLOAT));
     return he();
 }
 he he::operator * (he Other)const
@@ -138,7 +138,7 @@ he he::operator * (he Other)const
         if(Other.ElementType == heType::STRING)return he(Other.InterVstring)*InterVfloat;
         if(Other.ElementType==heType::FLOAT)return he(InterVfloat * Other.InterVfloat);
     }
-    Log::Assert(false,std::string("he * TYPE ERROR, type tuple is ")+NumberToString(ElementType)+std::string(" ")+NumberToString(Other.ElementType));
+    Log::Assert(false,std::string("he * TYPE ERROR, type tuple is ")+heType::ToString(ElementType)+std::string(" ")+heType::ToString(Other.ElementType));
     return he();
 }
 he he::operator - (he Other)const
@@ -153,7 +153,7 @@ he he::operator - (he Other)const
         if(Other.ElementType==heType::INT)return he(InterVfloat - Other.InterVint);
         if(Other.ElementType==heType::FLOAT)return he(InterVfloat - Other.InterVfloat);
     }
-    Log::Assert(false,std::string("he - TYPE ERROR, type tuple is ")+NumberToString(ElementType)+std::string(" ")+NumberToString(Other.ElementType));
+    Log::Assert(false,std::string("he - TYPE ERROR, type tuple is ")+heType::ToString(ElementType)+std::string(" ")+heType::ToString(Other.ElementType));
     return he();
 }
 he he::operator / (he Other)const
@@ -168,7 +168,7 @@ he he::operator / (he Other)const
         if(Other.ElementType==heType::INT)return he(InterVfloat / Other.InterVint);
         if(Other.ElementType==heType::FLOAT)return he(InterVfloat / Other.InterVfloat);
     }
-    Log::Assert(false,std::string("he / TYPE ERROR, type tuple is ")+NumberToString(ElementType)+std::string(" ")+NumberToString(Other.ElementType));
+    Log::Assert(false,std::string("he / TYPE ERROR, type tuple is ")+heType::ToString(ElementType)+std::string(" ")+heType::ToString(Other.ElementType));
     return he();
 }
 void he::Set(he* ThisOther,he Other)
@@ -198,7 +198,7 @@ bool he::operator == (he Other)const
     if(ElementType==heType::INT)return InterVint == Other.InterVint;
     if(ElementType==heType::STRING)return InterVstring == Other.InterVstring;
     if(ElementType==heType::FLOAT)return (InterVfloat - Other.InterVfloat)*(InterVfloat - Other.InterVfloat) < 1e-9;
-    Log::Assert(false,std::string("he == is not define, type tuple : ")+NumberToString(ElementType)+std::string(" ")+NumberToString(Other.ElementType));
+    Log::Assert(false,std::string("he == is not define, type tuple : ")+heType::ToString(ElementType)+std::string(" ")+heType::ToString(Other.ElementType));
     return false;
 }
 
@@ -208,7 +208,7 @@ he& he::operator [] (int Other)
     {
         return MemoryArray[Other];
     }
-    Log::Assert(false,std::string("he [] is not define, type tuple : ")+NumberToString(ElementType)+std::string(" ")+std::string(" int"));
+    Log::Assert(false,std::string("he [] is not define, type tuple : ")+heType::ToString(ElementType)+std::string(" ")+std::string(" int"));
     return MemoryArray[0];
 }
 
@@ -228,7 +228,7 @@ he& he::operator [] (he Other)
             return DictFromKtoV(Other);
         }
     }
-    Log::Assert(false,std::string("he [] is not define, type tuple : ")+NumberToString(ElementType)+std::string(" ")+NumberToString(Other.ElementType));
+    Log::Assert(false,std::string("he [] is not define, type tuple : ")+heType::ToString(ElementType)+std::string(" ")+heType::ToString(Other.ElementType));
     return MemoryArray[0];
 }
 bool he::operator < (he Other)const
@@ -237,7 +237,7 @@ bool he::operator < (he Other)const
     {
         if(Other.ElementType == heType::INT)return InterVint < Other.InterVint;
     }
-    Log::Assert(false,std::string("he < is not define, type tuple : ")+NumberToString(ElementType)+std::string(" ")+NumberToString(Other.ElementType));
+    Log::Assert(false,std::string("he < is not define, type tuple : ")+heType::ToString(ElementType)+std::string(" ")+heType::ToString(Other.ElementType));
     return false;
 }
 bool he::operator > (he Other)const
@@ -257,48 +257,17 @@ std::string he::DumpToString()
 {
     if(ElementType==heType::INT)
     {
-        int NPFlag;
-        int ABV;
-        if(InterVint < 0)
-        {
-            NPFlag = 1;
-            ABV = -InterVint;
-        }
-        else
-        {
-            NPFlag = 0;
-            ABV = InterVint;
-        }
-        if(ABV==0)return std::string("0");
-        if(NPFlag)return std::string("-") + NumberToString(ABV);
-        else return NumberToString(ABV);
+        return NumberToString(InterVint);
     }
     if(ElementType==heType::STRING)
     {
-        return InterVstring;
+        return std::string("\"")+InterVstring +std::string("\"");
     }
     if(ElementType == heType::FLOAT)
     {
-        int NPFlag;
-        float ABV;
-        if(InterVfloat < 0)
-        {
-            NPFlag = 1;
-            ABV = -InterVfloat;
-        }
-        else
-        {
-            NPFlag = 0;
-            ABV = InterVfloat;
-        }
-        int IntPart = ABV;
-        float FloatPart = ABV - IntPart;
-        int FloatPartInt = FloatPart*1000000;
-        while(FloatPartInt%10==0&&FloatPartInt>0)FloatPartInt/=10;
-        if(NPFlag)return std::string("-") +NumberToString(IntPart)+'.'+ NumberToString(FloatPartInt);
-        else return NumberToString(IntPart)+'.'+ NumberToString(FloatPartInt);
+        return NumberToString(InterVfloat);
     }
-    Log::Assert(false,std::string("he DumpToString is not define, type tuple : ")+NumberToString(ElementType));
+    Log::Assert(false,std::string("he DumpToString is not define, type tuple : ")+heType::ToString(ElementType));
     return "";
 }
 
@@ -308,7 +277,7 @@ he he::size()
     {
         return MemoryArrayUsefulLength;
     }
-    Log::Assert(false,std::string("he size is not define, type tuple : ")+NumberToString(ElementType));
+    Log::Assert(false,std::string("he size is not define, type tuple : ")+heType::ToString(ElementType));
     return he(0);
 }
 
@@ -326,7 +295,7 @@ int he::hash(he Other)
     {
         return HashFloat(Other.InterVfloat);
     }
-    Log::Assert(false,std::string("he hash is not define, type tuple : ")+NumberToString(Other.ElementType));
+    Log::Assert(false,std::string("he hash is not define, type tuple : ")+heType::ToString(Other.ElementType));
     return 0;
 }
 
@@ -347,7 +316,7 @@ void he::append(he Other)
         MemoryArrayUsefulLength +=1;
         return;
     }
-    Log::Assert(false,std::string("he append is not define, type tuple : ")+NumberToString(ElementType));
+    Log::Assert(false,std::string("he append is not define, type tuple : ")+heType::ToString(ElementType));
 }
 
 he he::NewDict()

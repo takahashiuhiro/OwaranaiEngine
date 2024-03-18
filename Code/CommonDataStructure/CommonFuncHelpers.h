@@ -8,13 +8,36 @@
 template<typename T>
 std::string NumberToString(T Input)
 {
-    std::string ReturnString = "";
-    while(Input)
+    int NPFlag = 0;
+    if(Input < 0)
     {
-        ReturnString += '0' + Input%10;
-        Input /= 10;
+        NPFlag = 1;
+        Input = -Input;
     }
-    std::reverse(ReturnString.begin(), ReturnString.end());
+    int IntInput = Input;
+    float FloatInput = Input - IntInput;
+    std::string ReturnString = "";
+    if(NPFlag)ReturnString += '-';
+    //整数部分
+    std::string IntReturnString = "";
+    while(IntInput)
+    {
+        IntReturnString += '0' + IntInput%10;
+        IntInput /= 10;
+    }
+    if(IntReturnString == "")IntReturnString = std::string("0");
+    std::reverse(IntReturnString.begin(), IntReturnString.end());
+    ReturnString += IntReturnString;
+    //浮点数部分
+    std::string FloatReturnString = "";
+    if(typeid(Input)==typeid(float)||typeid(Input)==typeid(double))
+    {
+        FloatReturnString += '.';
+        int FloatPartInt = FloatInput*1000000;
+        while(FloatPartInt%10==0&&FloatPartInt>0)FloatPartInt/=10;
+        FloatReturnString += NumberToString(FloatPartInt);
+    }
+    ReturnString += FloatReturnString;
     return ReturnString;
 }
 

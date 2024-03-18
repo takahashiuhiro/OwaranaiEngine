@@ -14,6 +14,17 @@ struct heType
     static const size_t FLOAT = 3;
     static const size_t LIST = 4;
     static const size_t DICT = 5;
+
+    template<typename T = size_t>
+    static std::string ToString(size_t InputType)
+    {
+        if(InputType == NONE)return "None";
+        if(InputType == INT)return "INT";
+        if(InputType == STRING)return "STRING";
+        if(InputType == FLOAT)return "FLOAT";
+        if(InputType == LIST)return "LIST";
+        if(InputType == DICT)return "DICT";
+    }
 };
 
 struct DictFindDfsInfo
