@@ -20,12 +20,20 @@ int main()
     s[he(5)] = he("888");
     s[he("qw")] = he(15.77);
     s[he(654)] = he(15.77);
-    s.SplayPrintForDebugTree();
-    std::cout<<"----------------------"<<std::endl;
-    s.SplayPrintForDebugArray();
-    s.SplayDelete(he(5));
-    std::cout<<std::endl<<std::endl;
-    s.SplayPrintForDebugTree();
-    std::cout<<"----------------------"<<std::endl;
-    s.SplayPrintForDebugArray();
+    std::cout<< s.DumpToString()<<std::endl;
+    s.SplayDelete(he(654));
+    std::cout<< s.DumpToString()<<std::endl;
+    s[he(654)] = he(1999.77);
+    std::cout<< s.DumpToString()<<std::endl;
+    s[he(654)] = he("asdasd");
+    std::cout<< s.DumpToString()<<std::endl;
+    //s.SplayPrintForDebugArray();
+    s[he("gg")] = s;
+    std::cout<< s.DumpToString()<<std::endl;
+    s[he(77)] = he::NewList();
+    s[he(77)].append(he("66"));
+    s[he(77)].append(he(66));
+    s[he(77)].append(s);
+    std::cout<< s.DumpToString()<<std::endl;
+    //s[he("gg")].SplayPrintForDebugArray();
 }

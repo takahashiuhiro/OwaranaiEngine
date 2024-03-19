@@ -132,7 +132,7 @@ struct he
     int SplayInsert(he InputKey, he InputValue);//在splay上插入一对k-v,返回内存块
     void SplayPrintForDebugArray();//debug用
     void SplayPrintForDebugTree();
-    void SplayPrintForDebugDfs(int Root);
+    void SplayPrintForDebugDfs(int Root,std::vector<int>&Result);
     void SplayPrintForDebugSingleNode(int Root);
     void Splay(int InputIndex);//通过内存块的index把输入的index的节点rotate到根上去
     void SplayDelete(he InputKey);//通过key删除节点

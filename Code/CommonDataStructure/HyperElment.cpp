@@ -179,7 +179,10 @@ void he::Set(he* ThisOther,he Other)
     ThisOther->InterVfloat = Other.InterVfloat;
     ThisOther->MemoryArray = Other.MemoryArray;
     ThisOther->MemoryArrayUsefulLength = Other.MemoryArrayUsefulLength;
-    ThisOther->SplayRoot = SplayRoot;
+    ThisOther->SplayRoot = Other.SplayRoot;
+    ThisOther->HashInt = Other.HashInt;
+    ThisOther->HashString = Other.HashString;
+    ThisOther->HashFloat = Other.HashFloat;
 }
 he he::operator = (he Other)const
 {
@@ -276,6 +279,19 @@ std::string he::DumpToString()
             if(a<MemoryArrayUsefulLength-1)ReturnString += ",";
         }
         ReturnString += "]";
+        return ReturnString;
+    }
+    if(ElementType == heType::DICT)
+    {
+        std::string ReturnString = "{";
+        std::vector<int>SplayResult;
+        SplayPrintForDebugDfs(SplayRoot, SplayResult);
+        for(int a=0;a<SplayResult.size();a++)
+        {
+            ReturnString += MemoryArray[DictGetIndexKey(SplayResult[a])].DumpToString() + ":"+MemoryArray[DictGetIndexValue(SplayResult[a])].DumpToString();
+            if(a<SplayResult.size()-1)ReturnString+=",";
+        }
+        ReturnString += "}";
         return ReturnString;
     }
     Log::Assert(false,std::string("he DumpToString is not define, type tuple : ")+heType::ToString(ElementType));
@@ -464,13 +480,15 @@ void he::SplayPrintForDebugArray()
 void he::SplayPrintForDebugTree()
 {
     std::cout<<"Root:: "<<SplayRoot<<std::endl;
-    SplayPrintForDebugDfs(SplayRoot);
+    std::vector<int>Result;
+    SplayPrintForDebugDfs(SplayRoot, Result);
+    for(int a=0;a<Result.size();a++)SplayPrintForDebugSingleNode(a);
 }
-void he::SplayPrintForDebugDfs(int Root)
+void he::SplayPrintForDebugDfs(int Root, std::vector<int>&Result)
 {
-    SplayPrintForDebugSingleNode(Root);
-    if(MemoryArray[DictGetIndexLeft(Root)].i() != -1)SplayPrintForDebugDfs(MemoryArray[DictGetIndexLeft(Root)].i());
-    if(MemoryArray[DictGetIndexRight(Root)].i() != -1)SplayPrintForDebugDfs(MemoryArray[DictGetIndexRight(Root)].i());
+    Result.push_back(Root);
+    if(MemoryArray[DictGetIndexLeft(Root)].i() != -1)SplayPrintForDebugDfs(MemoryArray[DictGetIndexLeft(Root)].i(),Result);
+    if(MemoryArray[DictGetIndexRight(Root)].i() != -1)SplayPrintForDebugDfs(MemoryArray[DictGetIndexRight(Root)].i(),Result);
 }
 
 void he::SplayPrintForDebugSingleNode(int Root)
