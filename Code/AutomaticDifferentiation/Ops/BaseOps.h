@@ -1,6 +1,7 @@
 #pragma once
 #include "../../CommonMathMoudle/Tensor.h"
 #include "../../CommonDataStructure/Dict.h"
+#include "../../CommonDataStructure/HyperElement.h"
 #include "OpsType.h"
 #include "../ForwardFunction.h"
 #include <cmath>
@@ -11,6 +12,7 @@ class BaseOps
 public:
     size_t OpsTypeName;
     Dict Params;
+    he Param;
     ComputationalGraph* CG;
     std::string Nodeid;
 

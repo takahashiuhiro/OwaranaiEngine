@@ -1,8 +1,10 @@
+#pragma once
 #include <iostream>
 #include <string>
 #include <functional>
 #include <vector>
 #include <queue>
+#include <stack>
 #include "Log.h"
 #include "CommonFuncHelpers.h"
 
@@ -76,7 +78,9 @@ struct he
     void w(double Input);
 
     /**公共函数.*/
-    std::string DumpToString();
+    std::string DumpToString();//dump成字符串
+    static he LoadFromString(std::string Input);//仅限list, dict, string, float, int五个类型的嵌套
+    static size_t CheckMatch(std::string Input);
 
     ~he();
 

@@ -298,6 +298,108 @@ std::string he::DumpToString()
     return "";
 }
 
+size_t he::CheckMatch(std::string Input)
+{
+    int StrFlag = 0;//双引号个数
+    int FloatFlagPoint = 0;//句点个数
+    bool NumberOnlyFlag = true;//字符串里是否存在非0到9的字符
+    bool NumberOnlyAndPointFlag = true;//允许存在point
+    std::stack<int>DictLeftIndex;//大括号左边
+    std::stack<int>ListLeftIndex;//中括号左边
+    int DictLeftCount = 0;//括号计数
+    int DictRightCount = 0;//括号计数
+    int ListLeftCount = 0;//括号计数
+    int ListRightCount = 0;//括号计数
+    for(int a=0;a<Input.size();a++)
+    {
+        if(Input[a] == '"')StrFlag++;
+        if(Input[a]-'0'>9||Input[a]-'0'<0)NumberOnlyFlag = false;
+        if((Input[a]-'0'>9||Input[a]-'0'<0)&&Input[a]!='.')NumberOnlyAndPointFlag = false;
+        if(Input[a] == '.')FloatFlagPoint++;
+        if(Input[a] == '['&&StrFlag%2==0)ListLeftIndex.push(a);//这种情况下在字符串内
+        if(Input[a] == ']'&&StrFlag%2==0&&a!=Input.size()-1&&!ListLeftIndex.empty())ListLeftIndex.pop();
+        if(Input[a] == '{'&&StrFlag%2==0)DictLeftIndex.push(a);//这种情况下在字符串内
+        if(Input[a] == '}'&&StrFlag%2==0&&a!=Input.size()-1&&!DictLeftIndex.empty())DictLeftIndex.pop();
+        if(Input[a] == '{'&&StrFlag%2==0)DictLeftCount++;
+        if(Input[a] == '}'&&StrFlag%2==0)DictRightCount++;
+        if(Input[a] == '['&&StrFlag%2==0)ListLeftCount++;
+        if(Input[a] == ']'&&StrFlag%2==0)ListRightCount++;
+    }
+    if(FloatFlagPoint==0&&NumberOnlyFlag)return heType::INT;
+    if(StrFlag==2&&Input[0]=='"'&&Input[Input.size()-1]=='"')return heType::STRING;
+    if(FloatFlagPoint==1&&NumberOnlyAndPointFlag)return heType::FLOAT;
+    if(ListLeftCount==ListRightCount&&(!ListLeftIndex.empty())&&Input[Input.size()-1]==']'&&ListLeftIndex.top()==0)return heType::LIST;
+    if(DictLeftCount==DictRightCount&&(!DictLeftIndex.empty())&&Input[Input.size()-1]=='}'&&DictLeftIndex.top()==0)return heType::DICT;
+    return 0;//没有识别出类型
+}
+
+he he::LoadFromString(std::string Input)
+{
+    size_t InputType = he::CheckMatch(Input);
+    if(InputType == heType::INT)return he(StringToNumber<int>(Input));
+    if(InputType == heType::STRING)return he(Input.substr(1,Input.size()-2));
+    if(InputType == heType::FLOAT)return he(StringToNumber<float>(Input));
+    if(InputType == heType::LIST)
+    {
+        he ResList = he::NewList();
+        int PreIndex = -1;
+        for(int a=1;a<Input.size()-1;a++)
+        {
+            if(Input[a]!=',')continue;
+            std::string ThisStr;
+            if(PreIndex == -1)ThisStr = Input.substr(1, a-1);
+            else ThisStr = Input.substr(PreIndex+1, a-PreIndex-1);
+            size_t ThisCheckRes = he::CheckMatch(ThisStr);
+            if(ThisCheckRes)
+            {
+                ResList.append(LoadFromString(ThisStr));
+                PreIndex = a;
+            }
+        }
+        ResList.append(LoadFromString(Input.substr(PreIndex+1, Input.size()-2 - PreIndex)));
+        return ResList;
+    }
+    if(InputType == heType::DICT)
+    {
+        he ResDict = he::NewDict();
+        int PreIndex = -1;
+        std::vector<he>Keys;
+        std::vector<he>Values;
+        for(int a=1;a<Input.size()-1;a++)
+        {
+            if(Input[a] != ':')continue;
+            if(PreIndex == -1)
+            {
+                Keys.push_back(LoadFromString(Input.substr(1, a-1)));
+                PreIndex = a;
+            }
+            else
+            {
+                for(int b=PreIndex+1;b<a;b++)
+                {
+                    if(Input[b]==',')
+                    {
+                        std::string LeftStr = Input.substr(PreIndex+1,b-PreIndex-1);
+                        std::string RightStr = Input.substr(b+1,a-1-b);
+                        size_t LeftCheckRes = he::CheckMatch(LeftStr);
+                        size_t RightCheckRes = he::CheckMatch(RightStr);
+                        if(LeftCheckRes&&RightCheckRes)
+                        {
+                            Values.push_back(LoadFromString(LeftStr));
+                            Keys.push_back(LoadFromString(RightStr));
+                            PreIndex = a;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        Values.push_back(LoadFromString(Input.substr(PreIndex+1, Input.size()-2 - PreIndex)));
+        for(int a=0;a<Keys.size();a++)ResDict[Keys[a]] = Values[a];
+        return ResDict;
+    }
+}
+
 he he::size()
 {
     if(ElementType == heType::LIST)
