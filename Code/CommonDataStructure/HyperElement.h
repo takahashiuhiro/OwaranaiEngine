@@ -94,9 +94,16 @@ struct he
     he operator * (float Other)const;
     he operator / (he Other)const;
     he operator = (he Other)const;
+    he& operator = (int Other);
+    he& operator = (std::string Other);
+    he& operator = (float Other);
+    he& operator = (double Other);
     he& operator = (he Other);
     bool operator == (he Other)const;
     he& operator [] (int Other);
+    he& operator [] (float Other);
+    he& operator [] (double Other);
+    he& operator [] (std::string Other);
     he& operator [] (he Other);
     bool operator < (he Other)const;
     bool operator <= (he Other)const;
@@ -116,6 +123,10 @@ struct he
 
     /**list类型管理.*/
     static he NewList(int InputLength = 0);
+    void append(int Other);
+    void append(std::string Other);
+    void append(float Other);
+    void append(double Other);
     void append(he Other);
 
     /**dict类型管理.*/

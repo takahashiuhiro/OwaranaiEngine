@@ -190,6 +190,22 @@ he he::operator = (he Other)const
     Res.Set(&Res,Other);
     return Res;
 }
+he& he::operator = (int Other)
+{
+    return operator=(he(Other));
+}
+he& he::operator = (std::string Other)
+{
+    return operator=(he(Other));
+}
+he& he::operator = (float Other)
+{
+    return operator=(he(Other));
+}
+he& he::operator = (double Other)
+{
+    return operator=(he(Other));
+}
 he& he::operator = (he Other)
 {
     Set(this, Other);
@@ -207,12 +223,19 @@ bool he::operator == (he Other)const
 
 he& he::operator [] (int Other)
 {
-    if(ElementType==heType::LIST)
-    {
-        return MemoryArray[Other];
-    }
-    Log::Assert(false,std::string("he [] is not define, type tuple : ")+heType::ToString(ElementType)+std::string(" ")+std::string(" int"));
-    return MemoryArray[0];
+    return (*this)[he(Other)];
+}
+he& he::operator [] (float Other)
+{
+    return (*this)[he(Other)];
+}
+he& he::operator [] (double Other)
+{
+    return (*this)[he(Other)];
+}
+he& he::operator [] (std::string Other)
+{
+    return (*this)[he(Other)];
 }
 
 he& he::operator [] (he Other)
@@ -435,6 +458,23 @@ he he::NewList(int InputLength)
     Res.MemoryArray.resize(InputLength);
     Res.MemoryArrayUsefulLength = InputLength;
     return Res;
+}
+
+void he::append(int Other)
+{
+    append(he(Other));
+}
+void he::append(std::string Other)
+{
+    append(he(Other));
+}
+void he::append(float Other)
+{
+    append(he(Other));
+}
+void he::append(double Other)
+{
+    append(he(Other));
 }
 
 void he::append(he Other)

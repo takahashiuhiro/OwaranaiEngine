@@ -17,29 +17,23 @@
 int main() 
 {
     he s = he::NewDict();
-    s[he(5)] = he("888");
-    s[he("qw")] = he(15.77);
-    s[he(654)] = he(15.77);
-    //std::cout<< s.DumpToString()<<std::endl;
-    s.SplayDelete(he(654));
-    //std::cout<< s.DumpToString()<<std::endl;
-    s[he(654)] = he(1999.77);
-    //std::cout<< s.DumpToString()<<std::endl;
-    s[he(654)] = he("asdasd");
-    //std::cout<< s.DumpToString()<<std::endl;
-    //s.SplayPrintForDebugArray();
-    s[he("gg")] = s;
-    s[he("gg")][he("gg")] = s;
-    //std::cout<< s.DumpToString()<<std::endl;
-    //he scopy = he::LoadFromString(s.DumpToString());
-   // std::cout<< scopy.DumpToString()<<std::endl;
-    s[he(77)] = he::NewList();
-    s[he(77)].append(he("66"));
-    s[he(77)].append(he(66));
-    s[he(77)].append(s);
+
+    s[1.667] = 6;
+    s[8.5] = 6;
+    s["1.667"] = 6;
+    s[1.667] = 8;
+    s[9.55] = 7.8;
+    s[1] = "qweqweqwe";
+    s["ggg"] = "bigo";
+
     std::cout<< s.DumpToString()<<std::endl;
     he scopy = he::LoadFromString(s.DumpToString());
     std::cout<< scopy.DumpToString()<<std::endl;
     std::cout<< (scopy.DumpToString() == s.DumpToString())<<std::endl;
-    //s[he("gg")].SplayPrintForDebugArray();
+
+    he gg = he::NewList();
+    gg.append(6);
+    gg.append(6.888);
+    gg.append("asdasdasd");
+    std::cout<<gg.DumpToString()<<std::endl;
 }
