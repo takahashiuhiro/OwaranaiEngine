@@ -25,11 +25,9 @@ todo
 
 ## 关于本项目的配置  
 
-(必须) 
-C++ 11  
-(选装) 
-Cuda Version:11.8  
-Cuda Drive Version:522.25  
+(必须)C++ 11  
+(选装)Cuda Version:11.8  
+(选装)Cuda Drive Version:522.25  
 
 只要装了g++就能跑起来, 检测不到cuda会编译C++版
 
