@@ -415,6 +415,20 @@ __global__ void FillOnehotDataKernel(float* OutputData, size_t BaseShape, size_t
   OutputData[Index*OnehotShape+InputData[Index]] = 1.;
 }
 
+__global__ void TrigonometricFunctionsKernel(float* OutputData, size_t OutputShapeCount, size_t FunType)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= OutputShapeCount)return;
+  if(FunType == 0)OutputData[Index] = sin(OutputData[Index]);
+  if(FunType == 1)OutputData[Index] = cos(OutputData[Index]);
+}
+
+void TrigonometricFunctionsInCPP(float* OutputData, size_t OutputShapeCount, size_t FunType)
+{
+  CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
+  TrigonometricFunctionsKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, OutputShapeCount,FunType);
+}
+
 void FillOnehotDataInCPP(float* OutputData, size_t BaseShape, size_t OnehotShape, size_t* InputData)
 {
   CudaPair CudaPairInput = GetCudaPair(BaseShape);

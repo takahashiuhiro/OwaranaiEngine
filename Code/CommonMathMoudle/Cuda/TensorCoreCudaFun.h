@@ -42,3 +42,5 @@ extern "C" void PowInCPP(float* OutputData, size_t OutputShapeCount,float Expone
 extern "C" void FillRandomValBernoulliInCPP(float* OutputData, size_t OutputShapeCount, float P, unsigned Seed);
 extern "C" void FillRandomValUniformInCPP(float* OutputData, size_t OutputShapeCount,float MinV, float MaxV, unsigned Seed);
 extern "C" void FillOnehotDataInCPP(float* OutputData, size_t BaseShape, size_t OnehotShape, size_t* InputData);
+/**一堆奇怪的三角函数.*/
+extern "C" void TrigonometricFunctionsInCPP(float* OutputData, size_t OutputShapeCount, size_t FunType);

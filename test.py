@@ -27,4 +27,11 @@ class PositionalEncoding(nn.Module):
         x = x + self.pe[:x.size(0)]
         return self.dropout(x)
 
-po = PositionalEncoding()
+max_len = 3
+d_model = 5
+position = torch.arange(max_len).unsqueeze(1)
+div_term = torch.exp(torch.arange(0, d_model, 2) * (-math.log(10000.0) / d_model))
+print(position)
+print(div_term)
+print(torch.arange(5,30,10))
+print(position*div_term)

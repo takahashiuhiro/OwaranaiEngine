@@ -227,3 +227,13 @@ std::string OEAutoDiff::View(std::shared_ptr<ComputationalGraph>CG,std::string I
 {
     return View(CG.get(),InputNode,InputShape,MinusOneIdx);
 }
+
+std::string PositionalEncoding(ComputationalGraph*CG, std::string InputNode, int DModel, float DropoutV = 0.1)
+{
+    //todo
+    return "";
+}
+std::string PositionalEncoding(std::shared_ptr<ComputationalGraph>CG, std::string InputNode, int DModel, float DropoutV = 0.1)
+{
+    return PositionalEncoding(CG.get(),InputNode,DModel,DropoutV);
+}

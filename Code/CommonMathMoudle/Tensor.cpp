@@ -1187,3 +1187,45 @@ Tensor* Tensor::CreateOnehotTensor(std::vector<size_t> InputShape, std::vector<s
     }
     return ReturnTensor;
 }
+
+Tensor* Tensor::Sin()
+{
+    Tensor* ReturnTensor = Copy();
+    if(ReturnTensor->GetDeviceNum())
+    {
+        #ifdef CUDA_USEFUL
+        TrigonometricFunctionsInCPP(ReturnTensor->GetDevicePointer(), ShapeCount, 0);
+        #endif
+    }
+    else
+    {
+        for(size_t a = 0;a < ReturnTensor->ShapeCount;a++)
+        {
+            ReturnTensor->GetDevicePointer()[a] = std::sin(ReturnTensor->GetDevicePointer()[a]);
+        }
+    }
+    return ReturnTensor;
+}
+Tensor* Tensor::Cos()
+{
+    Tensor* ReturnTensor = Copy();
+    if(ReturnTensor->GetDeviceNum())
+    {
+        #ifdef CUDA_USEFUL
+        TrigonometricFunctionsInCPP(ReturnTensor->GetDevicePointer(), ShapeCount, 1);
+        #endif
+    }
+    else
+    {
+        for(size_t a = 0;a < ReturnTensor->ShapeCount;a++)
+        {
+            ReturnTensor->GetDevicePointer()[a] = std::cos(ReturnTensor->GetDevicePointer()[a]);
+        }
+    }
+    return ReturnTensor;
+}
+
+Tensor* Tensor::PositionalEncoding(std::vector<size_t> InputShape, size_t InputDeviceNum)
+{
+    //todo
+}

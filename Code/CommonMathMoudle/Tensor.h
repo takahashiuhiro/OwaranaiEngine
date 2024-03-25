@@ -131,4 +131,9 @@ public:
     Tensor* View(std::vector<size_t> OutputShape, int MinusOneIdx = -1);
     /**返回一个onthot张量.*/
     static Tensor* CreateOnehotTensor(std::vector<size_t> InputShape, std::vector<size_t>InputData, size_t TokenLength = 0, size_t DeviceNum = 0);
+    /**对于元素的cos,sin.*/
+    Tensor* Sin();
+    Tensor* Cos();
+    /**位置编码，最后一维度偶数sin，奇数cos.*/
+    static Tensor* PositionalEncoding(std::vector<size_t> InputShape, size_t InputDeviceNum = 0);
 };
