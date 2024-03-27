@@ -423,6 +423,27 @@ __global__ void TrigonometricFunctionsKernel(float* OutputData, size_t OutputSha
   if(FunType == 1)OutputData[Index] = cos(OutputData[Index]);
 }
 
+__global__ void ArithmeticSequenceKernel(float* OutputData, size_t* OutputShape, size_t OutputShapeSize, float A1, float Arithmetic)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  size_t OutputShapeCount = 1;
+  for(size_t a=0;a<OutputShapeSize;a++)OutputShapeCount *= OutputShape[a];
+  if(Index >= OutputShapeCount)return;
+  size_t CurIndex = Index%OutputShape[OutputShapeSize-1];
+  OutputData[Index] = CurIndex*Arithmetic + A1;
+}
+
+void ArithmeticSequenceInCPP(float* OutputData, size_t* OutputShape, size_t OutputShapeSize, float A1, float Arithmetic)
+{
+  size_t OutputShapeCount = 1;
+  for(size_t a=0;a<OutputShapeSize;a++)OutputShapeCount *= OutputShape[a];
+  CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
+  size_t *OutputShapeCuda;
+  cudaMalloc((void**)&OutputShapeCuda, OutputShapeSize*sizeof(size_t));
+  cudaMemcpy(OutputShapeCuda,OutputShape,sizeof(size_t)*OutputShapeSize,cudaMemcpyHostToDevice);
+  ArithmeticSequenceKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, OutputShapeCuda, OutputShapeSize, A1, Arithmetic);
+}
+
 void TrigonometricFunctionsInCPP(float* OutputData, size_t OutputShapeCount, size_t FunType)
 {
   CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);

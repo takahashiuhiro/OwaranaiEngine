@@ -15,8 +15,5 @@
 #include <stack>
 int main() 
 {
-    Tensor* t = new Tensor({3,3},1);
-    t->FillArray(3.14);
-    t->Sin()->PrintData();
-    t->Cos()->PrintData();
+    Tensor::ArithmeticSequence({2,3},1,5,1)->PrintData();
 }

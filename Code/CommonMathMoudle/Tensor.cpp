@@ -1227,5 +1227,31 @@ Tensor* Tensor::Cos()
 
 Tensor* Tensor::PositionalEncoding(std::vector<size_t> InputShape, size_t InputDeviceNum)
 {
-    //todo
+    Tensor* ReturnTensor = new Tensor(InputShape, InputDeviceNum);
+    if(ReturnTensor->GetDeviceNum())
+    {
+       
+    }
+}
+
+Tensor* Tensor::ArithmeticSequence(std::vector<size_t> InputShape, float A1, float Arithmetic, size_t InputDeviceNum)
+{
+    Tensor* ReturnTensor = new Tensor(InputShape, InputDeviceNum);
+    if(ReturnTensor->GetDeviceNum())
+    {
+        #ifdef CUDA_USEFUL
+        CudaDimVec InputShapeArray = ReturnTensor->TransformFromStdVector(InputShape, InputShape.size());
+        ArithmeticSequenceInCPP(ReturnTensor->GetDevicePointer(), InputShapeArray.Shape, InputShape.size(), A1, Arithmetic);
+        #endif
+    }
+    else
+    {
+        size_t CurIndex;
+        for(size_t a = 0;a<ReturnTensor->ShapeCount;a++)
+        {
+            CurIndex = a%InputShape[InputShape.size()-1];
+            ReturnTensor->GetDevicePointer()[a] = CurIndex*Arithmetic + A1;
+        }
+    }
+    return ReturnTensor;
 }
