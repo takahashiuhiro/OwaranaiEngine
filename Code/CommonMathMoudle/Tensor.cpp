@@ -1225,15 +1225,6 @@ Tensor* Tensor::Cos()
     return ReturnTensor;
 }
 
-Tensor* Tensor::PositionalEncoding(std::vector<size_t> InputShape, size_t InputDeviceNum)
-{
-    Tensor* ReturnTensor = new Tensor(InputShape, InputDeviceNum);
-    if(ReturnTensor->GetDeviceNum())
-    {
-       
-    }
-}
-
 Tensor* Tensor::ArithmeticSequence(std::vector<size_t> InputShape, float A1, float Arithmetic, size_t InputDeviceNum)
 {
     Tensor* ReturnTensor = new Tensor(InputShape, InputDeviceNum);

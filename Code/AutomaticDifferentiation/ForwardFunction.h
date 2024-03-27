@@ -57,8 +57,5 @@ public:
     /**View.*/
     static std::string View(ComputationalGraph*CG,std::string InputNode, std::vector<size_t>InputShape, int MinusOneIdx = -1);
     static std::string View(std::shared_ptr<ComputationalGraph>CG,std::string InputNode, std::vector<size_t>InputShape, int MinusOneIdx = -1);
-    /**PositionalEncoding.*/
-    static std::string PositionalEncoding(ComputationalGraph*CG, std::string InputNode, int DModel, float DropoutV = 0.1);
-    static std::string PositionalEncoding(std::shared_ptr<ComputationalGraph>CG, std::string InputNode, int DModel, float DropoutV = 0.1);
 };
 
