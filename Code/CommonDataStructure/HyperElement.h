@@ -99,7 +99,16 @@ struct he
     he& operator = (float Other);
     he& operator = (double Other);
     he& operator = (he Other);
+    bool operator == (int Other)const;
+    bool operator == (std::string Other)const;
+    bool operator == (double Other)const;
+    bool operator == (float Other)const;
     bool operator == (he Other)const;
+    bool operator != (int Other)const;
+    bool operator != (std::string Other)const;
+    bool operator != (double Other)const;
+    bool operator != (float Other)const;
+    bool operator != (he Other)const;
     he& operator [] (int Other);
     he& operator [] (float Other);
     he& operator [] (double Other);

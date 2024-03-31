@@ -5,9 +5,11 @@ cmake_minimum_required(VERSION 3.8)
 add_subdirectory(CommonMathMoudle)
 add_subdirectory(CommonDataStructure)
 add_subdirectory(AutomaticDifferentiation)
+add_subdirectory(DynamicAutomaticDifferentiation)
 
 add_library(OwaranaiEngine STATIC Code.cpp)
 
 target_link_libraries (OwaranaiEngine CommonMathMoudle)
 target_link_libraries (OwaranaiEngine CommonDataStructure)
 target_link_libraries (OwaranaiEngine AutomaticDifferentiation)
+target_link_libraries (OwaranaiEngine DynamicAutomaticDifferentiation)

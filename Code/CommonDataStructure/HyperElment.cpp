@@ -211,6 +211,22 @@ he& he::operator = (he Other)
     Set(this, Other);
     return (*this);
 }
+bool he::operator == (int Other)const
+{
+    return operator==(he(Other));
+}
+bool he::operator == (std::string Other)const
+{
+    return operator==(he(Other));
+}
+bool he::operator == (double Other)const
+{
+    return operator==(he(Other));
+}
+bool he::operator == (float Other)const
+{
+    return operator==(he(Other));
+}
 bool he::operator == (he Other)const
 {
     if(ElementType!=Other.ElementType)return false;
@@ -219,6 +235,26 @@ bool he::operator == (he Other)const
     if(ElementType==heType::FLOAT)return (InterVfloat - Other.InterVfloat)*(InterVfloat - Other.InterVfloat) < 1e-9;
     Log::Assert(false,std::string("he == is not define, type tuple : ")+heType::ToString(ElementType)+std::string(" ")+heType::ToString(Other.ElementType));
     return false;
+}
+bool he::operator != (int Other)const
+{
+    return !operator==(Other);
+}
+bool he::operator != (std::string Other)const
+{
+    return !operator==(Other);
+}
+bool he::operator != (double Other)const
+{
+    return !operator==(Other);
+}
+bool he::operator != (float Other)const
+{
+    return !operator==(Other);
+}
+bool he::operator != (he Other)const
+{
+    return !operator==(Other);
 }
 
 he& he::operator [] (int Other)
