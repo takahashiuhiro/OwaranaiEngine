@@ -8,3 +8,6 @@ import random
 import tqdm
 
 a = torch.Tensor([1,2,3])
+b = torch.Tensor([[1],[2],[3]])
+
+print(a+b)

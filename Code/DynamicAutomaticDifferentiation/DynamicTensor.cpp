@@ -1,48 +1,101 @@
 #include "DynamicTensor.h"
 
-DynamicTensor::DynamicTensor(Tensor* InputTensor)
-{
-    TensorPointer = InputTensor;
-    DynamicTensorInit();
-}
-std::shared_ptr<DynamicTensor> DynamicTensor::CreateDynamicTensor(Tensor* InputTensor)
-{
-    std::shared_ptr<DynamicTensor> Res = std::make_shared<DynamicTensor>(InputTensor);
-    return Res;
-}
-std::shared_ptr<DynamicTensor> DynamicTensor::CreateDynamicTensor(std::vector<size_t>shape)
-{
-    std::shared_ptr<DynamicTensor> Res = std::make_shared<DynamicTensor>(new Tensor(shape));
-    return Res;
-}
-std::shared_ptr<DynamicTensor> DynamicTensor::CreateDynamicTensor(std::vector<size_t>shape, size_t DeviceNum)
-{
-    std::shared_ptr<DynamicTensor> Res = std::make_shared<DynamicTensor>(new Tensor(shape, DeviceNum));
-    return Res;
-}
-std::shared_ptr<DynamicTensor> DynamicTensor::CreateDynamicTensor(std::vector<size_t>shape, size_t DeviceNum, std::vector<float>InputData)
-{
-    std::shared_ptr<DynamicTensor> Res = std::make_shared<DynamicTensor>(new Tensor(shape, DeviceNum, InputData));
-    return Res;
-}
-
-void DynamicTensor::DynamicTensorInit()
-{
-    DynamicTensorParamsInit();
-}
-
-void DynamicTensor::DynamicTensorParamsInit()
-{
-    Params = he::NewDict();
-    Params["requires_grad"] = 0;
-}
+DynamicTensor::DynamicTensor(Tensor* InputTensor){TensorPointer = InputTensor;}
+DynamicTensor DynamicTensor::CreateDynamicTensor(Tensor* InputTensor){return DynamicTensor(InputTensor);}
+DynamicTensor DynamicTensor::CreateDynamicTensor(std::vector<size_t>shape){return DynamicTensor(new Tensor(shape));}
+DynamicTensor DynamicTensor::CreateDynamicTensor(std::vector<size_t>shape, size_t DeviceNum){return DynamicTensor(new Tensor(shape, DeviceNum));}
+DynamicTensor DynamicTensor::CreateDynamicTensor(std::vector<size_t>shape, size_t DeviceNum, std::vector<float>InputData){return DynamicTensor(new Tensor(shape, DeviceNum, InputData));}
+DynamicTensor DynamicTensor::CreateVector(std::vector<float>InputData, size_t DeviceNum){return DynamicTensor(new Tensor({1,InputData.size()}, DeviceNum, InputData));}
 
 DynamicTensor::~DynamicTensor()
 {
     if(TensorPointer!=nullptr)
     {
         delete TensorPointer;
+        TensorPointer=nullptr;
     }
+}
+
+DynamicTensor DynamicTensor::operator + (DynamicTensor& Other)
+{
+    if(TensorPointer->shape.size()==Other.TensorPointer->shape.size())
+    {
+        bool ShapeCheck = true;
+        for(size_t a=0;a<TensorPointer->shape.size();a++)
+        {
+            ShapeCheck &= TensorPointer->shape[a] == Other.TensorPointer->shape[a];
+        }
+        if(ShapeCheck)return DynamicTensor(TensorPointer->Add(Other.TensorPointer));
+    }
+    std::vector<size_t>FinalShapeVec;
+    FinalShapeVec.resize(std::max(TensorPointer->shape.size(), Other.TensorPointer->shape.size()));
+    for(size_t a =0;a<FinalShapeVec.size();a++)FinalShapeVec[a] = 1;
+    for(size_t a =0;a<FinalShapeVec.size();a++)
+    {
+        int CurShapeVec = FinalShapeVec.size() - 1 - a;
+        int ThisShapeVec = TensorPointer->shape.size() - 1 - a;
+        int OtherShapeVec = Other.TensorPointer->shape.size() - 1 - a;
+        if(ThisShapeVec<0&&OtherShapeVec>=0)FinalShapeVec[CurShapeVec] = Other.TensorPointer->shape[OtherShapeVec];
+        else if(ThisShapeVec>=0&&OtherShapeVec<0)FinalShapeVec[CurShapeVec] = TensorPointer->shape[ThisShapeVec];
+        else
+        {
+            if(Other.TensorPointer->shape[OtherShapeVec]==1)FinalShapeVec[CurShapeVec] = TensorPointer->shape[ThisShapeVec];
+            else if(TensorPointer->shape[ThisShapeVec]==1)FinalShapeVec[CurShapeVec] = Other.TensorPointer->shape[OtherShapeVec];
+            else
+            {
+                Log::Assert(TensorPointer->shape[ThisShapeVec]==Other.TensorPointer->shape[OtherShapeVec],"DynamicTensor Add shape error");
+                FinalShapeVec[CurShapeVec] = TensorPointer->shape[ThisShapeVec];
+            }
+        }
+    }
+    Log::Assert(TensorPointer->CanBroadCastTo(FinalShapeVec)&&Other.TensorPointer->CanBroadCastTo(FinalShapeVec),"DynamicTensor Add shape error");
+    Tensor* BroadThis = TensorPointer->BroadCastTo(FinalShapeVec);
+    Tensor* BroadOther = Other.TensorPointer->BroadCastTo(FinalShapeVec);
+    Tensor* Res = BroadThis->Add(BroadOther);
+    delete BroadThis;
+    delete BroadOther;
+    return DynamicTensor(Res);
+}
+
+DynamicTensor DynamicTensor::operator + (DynamicTensor&& Other)
+{
+    if(TensorPointer->shape.size()==Other.TensorPointer->shape.size())
+    {
+        bool ShapeCheck = true;
+        for(size_t a=0;a<TensorPointer->shape.size();a++)
+        {
+            ShapeCheck &= TensorPointer->shape[a] == Other.TensorPointer->shape[a];
+        }
+        if(ShapeCheck)return DynamicTensor(TensorPointer->Add(Other.TensorPointer));
+    }
+    std::vector<size_t>FinalShapeVec;
+    FinalShapeVec.resize(std::max(TensorPointer->shape.size(), Other.TensorPointer->shape.size()));
+    for(size_t a =0;a<FinalShapeVec.size();a++)FinalShapeVec[a] = 1;
+    for(size_t a =0;a<FinalShapeVec.size();a++)
+    {
+        int CurShapeVec = FinalShapeVec.size() - 1 - a;
+        int ThisShapeVec = TensorPointer->shape.size() - 1 - a;
+        int OtherShapeVec = Other.TensorPointer->shape.size() - 1 - a;
+        if(ThisShapeVec<0&&OtherShapeVec>=0)FinalShapeVec[CurShapeVec] = Other.TensorPointer->shape[OtherShapeVec];
+        else if(ThisShapeVec>=0&&OtherShapeVec<0)FinalShapeVec[CurShapeVec] = TensorPointer->shape[ThisShapeVec];
+        else
+        {
+            if(Other.TensorPointer->shape[OtherShapeVec]==1)FinalShapeVec[CurShapeVec] = TensorPointer->shape[ThisShapeVec];
+            else if(TensorPointer->shape[ThisShapeVec]==1)FinalShapeVec[CurShapeVec] = Other.TensorPointer->shape[OtherShapeVec];
+            else
+            {
+                Log::Assert(TensorPointer->shape[ThisShapeVec]==Other.TensorPointer->shape[OtherShapeVec],"DynamicTensor Add shape error");
+                FinalShapeVec[CurShapeVec] = TensorPointer->shape[ThisShapeVec];
+            }
+        }
+    }
+    Log::Assert(TensorPointer->CanBroadCastTo(FinalShapeVec)&&Other.TensorPointer->CanBroadCastTo(FinalShapeVec),"DynamicTensor Add shape error");
+    Tensor* BroadThis = TensorPointer->BroadCastTo(FinalShapeVec);
+    Tensor* BroadOther = Other.TensorPointer->BroadCastTo(FinalShapeVec);
+    Tensor* Res = BroadThis->Add(BroadOther);
+    delete BroadThis;
+    delete BroadOther;
+    return DynamicTensor(Res);
 }
 
 void DynamicTensor::PrintData()
@@ -50,22 +103,3 @@ void DynamicTensor::PrintData()
     TensorPointer->PrintData();
 }
 
-std::shared_ptr<DynamicTensor> DynamicTensor::Add(DynamicTensor* Input1, DynamicTensor* Input2, bool NeedGrad)
-{
-    std::shared_ptr<DynamicTensor> Res = std::make_shared<DynamicTensor>(Input1->TensorPointer->Add(Input2->TensorPointer));
-    Res->OpsType = DynamicTensorOpsType::Add;
-    if(NeedGrad)
-    {
-        bool Input1Flag = Input1->Params["requires_grad"].i();
-        bool Input2Flag = Input2->Params["requires_grad"].i();
-        if(Input1Flag||Input2Flag)
-        {
-            Res->Params["requires_grad"] = 1;
-            Res->InputList.push_back(Input1);
-            Res->InputList.push_back(Input2);
-            if(Input1Flag)Input1->OutputList.push_back(Res.get());
-            if(Input2Flag)Input2->OutputList.push_back(Res.get());
-        }
-    }
-    return Res;
-}

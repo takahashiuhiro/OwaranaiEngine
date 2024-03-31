@@ -7,11 +7,9 @@
 #include <stack>
 int main() 
 {
-    auto q = DynamicTensor::CreateDynamicTensor({1,2}, 0, {5,8.});
-    auto w = DynamicTensor::CreateDynamicTensor({1,2}, 0, {5,9.});
-    q->Params["requires_grad"] = 1;
-    w->Params["requires_grad"] = 0;
-    auto e = DynamicTensor::Add(q.get(),w.get(),1);
-    e->InputList[0]->PrintData();
-    w->OutputList[0]->PrintData();
+    DynamicTensor a = DynamicTensor::CreateVector({1.2,5});
+    DynamicTensor b = DynamicTensor::CreateDynamicTensor({2},0,{3.2,5});
+    a+DynamicTensor::CreateDynamicTensor({2},0,{3.2,5});
+    auto sd = (DynamicTensor::CreateDynamicTensor({2,1},0,{888.2,5})+DynamicTensor::CreateDynamicTensor({3,1,2},0,{3.2,5,77,88,99,1010}));
+    sd.PrintData();
 }
