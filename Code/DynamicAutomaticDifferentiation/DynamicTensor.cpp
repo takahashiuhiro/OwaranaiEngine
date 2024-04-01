@@ -16,7 +16,22 @@ DynamicTensor::~DynamicTensor()
     }
 }
 
-Tensor* DynamicTensor::OperatorPlus(Tensor*OtherDynamicTensor)
+
+DynamicTensor DynamicTensor::operator + (DynamicTensor& Other){return DynamicTensor(OperatorPlus(Other.TensorPointer,0));}
+DynamicTensor DynamicTensor::operator + (DynamicTensor&& Other){return DynamicTensor(OperatorPlus(Other.TensorPointer,0));}
+DynamicTensor DynamicTensor::operator * (DynamicTensor& Other){return DynamicTensor(OperatorPlus(Other.TensorPointer,1));}
+DynamicTensor DynamicTensor::operator * (DynamicTensor&& Other){return DynamicTensor(OperatorPlus(Other.TensorPointer,1));}
+
+DynamicTensor DynamicTensor::Matmul(DynamicTensor& Other){return DynamicTensor(TensorPointer->Matmul(Other.TensorPointer));}
+DynamicTensor DynamicTensor::Matmul(DynamicTensor&& Other){return DynamicTensor(TensorPointer->Matmul(Other.TensorPointer));}
+DynamicTensor DynamicTensor::T(){return DynamicTensor(TensorPointer->T());}
+
+void DynamicTensor::PrintData()
+{
+    TensorPointer->PrintData();
+}
+
+Tensor* DynamicTensor::OperatorPlus(Tensor*OtherDynamicTensor, size_t InputFunType)
 {
     if(TensorPointer->shape.size()==OtherDynamicTensor->shape.size())
     {
@@ -25,7 +40,11 @@ Tensor* DynamicTensor::OperatorPlus(Tensor*OtherDynamicTensor)
         {
             ShapeCheck &= TensorPointer->shape[a] == OtherDynamicTensor->shape[a];
         }
-        if(ShapeCheck)return TensorPointer->Add(OtherDynamicTensor);
+        if(ShapeCheck)
+        {
+            if(InputFunType==0)return TensorPointer->Add(OtherDynamicTensor);
+            if(InputFunType==1)return TensorPointer->EleMul(OtherDynamicTensor);
+        }
     }
     std::vector<size_t>FinalShapeVec;
     FinalShapeVec.resize(std::max(TensorPointer->shape.size(), OtherDynamicTensor->shape.size()));
@@ -51,17 +70,10 @@ Tensor* DynamicTensor::OperatorPlus(Tensor*OtherDynamicTensor)
     Log::Assert(TensorPointer->CanBroadCastTo(FinalShapeVec)&&OtherDynamicTensor->CanBroadCastTo(FinalShapeVec),"DynamicTensor Add shape error");
     Tensor* BroadThis = TensorPointer->BroadCastTo(FinalShapeVec);
     Tensor* BroadOther = OtherDynamicTensor->BroadCastTo(FinalShapeVec);
-    Tensor* Res = BroadThis->Add(BroadOther);
+    Tensor* Res;
+    if(InputFunType==0)Res = BroadThis->Add(BroadOther);
+    if(InputFunType==1)Res = BroadThis->EleMul(BroadOther);
     delete BroadThis;
     delete BroadOther;
     return Res;
 }
-
-DynamicTensor DynamicTensor::operator + (DynamicTensor& Other){return DynamicTensor(OperatorPlus(Other.TensorPointer));}
-DynamicTensor DynamicTensor::operator + (DynamicTensor&& Other){return DynamicTensor(OperatorPlus(Other.TensorPointer));}
-
-void DynamicTensor::PrintData()
-{
-    TensorPointer->PrintData();
-}
-

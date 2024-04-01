@@ -32,15 +32,22 @@ public:
     /**运算符重载.*/
     DynamicTensor operator + (DynamicTensor& Other);
     DynamicTensor operator + (DynamicTensor&& Other);
-
-    /**运算符重载执行逻辑.*/
-    Tensor* OperatorPlus(Tensor*OtherDynamicTensor);
+    DynamicTensor operator * (DynamicTensor& Other);
+    DynamicTensor operator * (DynamicTensor&& Other);
+    //DynamicTensor operator - (DynamicTensor& Other);
+    //DynamicTensor operator - (DynamicTensor&& Other);
 
     /**Tensor内函数组装.*/
     void PrintData();
     void Backward(DynamicTensor* Input = nullptr);
 
-    /**算子.*/
+    /**运算.*/
+    DynamicTensor Matmul(DynamicTensor& Other);//矩阵乘法
+    DynamicTensor Matmul(DynamicTensor&& Other);
+    DynamicTensor T();//矩阵转置
 
+
+    /**运算符重载执行逻辑.*/
+    Tensor* OperatorPlus(Tensor*OtherDynamicTensor, size_t InputFunType);
 
 };

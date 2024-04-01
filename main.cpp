@@ -7,10 +7,6 @@
 #include <stack>
 int main() 
 {
-    DynamicTensor a = DynamicTensor::CreateVector({1.2,5});
-    DynamicTensor b = DynamicTensor::CreateDynamicTensor({2},0,{3.2,5});
-    a+DynamicTensor::CreateDynamicTensor({2},0,{3.2,5});
-    auto sd = (DynamicTensor::CreateDynamicTensor({2,1},0,{888.2,5})+DynamicTensor::CreateDynamicTensor({3,1,2},0,{3.2,5,77,88,99,1010}));
-    sd.PrintData();
-    (a+b).PrintData();
+    DynamicTensor::CreateDynamicTensor({2,2,1},0,{5,8,56,44}).PrintData();
+    DynamicTensor::CreateDynamicTensor({2,2,1},0,{5,8,56,44}).T().PrintData();
 }
