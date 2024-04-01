@@ -12,4 +12,5 @@ int main()
     a+DynamicTensor::CreateDynamicTensor({2},0,{3.2,5});
     auto sd = (DynamicTensor::CreateDynamicTensor({2,1},0,{888.2,5})+DynamicTensor::CreateDynamicTensor({3,1,2},0,{3.2,5,77,88,99,1010}));
     sd.PrintData();
+    (a+b).PrintData();
 }

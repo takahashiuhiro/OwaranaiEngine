@@ -33,6 +33,9 @@ public:
     DynamicTensor operator + (DynamicTensor& Other);
     DynamicTensor operator + (DynamicTensor&& Other);
 
+    /**运算符重载执行逻辑.*/
+    Tensor* OperatorPlus(Tensor*OtherDynamicTensor);
+
     /**Tensor内函数组装.*/
     void PrintData();
     void Backward(DynamicTensor* Input = nullptr);
