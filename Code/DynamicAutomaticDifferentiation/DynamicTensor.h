@@ -34,12 +34,9 @@ public:
     DynamicTensor operator + (DynamicTensor&& Other);
     DynamicTensor operator * (DynamicTensor& Other);
     DynamicTensor operator * (DynamicTensor&& Other);
-    //DynamicTensor operator - (DynamicTensor& Other);
-    //DynamicTensor operator - (DynamicTensor&& Other);
 
     /**Tensor内函数组装.*/
     void PrintData();
-    void Backward(DynamicTensor* Input = nullptr);
 
     /**运算.*/
     DynamicTensor Matmul(DynamicTensor& Other);//矩阵乘法
