@@ -16,7 +16,7 @@ public:
     std::map<std::string, bool>BackwardFlag;
     /**当前哪些节点需要被求导，本轮新增节点不求导.*/
     std::map<std::string, size_t>CurrentBackwardFlag;
-    /**当前的求导编号*/
+    /**当前的求导编号.*/
     size_t CurrentBackwardFlagIndex = 0;
     /**计算图模式，true为训练模式，false为推理模式.*/
     bool CGMode  = true;

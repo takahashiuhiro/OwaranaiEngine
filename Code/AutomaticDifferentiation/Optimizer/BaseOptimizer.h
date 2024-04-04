@@ -16,7 +16,7 @@ public:
     std::shared_ptr<ComputationalGraph> CG = nullptr;
     /**存张量的名称和对应的本体以及导数.*/
     std::map<std::string, std::pair<Tensor*, Tensor*>>TensorMap;
-    /**计算完成后的位置.清除的时候直接删掉，因为所有权理应已经交了出去*/
+    /**计算完成后的位置.清除的时候直接删掉，因为所有权理应已经交了出去.*/
     std::map<std::string, Tensor*>ResTensorMap;
     /**配置参数.*/
     Dict Params;

@@ -22,6 +22,6 @@ public:
     /**封装误差反传流程.*/
     virtual void Backward();
 
-    /**在计算图上建立loss节点,返回loss节点*/
+    /**在计算图上建立loss节点,返回loss节点.*/
     virtual void Build(std::vector<std::string>InputCGNodeList, std::vector<std::string>LabelNodeList) = 0;
 };

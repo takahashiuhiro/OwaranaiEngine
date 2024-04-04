@@ -1,4 +1,5 @@
 #pragma once
+#include "../ForPlatforms.h"
 #include <memory>
 #include "../CommonDataStructure/Log.h"
 #include "MathHelpers.h"
@@ -75,7 +76,7 @@ public:
     /**对标定维度求平均数.*/
     Tensor* Mean(std::vector<size_t>InputDims);
     /**对标定维度求方差.*/
-    Tensor* Var(std::vector<size_t>InputDims);
+    //Tensor* Var(std::vector<size_t>InputDims);
     /**Get a sum tensor by specifying dimensions*/
     Tensor* SumTensorDim(size_t InputDim);
     /**Get a average tensor by specifying dimensions*/

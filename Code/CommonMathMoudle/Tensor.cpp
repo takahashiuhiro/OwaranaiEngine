@@ -556,11 +556,11 @@ Tensor* Tensor::Mean(std::vector<size_t>InputDims)
     return ResTensor;
 }
 
-Tensor* Tensor::Var(std::vector<size_t>InputDims)
-{
-    Tensor* MeanTensor = Mean(InputDims);
-    //todo
-}
+//Tensor* Tensor::Var(std::vector<size_t>InputDims)
+//{
+//    Tensor* MeanTensor = Mean(InputDims);
+//    //todo
+//}
 
 Tensor* Tensor::Sum(std::vector<size_t>InputDims)
 {

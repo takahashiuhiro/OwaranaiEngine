@@ -47,7 +47,7 @@ public:
     std::vector<std::string> &GetInputNodeList(std::string InputNodeid);
     /**计算图标记后处理,只有在前向赋值计算以后才允许调用.*/
     void CGForwardProcess();
-    /**.dropout后处理*/
+    /**dropout后处理.*/
     void CGForwardProcessDropout();
 
     virtual void AfterSettingShapeComputing() = 0;
