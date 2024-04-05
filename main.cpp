@@ -7,6 +7,6 @@
 #include <stack>
 int main() 
 {
-    Tensor* s = Tensor::PositionalEncoding(4, 5,1);
+    Tensor* s = Tensor::PositionalEncoding(4, 5,0);
     s->PrintData();
 }

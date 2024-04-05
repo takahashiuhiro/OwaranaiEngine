@@ -1265,7 +1265,8 @@ Tensor* Tensor::PositionalEncoding(int DModel, int MaxLen, size_t InputDeviceNum
     Tensor* SinDivTerm = PosMulDiv->Sin();
     delete PosMulDiv;
     auto ProtoShape = CosDivTerm->shape;
-    ProtoShape[ProtoShape.size() - 1] *= 2;
+    ProtoShape.push_back(ProtoShape[ProtoShape.size() - 1] * 2);
+    ProtoShape[ProtoShape.size() - 2] = 1;
     CosDivTerm->shape = { CosDivTerm->ShapeCount, 1 };
     SinDivTerm->shape = { SinDivTerm->ShapeCount, 1 };
     Tensor* CombDivTerm = SinDivTerm->TensorSplice(CosDivTerm, 1);
