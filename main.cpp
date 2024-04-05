@@ -7,6 +7,6 @@
 #include <stack>
 int main() 
 {
-    DynamicTensor::CreateDynamicTensor({2,2,1},0,{5,8,56,44}).PrintData();
-    DynamicTensor::CreateDynamicTensor({2,2,1},0,{5,8,56,44}).T().PrintData();
+    Tensor* s = Tensor::PositionalEncoding(4, 5,1);
+    s->PrintData();
 }

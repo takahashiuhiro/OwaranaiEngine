@@ -1246,3 +1246,31 @@ Tensor* Tensor::ArithmeticSequence(std::vector<size_t> InputShape, float A1, flo
     }
     return ReturnTensor;
 }
+
+Tensor* Tensor::PositionalEncoding(int DModel, int MaxLen, size_t InputDeviceNum)
+{
+    Tensor* Position = Tensor::ArithmeticSequence({ MaxLen * 1U }, 0, 1, InputDeviceNum);
+    Position->shape.push_back(1);
+    Tensor* DivTermBase = Tensor::ArithmeticSequence({ (DModel+1)/2 * 1U }, 0, 2, InputDeviceNum);
+    float DivTermNum = -std::log(10000.0) / DModel;
+    Tensor* DivTermBaseMulNum = DivTermBase->MulScalar(DivTermNum);
+    delete DivTermBase;
+    Tensor* DivTerm = DivTermBaseMulNum->EleExp(M_E);
+    DivTerm->shape = { 1,DivTerm->ShapeCount };
+    delete DivTermBaseMulNum;
+    Tensor* PosMulDiv = Position->Matmul(DivTerm);
+    delete DivTerm;
+    delete Position;
+    Tensor* CosDivTerm = PosMulDiv->Cos();
+    Tensor* SinDivTerm = PosMulDiv->Sin();
+    delete PosMulDiv;
+    auto ProtoShape = CosDivTerm->shape;
+    ProtoShape[ProtoShape.size() - 1] *= 2;
+    CosDivTerm->shape = { CosDivTerm->ShapeCount, 1 };
+    SinDivTerm->shape = { SinDivTerm->ShapeCount, 1 };
+    Tensor* CombDivTerm = SinDivTerm->TensorSplice(CosDivTerm, 1);
+    delete CosDivTerm;
+    delete SinDivTerm;
+    CombDivTerm->shape = ProtoShape;
+    return CombDivTerm;
+}   

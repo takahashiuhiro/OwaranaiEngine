@@ -137,4 +137,6 @@ public:
     Tensor* Cos();
     /**生成等差数列.*/
     static Tensor* ArithmeticSequence(std::vector<size_t> InputShape, float A1, float Arithmetic, size_t DeviceNum = 0);
+    /**生成位置编码.*/
+    static Tensor* PositionalEncoding(int DModel, int MaxLen, size_t DeviceNum = 0);
 };
