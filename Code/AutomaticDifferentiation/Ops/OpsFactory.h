@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 #include "../../CommonDataStructure/Log.h"
-#include "OpsType.h"
+#include "../../CommonMathMoudle/OpsType.h"
 #include "AllOpsTypeHeader.h"
 #include "../../CommonDataStructure/Dict.h"
 

@@ -8,7 +8,6 @@
 #include "../../CommonMathMoudle/Tensor.h"
 #include "../../CommonDataStructure/Dict.h"
 #include "../ComputationalGraph.h"
-#include "../Ops/OpsType.h"
 #include "../ForwardFunction.h"
 
 class BaseLayer

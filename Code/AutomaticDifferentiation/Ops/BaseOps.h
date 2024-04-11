@@ -2,7 +2,6 @@
 #include "../../CommonMathMoudle/Tensor.h"
 #include "../../CommonDataStructure/Dict.h"
 #include "../../CommonDataStructure/HyperElement.h"
-#include "OpsType.h"
 #include "../ForwardFunction.h"
 #include <cmath>
 

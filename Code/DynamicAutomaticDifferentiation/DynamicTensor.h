@@ -5,46 +5,57 @@
 #include <memory>
 #include "../CommonMathMoudle/Tensor.h"
 #include "../CommonDataStructure/HyperElement.h"
+#include "../CommonMathMoudle/OpsType.h"
+
+class DynamicTensor;
+
+struct DynamicOps
+{
+    DynamicOps(){}
+    DynamicOps(DynamicTensor* DynamicTensorNode);
+    /**算子，叶子节点为Base.*/
+    size_t DynamicOpsType;
+    /**只有叶子节点有这一项.*/
+    DynamicTensor* leafNode = nullptr;
+    /**输入节点.*/
+    std::vector<DynamicOps>InputOpsList;
+};
 
 class DynamicTensor
 {
 public:
 
     /**动态张量的成员变量.*/
-    Tensor* TensorPointer = nullptr;
-    std::string id;
+    std::shared_ptr<Tensor> TensorPointer = nullptr;
+    DynamicOps Ops;
 
     /**初始化动态张量.*/
     DynamicTensor(){};
-    DynamicTensor(Tensor* InputTensor);
+    DynamicTensor(std::shared_ptr<Tensor> InputTensor);
+    DynamicTensor(const DynamicTensor& Other);
 
     /**创建动态张量.*/
-    static DynamicTensor CreateDynamicTensor(Tensor* InputTensor);
-    static DynamicTensor CreateDynamicTensor(std::vector<size_t>shape);
-    static DynamicTensor CreateDynamicTensor(std::vector<size_t>shape, size_t DeviceNum);
-    static DynamicTensor CreateDynamicTensor(std::vector<size_t>shape, size_t DeviceNum, std::vector<float>InputData);
+    static DynamicTensor CreateDynamicTensor(std::shared_ptr<Tensor> InputTensor);
+    static DynamicTensor CreateDynamicTensor(std::vector<size_t>shape, size_t DeviceNum = 0);
+    static DynamicTensor CreateDynamicTensor(std::vector<size_t>shape, std::vector<float>InputData, size_t DeviceNum = 0);
     /**创建向量，默认为行向量.*/
     static DynamicTensor CreateVector(std::vector<float>InputData, size_t DeviceNum = 0);
 
     /**析构函数释放内存.*/
     ~DynamicTensor();
 
-    /**运算符重载.*/
-    DynamicTensor operator + (DynamicTensor& Other);
-    DynamicTensor operator + (DynamicTensor&& Other);
-    DynamicTensor operator * (DynamicTensor& Other);
-    DynamicTensor operator * (DynamicTensor&& Other);
-
     /**Tensor内函数组装.*/
     void PrintData();
 
-    /**运算.*/
-    DynamicTensor Matmul(DynamicTensor& Other);//矩阵乘法
-    DynamicTensor Matmul(DynamicTensor&& Other);
-    DynamicTensor T();//矩阵转置
+    /**运算符重载.*/
+    DynamicTensor operator=(DynamicTensor& Other);
+    DynamicTensor operator=(DynamicTensor&& Other);
 
+    /**计算图逻辑.*/
+    
+    /**运算符重载逻辑.*/
+    void Set(DynamicTensor* ThisTensor, const DynamicTensor* OtherTensor);
 
-    /**运算符重载执行逻辑.*/
-    Tensor* OperatorPlus(Tensor*OtherDynamicTensor, size_t InputFunType);
-
+    /**算子.*/
+    static DynamicTensor Add(DynamicTensor& InputFirst, DynamicTensor& InputSecond, bool RequiresGrad = false);
 };

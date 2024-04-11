@@ -5,7 +5,7 @@
 #include <memory>
 #include <map>
 #include <cmath>
-#include "Ops/OpsType.h"
+#include "../CommonMathMoudle/OpsType.h"
 
 class ComputationalGraph;
 

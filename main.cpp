@@ -7,6 +7,7 @@
 #include <stack>
 int main() 
 {
-    Tensor* s = Tensor::PositionalEncoding(4, 5,0);
-    s->PrintData();
+    DynamicTensor r = DynamicTensor::CreateVector({ 2,3 });
+    DynamicTensor e = DynamicTensor::Add(r, r, true);
+    e.PrintData();
 }
