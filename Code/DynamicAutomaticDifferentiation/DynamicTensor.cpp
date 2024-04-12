@@ -15,6 +15,11 @@ DynamicTensor DynamicTensor::CreateVector(std::vector<float>InputData, size_t De
 
 DynamicTensor::~DynamicTensor()
 {
+    //todo::把inputlist里的节点的output都改成自己的output，用dfs
+    for (size_t a = 0; a < OutNodeList.size(); a++)
+    {
+        //todo::通过dfs查询output节点里用过自己的位置修改为一个dynamicops
+    }
     if(TensorPointer!=nullptr)
     {
         TensorPointer.reset();
