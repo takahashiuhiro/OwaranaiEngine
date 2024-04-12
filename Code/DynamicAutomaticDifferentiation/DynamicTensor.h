@@ -28,6 +28,7 @@ public:
     /**动态张量的成员变量.*/
     std::shared_ptr<Tensor> TensorPointer = nullptr;
     DynamicOps Ops;
+    std::vector<DynamicTensor*>OutNodeList;//输出节点，只有在需要求导的时候可用
 
     /**初始化动态张量.*/
     DynamicTensor(){};
@@ -48,8 +49,6 @@ public:
     void PrintData();
 
     /**运算符重载.*/
-    DynamicTensor operator=(DynamicTensor& Other);
-    DynamicTensor operator=(DynamicTensor&& Other);
 
     /**计算图逻辑.*/
     

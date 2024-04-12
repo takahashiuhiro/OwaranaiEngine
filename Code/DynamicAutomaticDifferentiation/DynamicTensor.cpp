@@ -26,19 +26,6 @@ void DynamicTensor::PrintData()
     TensorPointer->PrintData();
 }
 
-DynamicTensor DynamicTensor::operator=(DynamicTensor& Other)
-{
-    DynamicTensor Res;
-    Res.TensorPointer = Other.TensorPointer;
-    return Res;
-}
-DynamicTensor DynamicTensor::operator=(DynamicTensor&& Other)
-{
-    DynamicTensor Res;
-    Res.TensorPointer = Other.TensorPointer;
-    return Res;
-}
-
 void DynamicTensor::Set(DynamicTensor* ThisTensor, const DynamicTensor* OtherTensor)
 {
     ThisTensor->TensorPointer = OtherTensor->TensorPointer;
@@ -51,5 +38,7 @@ DynamicTensor DynamicTensor::Add(DynamicTensor& InputFirst, DynamicTensor& Input
     if (!RequiresGrad)return Res;
     Res.Ops.DynamicOpsType = OpsType::Add;
     Res.Ops.InputOpsList = {DynamicOps(&InputFirst), DynamicOps(&InputSecond)};
+    InputFirst.OutNodeList.push_back(&Res);
+    InputSecond.OutNodeList.push_back(&Res);
     return Res;
 }
