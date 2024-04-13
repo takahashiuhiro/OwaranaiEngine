@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <string>
 
 struct OpsType
 {
@@ -16,4 +17,11 @@ struct OpsType
     static const size_t Pow = 10;//幂次
     static const size_t EleExp = 11;//指数函数
     static const size_t View = 12;//改变张量shape
+
+    static const std::string DumpToString(size_t InputOpsType)
+    {
+        if (InputOpsType == Base)return "Base";
+        if (InputOpsType == NoneOps)return "NoneOps";
+        if (InputOpsType == Add)return "Add";
+    }
 };

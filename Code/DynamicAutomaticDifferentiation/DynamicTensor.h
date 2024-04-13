@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include <memory>
+#include <set>
 #include "../CommonMathMoudle/Tensor.h"
 #include "../CommonDataStructure/HyperElement.h"
 #include "../CommonMathMoudle/OpsType.h"
@@ -28,7 +29,7 @@ public:
     /**动态张量的成员变量.*/
     std::shared_ptr<Tensor> TensorPointer = nullptr;
     DynamicOps Ops;
-    std::vector<DynamicTensor*>OutNodeList;//输出节点，只有在需要求导的时候可用
+    std::set<DynamicTensor*>OutNodeList;//输出节点，只有在需要求导的时候可用
 
     /**初始化动态张量.*/
     DynamicTensor(){};
@@ -44,6 +45,8 @@ public:
 
     /**析构函数释放内存.*/
     ~DynamicTensor();
+    void SetOutputList(DynamicOps&CurOps,DynamicTensor* TargetOutputNode);
+    void SetInputList(DynamicOps& CurOps, DynamicTensor* TargetOutputNode);
 
     /**Tensor内函数组装.*/
     void PrintData();
@@ -51,6 +54,7 @@ public:
     /**运算符重载.*/
 
     /**计算图逻辑.*/
+    static void SetForwardHistory(DynamicTensor&InputRes ,size_t InputOptType, std::vector<DynamicTensor*>OpsList, bool IsRequiresGrad);
     
     /**运算符重载逻辑.*/
     void Set(DynamicTensor* ThisTensor, const DynamicTensor* OtherTensor);

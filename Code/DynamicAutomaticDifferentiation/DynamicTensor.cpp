@@ -15,14 +15,41 @@ DynamicTensor DynamicTensor::CreateVector(std::vector<float>InputData, size_t De
 
 DynamicTensor::~DynamicTensor()
 {
-    //todo::把inputlist里的节点的output都改成自己的output，用dfs
-    for (size_t a = 0; a < OutNodeList.size(); a++)
-    {
-        //todo::通过dfs查询output节点里用过自己的位置修改为一个dynamicops
-    }
+    SetOutputList(Ops,this);
+    for (auto& element : OutNodeList)SetInputList(element->Ops, this);
     if(TensorPointer!=nullptr)
     {
         TensorPointer.reset();
+    }
+}
+
+void DynamicTensor::SetOutputList(DynamicOps& CurOps, DynamicTensor* TargetOutputNode)
+{
+    for (size_t a = 0; a < CurOps.InputOpsList.size(); a++)
+    {
+        if (CurOps.InputOpsList[a].leafNode != nullptr)
+        {
+            for (auto& element : TargetOutputNode->OutNodeList)CurOps.InputOpsList[a].leafNode->OutNodeList.insert(element);
+            CurOps.InputOpsList[a].leafNode->OutNodeList.erase(TargetOutputNode);
+            continue;
+        }
+        SetOutputList(CurOps.InputOpsList[a], TargetOutputNode);
+    }
+}
+
+void DynamicTensor::SetInputList(DynamicOps& CurOps, DynamicTensor* TargetOutputNode)
+{
+    for (size_t a = 0; a < CurOps.InputOpsList.size(); a++)
+    {
+        if (CurOps.InputOpsList[a].leafNode !=nullptr)
+        {
+            if (CurOps.InputOpsList[a].leafNode == TargetOutputNode)
+            {
+                CurOps.InputOpsList[a] = TargetOutputNode->Ops;
+                CurOps.InputOpsList[a].leafNode = nullptr;
+            }
+        }
+        else SetInputList(CurOps.InputOpsList[a], TargetOutputNode);
     }
 }
 
@@ -31,19 +58,27 @@ void DynamicTensor::PrintData()
     TensorPointer->PrintData();
 }
 
+void DynamicTensor::SetForwardHistory(DynamicTensor& InputRes, size_t InputOptType, std::vector<DynamicTensor*>OpsList, bool IsRequiresGrad)
+{   
+    if (!IsRequiresGrad)return;
+    InputRes.Ops.DynamicOpsType = InputOptType;
+    InputRes.Ops.InputOpsList = {};
+    for (size_t a = 0; a < OpsList.size(); a++)
+    {
+        InputRes.Ops.InputOpsList.push_back(DynamicOps(OpsList[a]));
+        OpsList[a]->OutNodeList.insert(&InputRes);
+    }
+}
+
 void DynamicTensor::Set(DynamicTensor* ThisTensor, const DynamicTensor* OtherTensor)
 {
     ThisTensor->TensorPointer = OtherTensor->TensorPointer;
     ThisTensor->Ops = OtherTensor->Ops;
 }
 
-DynamicTensor DynamicTensor::Add(DynamicTensor& InputFirst, DynamicTensor& InputSecond, bool RequiresGrad)
+DynamicTensor DynamicTensor::Add(DynamicTensor& InputFirst, DynamicTensor& InputSecond, bool IsRequiresGrad)
 {
     DynamicTensor Res = DynamicTensor(std::shared_ptr<Tensor>(InputFirst.TensorPointer->Add(InputSecond.TensorPointer.get())));
-    if (!RequiresGrad)return Res;
-    Res.Ops.DynamicOpsType = OpsType::Add;
-    Res.Ops.InputOpsList = {DynamicOps(&InputFirst), DynamicOps(&InputSecond)};
-    InputFirst.OutNodeList.push_back(&Res);
-    InputSecond.OutNodeList.push_back(&Res);
+    SetForwardHistory(Res, OpsType::Add, { &InputFirst ,&InputSecond }, IsRequiresGrad);
     return Res;
 }
