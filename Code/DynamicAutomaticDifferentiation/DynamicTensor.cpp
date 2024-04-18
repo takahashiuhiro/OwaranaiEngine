@@ -4,10 +4,15 @@
 DynamicTensor::DynamicTensor(){};
 DynamicTensor::DynamicTensor(std::shared_ptr<Tensor> InputTensorPointer, bool InputRequiresGrad)
 {
-	RequiresGrad = InputRequiresGrad;
 	Ops = std::make_shared<DynamicOps>();//每个动态张量都需要算子
 	Ops->TensorPointer = InputTensorPointer;
+	Ops->RequiresGrad = InputRequiresGrad;
 	Ops->LeafNode = this;//算子连回自家张量的途径
+}
+DynamicTensor::DynamicTensor(std::shared_ptr<DynamicOps>InputOps)
+{
+	Ops = InputOps;
+	Ops->LeafNode = this;
 }
 
 void DynamicTensor::OpsSetInMap()
@@ -23,7 +28,7 @@ DynamicTensor::~DynamicTensor()
 DynamicTensor DynamicTensor::SetComputationalHistory(Tensor* ResTensor, std::vector<DynamicTensor>InputList, he InputPrams, size_t InputOpsType, bool RequiresGrad)
 {
 	bool MaxRequiresGrad = 0;
-	for (size_t a = 0; a < InputList.size(); a++)MaxRequiresGrad |= InputList[a].RequiresGrad;
+	for (size_t a = 0; a < InputList.size(); a++)MaxRequiresGrad |= InputList[a].Ops->RequiresGrad;
 	DynamicTensor Res(std::shared_ptr<Tensor>(ResTensor), MaxRequiresGrad&RequiresGrad);
 	if (!RequiresGrad)return Res;
 	Res.Ops->DynamicOpsType = InputOpsType;
@@ -38,7 +43,8 @@ DynamicTensor DynamicTensor::SetComputationalHistory(Tensor* ResTensor, std::vec
 
 void DynamicTensor::Backward()
 {
-
+	//声明存放ops_s->pair(ops_e,result)的map，来看output的导数攒齐几个了
+	//攒齐了就合入计算图，建立新节点继续dfs
 }
 
 
