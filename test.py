@@ -7,14 +7,23 @@ import typing
 import random
 import tqdm
 
-a = torch.Tensor([1,2,3])
-a.requires_grad = True
-b = torch.Tensor([10,20,30])
-b.requires_grad = True
 
-c = a*b - torch.Tensor([1,1,1])
+q1 = torch.tensor([2.,3],requires_grad = True)
+q2 = torch.tensor([4.,7],requires_grad = True)
+q3 = torch.tensor([2.,3],requires_grad = True)
+q4 = torch.tensor([4.,7],requires_grad = True)
+q5 = torch.tensor([2.,3],requires_grad = True)
+q6 = torch.tensor([4.,7],requires_grad = True)
+e1 = q1+q2
+e2 = e1+q3
+e3 = e2+q4
+e4 = e3+q5
+e7 = q1+e4
+e8 = e4+q6
+e9 = e7+e8
+e10= e9+q6
+e11 = e10+e9
 
-c.backward(torch.Tensor([1,1,1]))
-
-print(a.grad)
-print(b.grad)
+e22 = torch.tensor([99,100.])
+e11.backward(e22)
+print(q1.grad)

@@ -1,13 +1,17 @@
 #include "DynamicTensor.h"
+#include "../CommonMathMoudle/OpsType.h"
 
-
-DynamicTensor::DynamicTensor(){};
+DynamicTensor::DynamicTensor()
+{
+	OpsSetInMap();
+};
 DynamicTensor::DynamicTensor(std::shared_ptr<Tensor> InputTensorPointer, bool InputRequiresGrad)
 {
-	Ops = std::make_shared<DynamicOps>();//每个动态张量都需要算子
+	Ops = std::make_shared<DynamicOps>();
 	Ops->TensorPointer = InputTensorPointer;
 	Ops->RequiresGrad = InputRequiresGrad;
-	Ops->LeafNode = this;//算子连回自家张量的途径
+	Ops->LeafNode = this;
+	OpsSetInMap();
 }
 DynamicTensor::DynamicTensor(std::shared_ptr<DynamicOps>InputOps)
 {
@@ -17,12 +21,12 @@ DynamicTensor::DynamicTensor(std::shared_ptr<DynamicOps>InputOps)
 
 void DynamicTensor::OpsSetInMap()
 {
-	ForwardOpsMap[OpsType::Add] = Add;
+	BackwardOps[OpsType::Add] = DynamicStdOps_Backward_Add;
 }
 
 DynamicTensor::~DynamicTensor()
 {
-	Ops->LeafNode = nullptr;//此时算子和动态张量会脱离
+	if(Ops->LeafNode == this)Ops->LeafNode = nullptr;
 }
 
 DynamicTensor DynamicTensor::SetComputationalHistory(Tensor* ResTensor, std::vector<DynamicTensor>InputList, he InputPrams, size_t InputOpsType, bool RequiresGrad)
@@ -41,17 +45,98 @@ DynamicTensor DynamicTensor::SetComputationalHistory(Tensor* ResTensor, std::vec
 	return Res;
 }
 
-void DynamicTensor::Backward()
+void DynamicTensor::Backward(DynamicTensor* Loss)
 {
-	//声明存放ops_s->pair(ops_e,result)的map，来看output的导数攒齐几个了
-	//攒齐了就合入计算图，建立新节点继续dfs
+	std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>BackwardOpsMap;
+	std::map<DynamicOps*, int>OutputSetSize;
+	GetAllOutputSizeBeforeBackward(OutputSetSize, Ops);
+	BackwardDFS(BackwardOpsMap, OutputSetSize,Loss, Ops);
 }
 
-
-
-DynamicTensor DynamicTensor::Add(std::vector<DynamicTensor>InputList, he InputPrams, bool RequiresGrad)
+void DynamicTensor::BackwardDFS(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::map<DynamicOps*, int>& OutputSetSize, DynamicTensor* Loss, std::shared_ptr<DynamicOps>CurOps)
 {
-	auto ResTensorContent = InputList[0].Ops->TensorPointer->Add(InputList[1].Ops->TensorPointer.get());
+	if (CheckPartialGradReady(BackwardOpsMap,OutputSetSize, CurOps))
+	{
+		if (CurOps->OutputOpsSet.empty())
+		{
+			GenEmptyGradDynamicTensor(Loss);
+		}
+		else
+		{
+			std::vector<DynamicOps*>OutputList;
+			for (auto Item : CurOps->OutputOpsSet)OutputList.push_back(Item);
+			DynamicTensor ThisOpsGradRes = DynamicTensor(BackwardOpsMap[CurOps.get()][OutputList[0]]);
+			for (size_t a = 1; a < OutputList.size(); a++)
+			{
+				ThisOpsGradRes = DynamicTensor::DynamicStdOps_Forward_Add({ ThisOpsGradRes, DynamicTensor(BackwardOpsMap[CurOps.get()][OutputList[a]]) },he(), true);
+			}
+			auto DynamicTensorGrad = std::make_shared<DynamicTensor>(ThisOpsGradRes.Ops);
+			Grad = DynamicTensorGrad;
+			CurOps->GradOps = Grad->Ops;
+		}
+		if(BackwardOps.find(CurOps->DynamicOpsType)!=BackwardOps.end())BackwardOps[CurOps->DynamicOpsType](BackwardOpsMap,CurOps);//通閫氳繃绠楀瓙浼犺緭partial grad
+		for (size_t a = 0; a < CurOps->InputOpsList.size(); a++)
+		{
+			if (!CurOps->InputOpsList[a]->RequiresGrad)continue;//涓嶉渶瑕佹眰瀵肩殑涓嶇敤dfs
+			BackwardDFS(BackwardOpsMap, OutputSetSize, Loss, CurOps->InputOpsList[a]);
+		}
+	}
+	else
+	{
+		return;
+	}
+}
+
+bool DynamicTensor::CheckPartialGradReady(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>&BackwardOpsMap, std::map<DynamicOps*, int>& OutputSetSize, std::shared_ptr<DynamicOps>CurOps)
+{
+	if (BackwardOpsMap.find(CurOps.get()) == BackwardOpsMap.end())
+	{
+		BackwardOpsMap[CurOps.get()] = {};
+	}
+	return BackwardOpsMap[CurOps.get()].size() == OutputSetSize[CurOps.get()];
+}
+
+void DynamicTensor::GenEmptyGradDynamicTensor(DynamicTensor* Loss)
+{
+	Tensor* GradResTensor;
+	if(Loss == nullptr)GradResTensor = Ops->TensorPointer->Copy();
+	else GradResTensor = Loss->Ops->TensorPointer->Copy();
+	auto DynamicTensorGrad = std::make_shared<DynamicTensor>(std::shared_ptr<Tensor>(GradResTensor), Ops->RequiresGrad);
+	Grad = DynamicTensorGrad;
+	Ops->GradOps = Grad->Ops;
+}
+
+void DynamicTensor::GetAllOutputSizeBeforeBackward(std::map<DynamicOps*, int>& OutputSetSize, std::shared_ptr<DynamicOps>CurOps)
+{
+	if (OutputSetSize.find(CurOps.get()) != OutputSetSize.end())return;
+	OutputSetSize[CurOps.get()] = CurOps->OutputOpsSet.size();
+	for (size_t a = 0; a < CurOps->InputOpsList.size(); a++)
+	{
+		GetAllOutputSizeBeforeBackward(OutputSetSize, CurOps->InputOpsList[a]);
+	}
+}
+
+DynamicTensor DynamicTensor::DynamicStdOps_Forward_Add(std::vector<DynamicTensor>InputList, he InputPrams, bool RequiresGrad)
+{
+	auto ResTensorContent = InputList[0].Ops->TensorPointer->Copy();
+	for (size_t a = 1; a < InputList.size(); a++)
+	{
+		Tensor* TMPTensor = ResTensorContent->Add(InputList[a].Ops->TensorPointer.get());
+		delete ResTensorContent;
+		ResTensorContent = TMPTensor;
+	}
 	return SetComputationalHistory(ResTensorContent, InputList, InputPrams,OpsType::Add, RequiresGrad);
 }
-
+void DynamicTensor::DynamicStdOps_Backward_Add(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps)
+{
+	for (size_t a = 0; a < CurOps->InputOpsList.size(); a++)
+	{
+		if (!CurOps->InputOpsList[a]->RequiresGrad)continue;
+		if(BackwardOpsMap.find(CurOps->InputOpsList[a].get()) == BackwardOpsMap.end())
+		{
+			BackwardOpsMap[CurOps->InputOpsList[a].get()] = {};
+		}
+		auto AddRes = DynamicTensor::DynamicStdOps_Forward_Add({DynamicTensor(CurOps->GradOps)},he(),true);
+		BackwardOpsMap[CurOps->InputOpsList[a].get()][CurOps.get()] =AddRes.Ops;
+	}
+}

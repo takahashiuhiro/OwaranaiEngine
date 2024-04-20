@@ -31,8 +31,7 @@ public:
     /**动态张量的成员变量.*/
     std::shared_ptr<DynamicOps>Ops = nullptr;//每个动态张量的算子，如果张量被删掉但是需要计算图，这个算子可以交出去，交出去的时候需要删掉算子中的leafNode变量为nullptr
     std::shared_ptr<DynamicTensor>Grad = nullptr;
-    std::map<size_t, DynamicTensor(*)(std::vector<DynamicTensor>, he, bool)>ForwardOpsMap;
-    //std::map<size_t, DynamicTensor(*)(std::vector<DynamicTensor*>, he, bool)>BackwardOpsMap;应该有，但可能不是这个类型
+    std::map<size_t, void(*)(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& ,std::shared_ptr<DynamicOps>)>BackwardOps;//反向函数map
 
     /**内存管理.*/
     DynamicTensor();//初始化动态张量
@@ -48,10 +47,15 @@ public:
 
     /**计算图逻辑.*/
     static DynamicTensor SetComputationalHistory(Tensor* ResTensor, std::vector<DynamicTensor>InputList, he InputPrams,size_t InputOpsType, bool RequiresGrad);
-    void Backward();//从这里开始反向传播,
+    void Backward(DynamicTensor* Loss = nullptr);//从这里开始反向传播
+    void BackwardDFS(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>&BackwardOpsMap, std::map<DynamicOps*, int>& OutputSetSize, DynamicTensor* Loss, std::shared_ptr<DynamicOps>CurOps);
+    bool CheckPartialGradReady(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::map<DynamicOps*, int>& OutputSetSize, std::shared_ptr<DynamicOps>CurOps);
+    void GenEmptyGradDynamicTensor(DynamicTensor* Loss);
+    void GetAllOutputSizeBeforeBackward(std::map<DynamicOps*, int>& OutputSetSize,std::shared_ptr<DynamicOps>CurOps);
 
     /**运算符重载逻辑.*/
 
     /**算子.*/
-    static DynamicTensor Add(std::vector<DynamicTensor>InputList, he InputPrams, bool RequiresGrad = false);
+    static DynamicTensor DynamicStdOps_Forward_Add(std::vector<DynamicTensor>InputList, he InputPrams, bool RequiresGrad = false);
+    static void DynamicStdOps_Backward_Add(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>&BackwardOpsMap,std::shared_ptr<DynamicOps>CurOps);
 };
