@@ -54,6 +54,8 @@ public:
     void GetAllOutputSizeBeforeBackward(std::map<DynamicOps*, int>& OutputSetSize,std::shared_ptr<DynamicOps>CurOps);
 
     /**运算符重载逻辑.*/
+    DynamicTensor operator+(DynamicTensor Other);
+
 
     /**算子.*/
     static DynamicTensor DynamicStdOps_Forward_Add(std::vector<DynamicTensor>InputList, he InputPrams, bool RequiresGrad = false);

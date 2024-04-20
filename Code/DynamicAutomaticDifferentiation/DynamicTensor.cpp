@@ -116,6 +116,11 @@ void DynamicTensor::GetAllOutputSizeBeforeBackward(std::map<DynamicOps*, int>& O
 	}
 }
 
+DynamicTensor DynamicTensor::operator+(DynamicTensor Other)
+{
+	return DynamicStdOps_Forward_Add({ *this, Other }, he(), true);
+}
+
 DynamicTensor DynamicTensor::DynamicStdOps_Forward_Add(std::vector<DynamicTensor>InputList, he InputPrams, bool RequiresGrad)
 {
 	auto ResTensorContent = InputList[0].Ops->TensorPointer->Copy();
