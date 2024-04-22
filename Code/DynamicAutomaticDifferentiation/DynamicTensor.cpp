@@ -49,6 +49,12 @@ DynamicTensor::~DynamicTensor()
 	if(Ops->LeafNode == this)Ops->LeafNode = nullptr;
 }
 
+DynamicTensor DynamicTensor::GetGrad()
+{
+	Log::Assert(Ops->GradOps != nullptr, "This DynamicTensor Has No Grad");
+	return DynamicTensor(Ops->GradOps);
+}
+
 void DynamicTensor::PrintData()
 {
 	Ops->TensorPointer->PrintData();

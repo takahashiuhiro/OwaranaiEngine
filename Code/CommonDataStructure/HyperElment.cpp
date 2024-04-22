@@ -357,6 +357,11 @@ std::string he::DumpToString()
     return "";
 }
 
+void he::PrintData()
+{
+    print(DumpToString());
+}
+
 size_t he::CheckMatch(std::string Input)
 {
     int StrFlag = 0;//双引号个数

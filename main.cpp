@@ -8,11 +8,6 @@
 #include <iostream>
 #include "Code/DynamicAutomaticDifferentiation/DynamicTensor.h"
 
-DynamicTensor rt(DynamicTensor q1, DynamicTensor q2,DynamicTensor q3,DynamicTensor q4)
-{
-	return q1%q2%q3%q4;
-}
-
 int main() 
 {
 	DynamicTensor q1({ 2,3 }, 1);
@@ -25,14 +20,13 @@ int main()
 	q3.Fill(3);
 	q4.Fill(4);
 
-	DynamicTensor e1 = rt(q1,q2,q3,q4);
-
-	e1.PrintData();
+	DynamicTensor e1 = q1%q2%q3%q4;
+	print(e1);
+	print(55);
+	print(-66);
+	print("asdasd");
 
 	e1.Backward();
 
-	q1.Ops->GradOps->TensorPointer->PrintData();
-	q2.Ops->GradOps->TensorPointer->PrintData();
-	q3.Ops->GradOps->TensorPointer->PrintData();
-	q4.Ops->GradOps->TensorPointer->PrintData();
+	print(q1.GetGrad());
 }

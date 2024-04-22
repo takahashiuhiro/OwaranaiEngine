@@ -79,6 +79,7 @@ struct he
 
     /**公共函数.*/
     std::string DumpToString();//dump成字符串
+    void PrintData();
     static he LoadFromString(std::string Input);//仅限list, dict, string, float, int五个类型的嵌套
     static size_t CheckMatch(std::string Input);
 

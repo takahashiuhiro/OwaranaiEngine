@@ -45,6 +45,9 @@ public:
 
     ~DynamicTensor();//析构函数释放内存
 
+    /**公共函数.*/
+    DynamicTensor GetGrad();
+
     /**Tensor内函数组装.*/
     void PrintData();
     void Fill(float InputValue);

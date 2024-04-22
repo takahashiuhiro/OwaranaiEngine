@@ -97,3 +97,12 @@ std::string LoadFromFileString(std::ifstream& OpenedFile)
     std::string ReturnString(Buffer, OutputStringLength);
     return ReturnString;
 }
+
+void print(int Input);
+void print(std::string Input);
+void print(float Input);
+void print(double Input);
+void print(const char* Input);
+void print(size_t Input);
+template<typename T>
+void print(T Input){Input.PrintData();}

@@ -2,6 +2,7 @@
 ## 关于项目内容介绍  
 
 项目内容为纯C++手写深度学习框架项目, 目前其中主要包含几个模块:  
+0. 对于深度学习框架的核心自动微分模块提供了两种不同的实现，动态计算图/静态计算图  
 1. 张量的基本操作  
 2. 计算图与自动微分(前向与反向)  
 3. 神经网络层(类似nn.module, 对计算图进行封装, 以达到方便使用, 复用逻辑的目的)  
@@ -32,10 +33,20 @@ todo
 只要装了g++就能跑起来, 检测不到cuda会编译C++版
 
 ## 关于项目运行方法  
-
+1. wsl/ubuntu:  
 git clone https://github.com/takahashiuhiro/OwaranaiEngine.git  
 cd build  
 cmake ../  
 make  
 ./OwaranaiEngineMain  
+
+2. windows:  
+git clone https://github.com/takahashiuhiro/OwaranaiEngine.git  
+新建一个空白的vs工程  
+把整个项目根目录放入空白工程下  
+打开工程  
+在右侧资源管理器下找到OwaranaiEngine  
+右键选中 包括在项目中  
+右键解决方案 生成  
+ctrl+F5编译运行  
 
