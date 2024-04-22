@@ -17,11 +17,31 @@ DynamicTensor::DynamicTensor(std::shared_ptr<DynamicOps>InputOps)
 {
 	Ops = InputOps;
 	Ops->LeafNode = this;
+	OpsSetInMap();
 }
 
-void DynamicTensor::OpsSetInMap()
+DynamicTensor::DynamicTensor(std::vector<size_t>InputShape, bool InputRequiresGrad, size_t DeviceNum)
 {
-	BackwardOps[OpsType::Add] = DynamicStdOps_Backward_Add;
+	Ops = std::make_shared<DynamicOps>();
+	Ops->TensorPointer = std::make_shared<Tensor>(InputShape, DeviceNum);
+	Ops->RequiresGrad = InputRequiresGrad;
+	Ops->LeafNode = this;
+	OpsSetInMap();
+}
+
+DynamicTensor::DynamicTensor(std::vector<size_t>InputShape, std::vector<float>InputData, bool InputRequiresGrad, size_t DeviceNum)
+{
+	Ops = std::make_shared<DynamicOps>();
+	Ops->TensorPointer = std::make_shared<Tensor>(InputShape, DeviceNum, InputData);
+	Ops->RequiresGrad = InputRequiresGrad;
+	Ops->LeafNode = this;
+	OpsSetInMap();
+}
+
+DynamicTensor DynamicTensor::CreateVector(std::vector<float>InputData, bool InputRequiresGrad, size_t DeviceNum)
+{
+	std::vector<size_t>InputShape = { 1,InputData.size() };
+	return DynamicTensor(InputShape, InputData, InputRequiresGrad, DeviceNum);
 }
 
 DynamicTensor::~DynamicTensor()
@@ -29,11 +49,22 @@ DynamicTensor::~DynamicTensor()
 	if(Ops->LeafNode == this)Ops->LeafNode = nullptr;
 }
 
+void DynamicTensor::PrintData()
+{
+	Ops->TensorPointer->PrintData();
+}
+
+void DynamicTensor::Fill(float InputValue)
+{
+	Ops->TensorPointer->FillArray(InputValue);
+}
+
 DynamicTensor DynamicTensor::SetComputationalHistory(Tensor* ResTensor, std::vector<DynamicTensor>InputList, he InputPrams, size_t InputOpsType, bool RequiresGrad)
 {
-	bool MaxRequiresGrad = 0;
+	bool MaxRequiresGrad = 0,MaxIsEval = 0;
 	for (size_t a = 0; a < InputList.size(); a++)MaxRequiresGrad |= InputList[a].Ops->RequiresGrad;
-	DynamicTensor Res(std::shared_ptr<Tensor>(ResTensor), MaxRequiresGrad&RequiresGrad);
+	for (size_t a = 0; a < InputList.size(); a++)MaxIsEval |= InputList[a].Ops->IsEval;
+	DynamicTensor Res(std::shared_ptr<Tensor>(ResTensor), MaxRequiresGrad&RequiresGrad&(!MaxIsEval));
 	if (!RequiresGrad)return Res;
 	Res.Ops->DynamicOpsType = InputOpsType;
 	Res.Ops->Params = InputPrams;
@@ -47,32 +78,39 @@ DynamicTensor DynamicTensor::SetComputationalHistory(Tensor* ResTensor, std::vec
 
 void DynamicTensor::Backward(DynamicTensor* Loss)
 {
+	Log::Assert(Ops->OutputOpsSet.size() == 0, "DynamicTensor Backward Must Be Output Data");
 	std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>BackwardOpsMap;
-	std::map<DynamicOps*, int>OutputSetSize;
+	std::map<DynamicOps*, std::set<DynamicOps*>>OutputSetSize;
 	GetAllOutputSizeBeforeBackward(OutputSetSize, Ops);
 	BackwardDFS(BackwardOpsMap, OutputSetSize,Loss, Ops);
 }
 
-void DynamicTensor::BackwardDFS(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::map<DynamicOps*, int>& OutputSetSize, DynamicTensor* Loss, std::shared_ptr<DynamicOps>CurOps)
+void DynamicTensor::BackwardDFS(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::map<DynamicOps*, std::set<DynamicOps*>>& OutputSetSize, DynamicTensor* Loss, std::shared_ptr<DynamicOps>CurOps)
 {
 	if (CheckPartialGradReady(BackwardOpsMap,OutputSetSize, CurOps))
 	{
-		if (CurOps->OutputOpsSet.empty())
+		if (OutputSetSize[CurOps.get()].empty())
 		{
 			GenEmptyGradDynamicTensor(Loss);
 		}
 		else
 		{
 			std::vector<DynamicOps*>OutputList;
-			for (auto Item : CurOps->OutputOpsSet)OutputList.push_back(Item);
+			for (auto Item : OutputSetSize[CurOps.get()])OutputList.push_back(Item);
 			DynamicTensor ThisOpsGradRes = DynamicTensor(BackwardOpsMap[CurOps.get()][OutputList[0]]);
 			for (size_t a = 1; a < OutputList.size(); a++)
 			{
 				ThisOpsGradRes = DynamicTensor::DynamicStdOps_Forward_Add({ ThisOpsGradRes, DynamicTensor(BackwardOpsMap[CurOps.get()][OutputList[a]]) },he(), true);
 			}
 			auto DynamicTensorGrad = std::make_shared<DynamicTensor>(ThisOpsGradRes.Ops);
-			Grad = DynamicTensorGrad;
-			CurOps->GradOps = Grad->Ops;
+			CurOps->GradOps = DynamicTensorGrad->Ops;
+		}
+		for (size_t a = 0; a < CurOps->InputOpsList.size(); a++)
+		{
+			if (BackwardOpsMap.find(CurOps->InputOpsList[a].get()) == BackwardOpsMap.end())
+			{
+				BackwardOpsMap[CurOps->InputOpsList[a].get()] = {};
+			}
 		}
 		if(BackwardOps.find(CurOps->DynamicOpsType)!=BackwardOps.end())BackwardOps[CurOps->DynamicOpsType](BackwardOpsMap,CurOps);//ͨ通过算子传输partial grad
 		for (size_t a = 0; a < CurOps->InputOpsList.size(); a++)
@@ -87,13 +125,13 @@ void DynamicTensor::BackwardDFS(std::map<DynamicOps*, std::map<DynamicOps*, std:
 	}
 }
 
-bool DynamicTensor::CheckPartialGradReady(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>&BackwardOpsMap, std::map<DynamicOps*, int>& OutputSetSize, std::shared_ptr<DynamicOps>CurOps)
+bool DynamicTensor::CheckPartialGradReady(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>&BackwardOpsMap, std::map<DynamicOps*, std::set<DynamicOps*>>& OutputSetSize, std::shared_ptr<DynamicOps>CurOps)
 {
 	if (BackwardOpsMap.find(CurOps.get()) == BackwardOpsMap.end())
 	{
 		BackwardOpsMap[CurOps.get()] = {};
 	}
-	return BackwardOpsMap[CurOps.get()].size() == OutputSetSize[CurOps.get()];
+	return BackwardOpsMap[CurOps.get()].size() == OutputSetSize[CurOps.get()].size();
 }
 
 void DynamicTensor::GenEmptyGradDynamicTensor(DynamicTensor* Loss)
@@ -106,10 +144,10 @@ void DynamicTensor::GenEmptyGradDynamicTensor(DynamicTensor* Loss)
 	Ops->GradOps = Grad->Ops;
 }
 
-void DynamicTensor::GetAllOutputSizeBeforeBackward(std::map<DynamicOps*, int>& OutputSetSize, std::shared_ptr<DynamicOps>CurOps)
+void DynamicTensor::GetAllOutputSizeBeforeBackward(std::map<DynamicOps*, std::set<DynamicOps*>>& OutputSetSize, std::shared_ptr<DynamicOps>CurOps)
 {
 	if (OutputSetSize.find(CurOps.get()) != OutputSetSize.end())return;
-	OutputSetSize[CurOps.get()] = CurOps->OutputOpsSet.size();
+	OutputSetSize[CurOps.get()] = CurOps->OutputOpsSet;
 	for (size_t a = 0; a < CurOps->InputOpsList.size(); a++)
 	{
 		GetAllOutputSizeBeforeBackward(OutputSetSize, CurOps->InputOpsList[a]);
@@ -118,30 +156,32 @@ void DynamicTensor::GetAllOutputSizeBeforeBackward(std::map<DynamicOps*, int>& O
 
 DynamicTensor DynamicTensor::operator+(DynamicTensor Other)
 {
-	return DynamicStdOps_Forward_Add({ *this, Other }, he(), true);
+	if (Other.Ops.get() != Ops.get())
+	{
+		//todo::检测广播
+		return DynamicStdOps_Forward_Add({ *this, Other }, he(), true);
+	}
+	else
+	{
+		return DynamicStdOps_Forward_Add({ *this, DynamicStdOps_Forward_Add({Other},he(),true) }, he(), true);
+	}
 }
 
-DynamicTensor DynamicTensor::DynamicStdOps_Forward_Add(std::vector<DynamicTensor>InputList, he InputPrams, bool RequiresGrad)
+DynamicTensor DynamicTensor::operator%(DynamicTensor Other)
 {
-	auto ResTensorContent = InputList[0].Ops->TensorPointer->Copy();
-	for (size_t a = 1; a < InputList.size(); a++)
+	if (Other.Ops.get() != Ops.get())
 	{
-		Tensor* TMPTensor = ResTensorContent->Add(InputList[a].Ops->TensorPointer.get());
-		delete ResTensorContent;
-		ResTensorContent = TMPTensor;
+		//todo::检测广播
+		he MatmulParams = he::NewDict();
+		MatmulParams["is_input_1st_T"] = false;
+		MatmulParams["is_input_2nd_T"] = false;
+		return DynamicStdOps_Forward_Matmul({ *this, Other }, MatmulParams, true);
 	}
-	return SetComputationalHistory(ResTensorContent, InputList, InputPrams,OpsType::Add, RequiresGrad);
-}
-void DynamicTensor::DynamicStdOps_Backward_Add(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps)
-{
-	for (size_t a = 0; a < CurOps->InputOpsList.size(); a++)
+	else
 	{
-		if (!CurOps->InputOpsList[a]->RequiresGrad)continue;
-		if(BackwardOpsMap.find(CurOps->InputOpsList[a].get()) == BackwardOpsMap.end())
-		{
-			BackwardOpsMap[CurOps->InputOpsList[a].get()] = {};
-		}
-		auto AddRes = DynamicTensor::DynamicStdOps_Forward_Add({DynamicTensor(CurOps->GradOps)},he(),true);
-		BackwardOpsMap[CurOps->InputOpsList[a].get()][CurOps.get()] =AddRes.Ops;
+		he MatmulParams = he::NewDict();
+		MatmulParams["is_input_1st_T"] = false;
+		MatmulParams["is_input_2nd_T"] = false;
+		return DynamicStdOps_Forward_Matmul({ *this, DynamicStdOps_Forward_Add({Other},he(),true) }, MatmulParams, true);
 	}
 }
