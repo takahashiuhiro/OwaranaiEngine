@@ -20,7 +20,7 @@ int main()
 	q3.Fill(3);
 	q4.Fill(4);
 
-	DynamicTensor e1 = q1%q2%q3%q4;
+	DynamicTensor e1 = q1%q2%q3%q4;	
 	print(e1);
 	print(55);
 	print(-66);
