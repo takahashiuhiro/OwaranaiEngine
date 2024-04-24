@@ -164,8 +164,23 @@ DynamicTensor DynamicTensor::operator+(DynamicTensor Other)
 {
 	if (Other.Ops.get() != Ops.get())
 	{
-		//todo::检测广播
-		return DynamicStdOps_Forward_Add({ *this, Other }, he(), true);
+		Log::Assert(Ops->TensorPointer->shape.size() == Other.Ops->TensorPointer->shape.size(), "DynamicTensor Opeator+ Shape Error,Shape Num!=");
+		he BCParams = he::NewDict();
+		BCParams["BroadCastToShape"] = he::NewList();
+		int BCFlag = 0;
+		for (size_t a = 0; a < Ops->TensorPointer->shape.size(); a++)
+		{
+			int ThisShapeNum = Ops->TensorPointer->shape[a];
+			int OtherShapeNum = Other.Ops->TensorPointer->shape[a];
+			Log::Assert(!(ThisShapeNum != OtherShapeNum &&std::min(ThisShapeNum, OtherShapeNum)!=1), "DynamicTensor Opeator+ Shape Error, Dim Can Not BroadCast");
+			BCParams["BroadCastToShape"].append(std::max(ThisShapeNum, OtherShapeNum));
+			if (ThisShapeNum < OtherShapeNum)BCFlag |= 1;
+			if (ThisShapeNum > OtherShapeNum)BCFlag |= 2;
+		}
+		if(!BCFlag)return DynamicStdOps_Forward_Add({ *this, Other }, he(), true);
+		if (BCFlag == 1)return DynamicStdOps_Forward_Add({ DynamicStdOps_Forward_BroadCastTo({*this}, BCParams,true), Other}, he(), true);
+		if (BCFlag == 2)return DynamicStdOps_Forward_Add({ *this, DynamicStdOps_Forward_BroadCastTo({Other}, BCParams,true) }, he(), true);
+		return DynamicStdOps_Forward_Add({ DynamicStdOps_Forward_BroadCastTo({*this}, BCParams,true), DynamicStdOps_Forward_BroadCastTo({Other},BCParams,true) }, he(), true);
 	}
 	else
 	{

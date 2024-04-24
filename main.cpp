@@ -10,21 +10,15 @@
 
 int main() 
 {
-	DynamicTensor q1({ 2,3 }, 1);
-	DynamicTensor q2({ 3,4 }, 1);
-	DynamicTensor q3({ 4,5 }, 1);
-	DynamicTensor q4({ 5,6 }, 1);
+	DynamicTensor q1({ 3,3 }, 1);
+	DynamicTensor q2({ 3,1 }, 1);
 
 	q1.Fill(1);
 	q2.Fill(2);
-	q3.Fill(3);
-	q4.Fill(4);
 
-	DynamicTensor e1 = q1%q2%q3%q4;	
+	DynamicTensor e1 = q1 + q2;
 	print(e1);
-	print(55);
-	print(-66);
-	print("asdasd");
+
 
 	e1.Backward();
 
