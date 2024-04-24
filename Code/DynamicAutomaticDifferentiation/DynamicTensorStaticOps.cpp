@@ -118,12 +118,25 @@ DynamicTensor DynamicTensor::DynamicStdOps_Forward_BroadCastTo(std::vector<Dynam
 	return SetComputationalHistory(TensorResult, InputList, InputParams, OpsType::BroadCastTo, RequiresGrad);
 }
 void DynamicTensor::DynamicStdOps_Backward_BroadCastTo(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps)
-{
-
+{//todo::≤‚ ‘
+	if (!CurOps->InputOpsList[0]->RequiresGrad)return;
+	std::vector<size_t>BroadCastToShape;
+	for (he a = 0; a < CurOps->Params["BroadCastToShape"].size(); a = a + 1)BroadCastToShape.push_back(CurOps->Params["BroadCastToShape"][a].i());
+	he InputParams = he::NewDict();
+	InputParams["SumDims"] = he::NewList();
+	for (size_t a = 0; a < CurOps->TensorPointer->shape.size(); a++)
+	{
+		if (CurOps->TensorPointer->shape[a] != CurOps->InputOpsList[a]->TensorPointer->shape[a])
+		{
+			InputParams["SumDims"].append(int(a));
+		}
+	}
+	DynamicTensor DynamicTensorRes = DynamicStdOps_Forward_Sum({ DynamicTensor(CurOps->GradOps) }, InputParams, true);
+	BackwardOpsMap[CurOps->InputOpsList[0].get()][CurOps.get()] = DynamicTensorRes.Ops;
 }
 
 DynamicTensor DynamicTensor::DynamicStdOps_Forward_Sum(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad)
-{
+{//todo::≤‚ ‘
 	std::vector<size_t>SumDims;
 	for (he a = 0; a < InputParams["SumDims"].size(); a = a + 1)SumDims.push_back(InputParams["SumDims"][a].i());
 	auto TensorResult = InputList[0].Ops->TensorPointer->Sum(SumDims);
@@ -131,5 +144,5 @@ DynamicTensor DynamicTensor::DynamicStdOps_Forward_Sum(std::vector<DynamicTensor
 }
 void DynamicTensor::DynamicStdOps_Backward_Sum(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps)
 {
-
+	//todo
 }
