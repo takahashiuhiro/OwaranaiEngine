@@ -10,8 +10,8 @@
 
 int main() 
 {
-	DynamicTensor q1({ 3,3 }, 1);
-	DynamicTensor q2({ 3,1 }, 1);
+	DynamicTensor q1({1,3,1,2}, 1);
+	DynamicTensor q2({3,1,2,1}, 1);
 
 	q1.Fill(1);
 	q2.Fill(2);
@@ -23,4 +23,5 @@ int main()
 	e1.Backward();
 
 	print(q1.GetGrad());
+	print(q2.GetGrad());
 }

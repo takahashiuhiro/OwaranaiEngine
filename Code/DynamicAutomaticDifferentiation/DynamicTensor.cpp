@@ -160,44 +160,120 @@ void DynamicTensor::GetAllOutputSizeBeforeBackward(std::map<DynamicOps*, std::se
 	}
 }
 
-DynamicTensor DynamicTensor::operator+(DynamicTensor Other)
+DynamicTensor DynamicTensor::ViewAndBC(DynamicTensor ThisDT, DynamicTensor Other, DynamicTensor(*InputFun)(std::vector<DynamicTensor>, he, bool), bool IsMatmul)
 {
-	if (Other.Ops.get() != Ops.get())
-	{
-		Log::Assert(Ops->TensorPointer->shape.size() == Other.Ops->TensorPointer->shape.size(), "DynamicTensor Opeator+ Shape Error,Shape Num!=");
-		he BCParams = he::NewDict();
-		BCParams["BroadCastToShape"] = he::NewList();
-		int BCFlag = 0;
-		for (size_t a = 0; a < Ops->TensorPointer->shape.size(); a++)
+	//View
+	auto ViewFun = [](DynamicTensor L, DynamicTensor S, DynamicTensor(*View)(std::vector<DynamicTensor>, he, bool))
 		{
-			int ThisShapeNum = Ops->TensorPointer->shape[a];
-			int OtherShapeNum = Other.Ops->TensorPointer->shape[a];
-			Log::Assert(!(ThisShapeNum != OtherShapeNum &&std::min(ThisShapeNum, OtherShapeNum)!=1), "DynamicTensor Opeator+ Shape Error, Dim Can Not BroadCast");
-			BCParams["BroadCastToShape"].append(std::max(ThisShapeNum, OtherShapeNum));
-			if (ThisShapeNum < OtherShapeNum)BCFlag |= 1;
-			if (ThisShapeNum > OtherShapeNum)BCFlag |= 2;
-		}
-		if(!BCFlag)return DynamicStdOps_Forward_Add({ *this, Other }, he(), true);
-		if (BCFlag == 1)return DynamicStdOps_Forward_Add({ DynamicStdOps_Forward_BroadCastTo({*this}, BCParams,true), Other}, he(), true);
-		if (BCFlag == 2)return DynamicStdOps_Forward_Add({ *this, DynamicStdOps_Forward_BroadCastTo({Other}, BCParams,true) }, he(), true);
-		return DynamicStdOps_Forward_Add({ DynamicStdOps_Forward_BroadCastTo({*this}, BCParams,true), DynamicStdOps_Forward_BroadCastTo({Other},BCParams,true) }, he(), true);
+			he ViewParams = he::NewDict();
+			ViewParams["ViewDims"] = he::NewList();
+			size_t ResiShape = L.Ops->TensorPointer->shape.size() - S.Ops->TensorPointer->shape.size();
+			for (size_t a = 0; a < ResiShape; a++)ViewParams["ViewDims"].append(1);
+			for (size_t a = 0; a < S.Ops->TensorPointer->shape.size(); a++)ViewParams["ViewDims"].append(int(S.Ops->TensorPointer->shape[a]));
+			return View({ S }, ViewParams, true);
+		};
+	if (!IsMatmul)
+	{
+		if (ThisDT.Ops->TensorPointer->shape.size() < Other.Ops->TensorPointer->shape.size())ThisDT = ViewFun(Other, ThisDT, DynamicStdOps_Forward_View);
+		if (ThisDT.Ops->TensorPointer->shape.size() > Other.Ops->TensorPointer->shape.size())Other = ViewFun(ThisDT, Other, DynamicStdOps_Forward_View);
 	}
 	else
 	{
-		return DynamicStdOps_Forward_Add({ *this, DynamicStdOps_Forward_Add({Other},he(),true) }, he(), true);
+		if (ThisDT.Ops->TensorPointer->shape.size() < Other.Ops->TensorPointer->shape.size())ThisDT = ViewFun(Other, ThisDT, DynamicStdOps_Forward_View);
+		else if (ThisDT.Ops->TensorPointer->shape.size() > Other.Ops->TensorPointer->shape.size())
+		{
+			if (Other.Ops->TensorPointer->shape.size() == 1)
+			{
+				he ViewParams = he::NewDict();
+				ViewParams["ViewDims"] = he::NewList();
+				size_t ResiShape = ThisDT.Ops->TensorPointer->shape.size() - Other.Ops->TensorPointer->shape.size() - 1;
+				for (size_t a = 0; a < ResiShape; a++)ViewParams["ViewDims"].append(1);
+				for (size_t a = 0; a < Other.Ops->TensorPointer->shape.size(); a++)ViewParams["ViewDims"].append(int(Other.Ops->TensorPointer->shape[a]));
+				ViewParams["ViewDims"].append(1);
+				Other = DynamicStdOps_Forward_View({ Other }, ViewParams, true);
+			}
+			else Other = ViewFun(ThisDT, Other, DynamicStdOps_Forward_View);
+		}
+		else
+		{
+			if (Other.Ops->TensorPointer->shape.size() == 1)
+			{
+				he ThisViewParams = he::NewDict();
+				ThisViewParams["ViewDims"] = he::NewList();
+				he OtherViewParams = he::NewDict();
+				OtherViewParams["ViewDims"] = he::NewList();
+				ThisViewParams["ViewDims"].append(1);
+				ThisViewParams["ViewDims"].append(int(ThisDT.Ops->TensorPointer->shape[0]));
+				OtherViewParams["ViewDims"].append(int(Other.Ops->TensorPointer->shape[0]));
+				OtherViewParams["ViewDims"].append(1);
+				ThisDT = DynamicStdOps_Forward_View({ ThisDT }, ThisViewParams, true);
+				Other = DynamicStdOps_Forward_View({ Other }, OtherViewParams, true);
+			}
+		}
+		if (Other.Ops->TensorPointer->shape.size() == 2)
+		{
+			he MatmulParams = he::NewDict();
+			MatmulParams["is_input_1st_T"] = false;
+			MatmulParams["is_input_2nd_T"] = false;
+			return InputFun({ ThisDT, Other }, MatmulParams, true);
+		}
 	}
+	//BC
+	he BCParams = he::NewDict();
+	BCParams["BroadCastToShape"] = he::NewList();
+	int BCFlag = 0;
+	for (size_t a = 0; a < ThisDT.Ops->TensorPointer->shape.size() - 2*IsMatmul; a++)
+	{
+		int ThisShapeNum = ThisDT.Ops->TensorPointer->shape[a];
+		int OtherShapeNum = Other.Ops->TensorPointer->shape[a];
+		Log::Assert(!(ThisShapeNum != OtherShapeNum && std::min(ThisShapeNum, OtherShapeNum) != 1), "DynamicTensor Opeator+ Shape Error, Dim Can Not BroadCast");
+		BCParams["BroadCastToShape"].append(std::max(ThisShapeNum, OtherShapeNum));
+		if (ThisShapeNum < OtherShapeNum)BCFlag |= 1;
+		if (ThisShapeNum > OtherShapeNum)BCFlag |= 2;
+	}
+	if (!IsMatmul)
+	{
+		if (!BCFlag)return InputFun({ ThisDT, Other }, he(), true);
+		if (BCFlag == 1)return InputFun({ DynamicStdOps_Forward_BroadCastTo({ThisDT}, BCParams,true), Other }, he(), true);
+		if (BCFlag == 2)return InputFun({ ThisDT, DynamicStdOps_Forward_BroadCastTo({Other}, BCParams,true) }, he(), true);
+		return InputFun({ DynamicStdOps_Forward_BroadCastTo({ThisDT}, BCParams,true), DynamicStdOps_Forward_BroadCastTo({Other},BCParams,true) }, he(), true);
+	}
+	else
+	{
+		he MatmulParams = he::NewDict();
+		MatmulParams["is_input_1st_T"] = false;
+		MatmulParams["is_input_2nd_T"] = false;
+		if (!BCFlag)return InputFun({ ThisDT, Other }, MatmulParams, true);
+		if (BCFlag == 1)
+		{
+			BCParams["BroadCastToShape"].append(int(ThisDT.Ops->TensorPointer->shape[ThisDT.Ops->TensorPointer->shape.size() - 2]));
+			BCParams["BroadCastToShape"].append(int(ThisDT.Ops->TensorPointer->shape[ThisDT.Ops->TensorPointer->shape.size() - 1]));
+			return InputFun({ DynamicStdOps_Forward_BroadCastTo({ThisDT}, BCParams,true), Other }, MatmulParams, true);
+		}
+		if (BCFlag == 2)
+		{
+			BCParams["BroadCastToShape"].append(int(Other.Ops->TensorPointer->shape[Other.Ops->TensorPointer->shape.size() - 2]));
+			BCParams["BroadCastToShape"].append(int(Other.Ops->TensorPointer->shape[Other.Ops->TensorPointer->shape.size() - 1]));
+			return InputFun({ ThisDT, DynamicStdOps_Forward_BroadCastTo({Other}, BCParams,true) }, MatmulParams, true);
+		}
+		he OtherBCParams = BCParams;
+		BCParams["BroadCastToShape"].append(int(ThisDT.Ops->TensorPointer->shape[ThisDT.Ops->TensorPointer->shape.size() - 2]));
+		BCParams["BroadCastToShape"].append(int(ThisDT.Ops->TensorPointer->shape[ThisDT.Ops->TensorPointer->shape.size() - 1]));
+		OtherBCParams["BroadCastToShape"].append(int(Other.Ops->TensorPointer->shape[Other.Ops->TensorPointer->shape.size() - 2]));
+		OtherBCParams["BroadCastToShape"].append(int(Other.Ops->TensorPointer->shape[Other.Ops->TensorPointer->shape.size() - 1]));
+		return InputFun({ DynamicStdOps_Forward_BroadCastTo({ThisDT}, BCParams,true), DynamicStdOps_Forward_BroadCastTo({Other},OtherBCParams,true) }, MatmulParams, true);
+	}
+}
+
+DynamicTensor DynamicTensor::operator+(DynamicTensor Other)
+{
+	if (Other.Ops.get() != Ops.get())return ViewAndBC(*this, Other, DynamicStdOps_Forward_Add, false);
+	else return DynamicStdOps_Forward_Add({ *this, DynamicStdOps_Forward_Add({Other},he(),true) }, he(), true);
 }
 
 DynamicTensor DynamicTensor::operator%(DynamicTensor Other)
 {
-	if (Other.Ops.get() != Ops.get())
-	{
-		//todo::检测广播
-		he MatmulParams = he::NewDict();
-		MatmulParams["is_input_1st_T"] = false;
-		MatmulParams["is_input_2nd_T"] = false;
-		return DynamicStdOps_Forward_Matmul({ *this, Other }, MatmulParams, true);
-	}
+	if (Other.Ops.get() != Ops.get())return ViewAndBC(*this, Other, DynamicStdOps_Forward_Matmul, true);
 	else
 	{
 		he MatmulParams = he::NewDict();
