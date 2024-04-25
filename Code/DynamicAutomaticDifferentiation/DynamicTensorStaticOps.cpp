@@ -6,6 +6,7 @@ void DynamicTensor::OpsSetInMap()
 	BackwardOps[OpsType::MatMul] = DynamicStdOps_Backward_Matmul;
 	BackwardOps[OpsType::Sum] = DynamicStdOps_Backward_Sum;
 	BackwardOps[OpsType::BroadCastTo] = DynamicStdOps_Backward_BroadCastTo;
+	BackwardOps[OpsType::View] = DynamicStdOps_Backward_View;
 }
 
 
@@ -111,7 +112,7 @@ void DynamicTensor::DynamicStdOps_Backward_Matmul(std::map<DynamicOps*, std::map
 }
 
 DynamicTensor DynamicTensor::DynamicStdOps_Forward_BroadCastTo(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad)
-{
+{//todo::≤‚ ‘
 	std::vector<size_t>BroadCastToShape;
 	for (he a = 0; a < InputParams["BroadCastToShape"].size(); a = a + 1)BroadCastToShape.push_back(InputParams["BroadCastToShape"][a].i());
 	auto TensorResult = InputList[0].Ops->TensorPointer->BroadCastTo(BroadCastToShape);
@@ -143,11 +144,33 @@ DynamicTensor DynamicTensor::DynamicStdOps_Forward_Sum(std::vector<DynamicTensor
 	return SetComputationalHistory(TensorResult, InputList, InputParams, OpsType::Sum, RequiresGrad);
 }
 void DynamicTensor::DynamicStdOps_Backward_Sum(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps)
-{
+{//todo::≤‚ ‘
 	if (!CurOps->InputOpsList[0]->RequiresGrad)return;
 	he InputParams = he::NewDict();
 	InputParams["BroadCastToShape"] = he::NewList();
 	for (size_t a = 0; a < CurOps->InputOpsList[0]->TensorPointer->shape.size(); a++)InputParams["BroadCastToShape"].append(int(CurOps->InputOpsList[0]->TensorPointer->shape[a]));
 	DynamicTensor DynamicTensorRes = DynamicStdOps_Forward_BroadCastTo({ DynamicTensor(CurOps->GradOps) }, InputParams, true);
+	BackwardOpsMap[CurOps->InputOpsList[0].get()][CurOps.get()] = DynamicTensorRes.Ops;
+}
+
+DynamicTensor DynamicTensor::DynamicStdOps_Forward_View(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad)
+{//todo::≤‚ ‘
+	std::vector<size_t>ViewDims;
+	int MinusIndex = -1;
+	for (he a = 0; a < InputParams["ViewDims"].size(); a = a + 1)
+	{
+		if (InputParams["ViewDims"][a] < 0)MinusIndex = a.i();
+		else ViewDims.push_back(InputParams["ViewDims"][a].i());
+	}
+	auto TensorResult = InputList[0].Ops->TensorPointer->View(ViewDims,MinusIndex);
+	return SetComputationalHistory(TensorResult, InputList, InputParams, OpsType::View, RequiresGrad);
+}
+void DynamicTensor::DynamicStdOps_Backward_View(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps)
+{//todo::≤‚ ‘
+	if (!CurOps->InputOpsList[0]->RequiresGrad)return;
+	he InputParams = he::NewDict();
+	InputParams["ViewDims"] = he::NewList();
+	for (size_t a = 0; a < CurOps->InputOpsList[0]->TensorPointer->shape.size(); a++)InputParams["ViewDims"].append(int(CurOps->InputOpsList[0]->TensorPointer->shape[a]));
+	DynamicTensor DynamicTensorRes = DynamicStdOps_Forward_View({ DynamicTensor(CurOps->GradOps) }, InputParams, true);
 	BackwardOpsMap[CurOps->InputOpsList[0].get()][CurOps.get()] = DynamicTensorRes.Ops;
 }
