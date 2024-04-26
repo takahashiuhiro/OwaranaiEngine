@@ -154,7 +154,6 @@ void DynamicTensor::DynamicStdOps_Backward_Sum(std::map<DynamicOps*, std::map<Dy
 }
 DynamicTensor DynamicTensor::Sum(std::vector<int>Dims, bool KeepDim)
 {
-	//bug::::!!!!!
 	he SumParams = he::NewDict();
 	SumParams["SumDims"] = he::NewList();
 	for (size_t a = 0; a < Dims.size(); a++)SumParams["SumDims"].append(Dims[a]);
@@ -166,7 +165,7 @@ DynamicTensor DynamicTensor::Sum(std::vector<int>Dims, bool KeepDim)
 	ViewParams["ViewDims"] = he::NewList();
 	for (size_t a = 0; a < Res.Ops->TensorPointer->shape.size(); a++)
 	{
-		if (DimsMp.find(int(a)) == DimsMp.end())ViewParams["ViewDims"].append(int(a));
+		if (DimsMp.find(int(a)) == DimsMp.end())ViewParams["ViewDims"].append(int(Res.Ops->TensorPointer->shape[a]));
 		else continue;
 	}
 	return DynamicStdOps_Forward_View({ Res }, ViewParams, true);
@@ -178,7 +177,11 @@ DynamicTensor DynamicTensor::DynamicStdOps_Forward_View(std::vector<DynamicTenso
 	int MinusIndex = -1;
 	for (he a = 0; a < InputParams["ViewDims"].size(); a = a + 1)
 	{
-		if (InputParams["ViewDims"][a] < 0)MinusIndex = a.i();
+		if (InputParams["ViewDims"][a] < 0)
+		{
+			MinusIndex = a.i();
+			ViewDims.push_back(0);
+		}
 		else ViewDims.push_back(InputParams["ViewDims"][a].i());
 	}
 	auto TensorResult = InputList[0].Ops->TensorPointer->View(ViewDims,MinusIndex);
@@ -192,4 +195,11 @@ void DynamicTensor::DynamicStdOps_Backward_View(std::map<DynamicOps*, std::map<D
 	for (size_t a = 0; a < CurOps->InputOpsList[0]->TensorPointer->shape.size(); a++)InputParams["ViewDims"].append(int(CurOps->InputOpsList[0]->TensorPointer->shape[a]));
 	DynamicTensor DynamicTensorRes = DynamicStdOps_Forward_View({ DynamicTensor(CurOps->GradOps) }, InputParams, true);
 	BackwardOpsMap[CurOps->InputOpsList[0].get()][CurOps.get()] = DynamicTensorRes.Ops;
+}
+DynamicTensor DynamicTensor::View(std::vector<int>Dims)
+{
+	he ViewParams = he::NewDict();
+	ViewParams["ViewDims"] = he::NewList();
+	for (size_t a = 0; a < Dims.size(); a++)ViewParams["ViewDims"].append(Dims[a]);
+	return DynamicTensor::DynamicStdOps_Forward_View({ *this }, ViewParams, true);
 }
