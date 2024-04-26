@@ -17,7 +17,11 @@ q2.requires_grad = True
 
 e1 = q1+q2
 
+e1 = e1.sum([1,3],keepdim=True)
+e1 = e1.sum([3])
+
 e1.backward(e1)
 print(e1)
+print(e1.shape)
 print(q1.grad)
 print(q2.grad)
