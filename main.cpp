@@ -16,7 +16,7 @@ int main()
 	q1.Fill(1);
 	q2.Fill(2);
 
-	DynamicTensor e1 = q1 + q2;
+	DynamicTensor e1 = q1 * q2;
 
 	e1 = e1.Sum({ 1,3 });
 	e1 = e1.View({1,-1});

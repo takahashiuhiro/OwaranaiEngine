@@ -63,6 +63,7 @@ public:
     /**运算符重载逻辑.*/
     DynamicTensor operator+(DynamicTensor Other);
     DynamicTensor operator%(DynamicTensor Other);//矩阵乘法
+    DynamicTensor operator*(DynamicTensor Other);
 
     /**重复逻辑抽出.*/
     DynamicTensor ViewAndBC(DynamicTensor ThisDT, DynamicTensor Other, DynamicTensor(*InputFun)(std::vector<DynamicTensor>, he, bool), bool IsMatmul);
@@ -84,4 +85,7 @@ public:
     static DynamicTensor DynamicStdOps_Forward_View(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad = false);
     static void DynamicStdOps_Backward_View(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps);
     DynamicTensor View(std::vector<int>Dims);
+
+    static DynamicTensor DynamicStdOps_Forward_Elemul(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad = false);
+    static void DynamicStdOps_Backward_Elemul(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps);
 };

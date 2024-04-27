@@ -7,6 +7,7 @@ void DynamicTensor::OpsSetInMap()
 	BackwardOps[OpsType::Sum] = DynamicStdOps_Backward_Sum;
 	BackwardOps[OpsType::BroadCastTo] = DynamicStdOps_Backward_BroadCastTo;
 	BackwardOps[OpsType::View] = DynamicStdOps_Backward_View;
+	BackwardOps[OpsType::EleMul] = DynamicStdOps_Backward_Elemul;
 }
 
 
@@ -202,4 +203,23 @@ DynamicTensor DynamicTensor::View(std::vector<int>Dims)
 	ViewParams["ViewDims"] = he::NewList();
 	for (size_t a = 0; a < Dims.size(); a++)ViewParams["ViewDims"].append(Dims[a]);
 	return DynamicTensor::DynamicStdOps_Forward_View({ *this }, ViewParams, true);
+}
+
+DynamicTensor DynamicTensor::DynamicStdOps_Forward_Elemul(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad)
+{
+	auto ResTensorContent = InputList[0].Ops->TensorPointer->EleMul(InputList[1].Ops->TensorPointer.get());
+	return SetComputationalHistory(ResTensorContent, InputList, InputParams, OpsType::EleMul, RequiresGrad);
+}
+void DynamicTensor::DynamicStdOps_Backward_Elemul(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps)
+{
+	if (CurOps->InputOpsList[0]->RequiresGrad)
+	{
+		DynamicTensor DynamicTensorRes = DynamicStdOps_Forward_Elemul({ DynamicTensor(CurOps->GradOps), DynamicTensor(CurOps->InputOpsList[1]) }, he(), true);
+		BackwardOpsMap[CurOps->InputOpsList[0].get()][CurOps.get()] = DynamicTensorRes.Ops;
+	}
+	if (CurOps->InputOpsList[1]->RequiresGrad)
+	{
+		DynamicTensor DynamicTensorRes = DynamicStdOps_Forward_Elemul({ DynamicTensor(CurOps->GradOps), DynamicTensor(CurOps->InputOpsList[0]) }, he(), true);
+		BackwardOpsMap[CurOps->InputOpsList[1].get()][CurOps.get()] = DynamicTensorRes.Ops;
+	}
 }

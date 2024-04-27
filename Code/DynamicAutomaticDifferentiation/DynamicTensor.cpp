@@ -282,3 +282,8 @@ DynamicTensor DynamicTensor::operator%(DynamicTensor Other)
 		return DynamicStdOps_Forward_Matmul({ *this, DynamicStdOps_Forward_Add({Other},he(),true) }, MatmulParams, true);
 	}
 }
+DynamicTensor DynamicTensor::operator*(DynamicTensor Other)
+{
+	if (Other.Ops.get() != Ops.get())return ViewAndBC(*this, Other, DynamicStdOps_Forward_Elemul, false);
+	else return DynamicStdOps_Forward_Add({ *this, DynamicStdOps_Forward_Elemul({Other},he(),true) }, he(), true);
+}
