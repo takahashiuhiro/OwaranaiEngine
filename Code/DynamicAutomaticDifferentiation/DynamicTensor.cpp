@@ -145,9 +145,8 @@ void DynamicTensor::GenEmptyGradDynamicTensor(DynamicTensor* Loss)
 	Tensor* GradResTensor;
 	if(Loss == nullptr)GradResTensor = Ops->TensorPointer->Copy();
 	else GradResTensor = Loss->Ops->TensorPointer->Copy();
-	auto DynamicTensorGrad = std::make_shared<DynamicTensor>(std::shared_ptr<Tensor>(GradResTensor), Ops->RequiresGrad);
-	Grad = DynamicTensorGrad;
-	Ops->GradOps = Grad->Ops;
+	DynamicTensor DynamicTensorGrad(std::shared_ptr<Tensor>(GradResTensor), Ops->RequiresGrad);
+	Ops->GradOps = DynamicTensorGrad.Ops;
 }
 
 void DynamicTensor::GetAllOutputSizeBeforeBackward(std::map<DynamicOps*, std::set<DynamicOps*>>& OutputSetSize, std::shared_ptr<DynamicOps>CurOps)

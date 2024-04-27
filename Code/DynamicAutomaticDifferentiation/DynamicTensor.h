@@ -31,7 +31,6 @@ public:
 
     /**动态张量的成员变量.*/
     std::shared_ptr<DynamicOps>Ops = nullptr;//每个动态张量的算子，如果张量被删掉但是需要计算图，这个算子可以交出去，交出去的时候需要删掉算子中的leafNode变量为nullptr
-    std::shared_ptr<DynamicTensor>Grad = nullptr;
     std::map<size_t, void(*)(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& ,std::shared_ptr<DynamicOps>)>BackwardOps;//反向函数map
 
     /**内存管理.*/
