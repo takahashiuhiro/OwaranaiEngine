@@ -56,11 +56,11 @@ public:
 
     /**计算图逻辑.*/
     static DynamicTensor SetComputationalHistory(Tensor* ResTensor, std::vector<DynamicTensor>InputList, he InputPrams,size_t InputOpsType, bool RequiresGrad);
-    void Backward(DynamicTensor* Loss = nullptr, bool ClearGrad = true);//从这里开始反向传播
-    void BackwardDFS(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>&BackwardOpsMap, std::map<DynamicOps*, std::set<DynamicOps*>>& OutputSetSize, DynamicTensor* Loss, std::shared_ptr<DynamicOps>CurOps);
+    void Backward(DynamicTensor Loss = DynamicTensor(), bool ClearGrad = true);//从这里开始反向传播
+    void BackwardDFS(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>&BackwardOpsMap, std::map<DynamicOps*, std::set<DynamicOps*>>& OutputSetSize, DynamicTensor Loss, std::shared_ptr<DynamicOps>CurOps);
     void BackwardClearDFS(std::shared_ptr<DynamicOps>CurOps);
     bool CheckPartialGradReady(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::map<DynamicOps*, std::set<DynamicOps*>>& OutputSetSize, std::shared_ptr<DynamicOps>CurOps);
-    void GenEmptyGradDynamicTensor(DynamicTensor* Loss);
+    void GenEmptyGradDynamicTensor(DynamicTensor Loss);
     void GetAllOutputSizeBeforeBackward(std::map<DynamicOps*, std::set<DynamicOps*>>& OutputSetSize,std::shared_ptr<DynamicOps>CurOps);
 
     /**运算符重载逻辑.*/

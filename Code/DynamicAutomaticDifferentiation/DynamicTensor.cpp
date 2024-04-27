@@ -93,7 +93,7 @@ DynamicTensor DynamicTensor::SetComputationalHistory(Tensor* ResTensor, std::vec
 	return Res;
 }
 
-void DynamicTensor::Backward(DynamicTensor* Loss,bool ClearGrad)
+void DynamicTensor::Backward(DynamicTensor Loss,bool ClearGrad)
 {
 	Log::Assert(Ops->OutputOpsSet.size() == 0, "DynamicTensor Backward Must Be Output Data");
 	std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>BackwardOpsMap;
@@ -110,7 +110,7 @@ void DynamicTensor::BackwardClearDFS(std::shared_ptr<DynamicOps>CurOps)
 	for (size_t a = 0; a < CurOps->InputOpsList.size(); a++)BackwardClearDFS(CurOps->InputOpsList[a]);
 }
 
-void DynamicTensor::BackwardDFS(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::map<DynamicOps*, std::set<DynamicOps*>>& OutputSetSize, DynamicTensor* Loss, std::shared_ptr<DynamicOps>CurOps)
+void DynamicTensor::BackwardDFS(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::map<DynamicOps*, std::set<DynamicOps*>>& OutputSetSize, DynamicTensor Loss, std::shared_ptr<DynamicOps>CurOps)
 {
 	if (CheckPartialGradReady(BackwardOpsMap,OutputSetSize, CurOps))
 	{
@@ -160,11 +160,11 @@ bool DynamicTensor::CheckPartialGradReady(std::map<DynamicOps*, std::map<Dynamic
 	return BackwardOpsMap[CurOps.get()].size() == OutputSetSize[CurOps.get()].size();
 }
 
-void DynamicTensor::GenEmptyGradDynamicTensor(DynamicTensor* Loss)
+void DynamicTensor::GenEmptyGradDynamicTensor(DynamicTensor Loss)
 {
 	Tensor* GradResTensor;
-	if(Loss == nullptr)GradResTensor = Ops->TensorPointer->Copy();
-	else GradResTensor = Loss->Ops->TensorPointer->Copy();
+	if(Loss.Ops == nullptr)GradResTensor = Ops->TensorPointer->Copy();
+	else GradResTensor = Loss.Ops->TensorPointer->Copy();
 	DynamicTensor DynamicTensorGrad(std::shared_ptr<Tensor>(GradResTensor), Ops->RequiresGrad);
 	Ops->GradOps = DynamicTensorGrad.Ops;
 }

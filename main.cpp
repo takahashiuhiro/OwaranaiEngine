@@ -18,7 +18,7 @@ int main()
 	q2.Fill(2);
 
 	DynamicTensor e1;
-	e1 = q1*q2;
+	e1 = q2%q1;
 
 	//e1 = e1.Sum({ 1,3 });
 	//e1 = e1.View({1,-1});
@@ -33,7 +33,7 @@ int main()
 
 	DynamicTensor loss1 = DynamicTensor(std::shared_ptr<Tensor>(loss));
 
-	e1.Backward(&loss1);
+	e1.Backward(loss1);
 	print(e1);
 	e1.Ops->TensorPointer->PrintShape();
 	print(q1.GetGrad());
