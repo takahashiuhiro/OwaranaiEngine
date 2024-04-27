@@ -62,8 +62,12 @@ public:
 
     /**运算符重载逻辑.*/
     DynamicTensor operator+(DynamicTensor Other);
+    DynamicTensor operator+(float Other);
     DynamicTensor operator%(DynamicTensor Other);//矩阵乘法
     DynamicTensor operator*(DynamicTensor Other);
+    DynamicTensor operator*(float Other);
+    DynamicTensor operator-(DynamicTensor Other);
+    DynamicTensor operator-(float Other);
 
     /**重复逻辑抽出.*/
     DynamicTensor ViewAndBC(DynamicTensor ThisDT, DynamicTensor Other, DynamicTensor(*InputFun)(std::vector<DynamicTensor>, he, bool), bool IsMatmul);

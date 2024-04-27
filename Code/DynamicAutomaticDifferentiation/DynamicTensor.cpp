@@ -270,6 +270,12 @@ DynamicTensor DynamicTensor::operator+(DynamicTensor Other)
 	if (Other.Ops.get() != Ops.get())return ViewAndBC(*this, Other, DynamicStdOps_Forward_Add, false);
 	else return DynamicStdOps_Forward_Add({ *this, DynamicStdOps_Forward_Add({Other},he(),true) }, he(), true);
 }
+DynamicTensor DynamicTensor::operator+(float Other)
+{
+	DynamicTensor Scalar({ 1 }, 0, Ops->TensorPointer->GetDeviceNum());
+	Scalar.Fill(Other);
+	return operator+(Scalar);
+}
 
 DynamicTensor DynamicTensor::operator%(DynamicTensor Other)
 {
@@ -286,4 +292,22 @@ DynamicTensor DynamicTensor::operator*(DynamicTensor Other)
 {
 	if (Other.Ops.get() != Ops.get())return ViewAndBC(*this, Other, DynamicStdOps_Forward_Elemul, false);
 	else return DynamicStdOps_Forward_Add({ *this, DynamicStdOps_Forward_Elemul({Other},he(),true) }, he(), true);
+}
+DynamicTensor DynamicTensor::operator*(float Other)
+{
+	DynamicTensor Scalar({ 1 }, 0, Ops->TensorPointer->GetDeviceNum());
+	Scalar.Fill(Other);
+	return operator*(Scalar);
+}
+DynamicTensor DynamicTensor::operator-(DynamicTensor Other)
+{
+	DynamicTensor MinusOne({1}, 0, Other.Ops->TensorPointer->GetDeviceNum());
+	MinusOne.Fill(-1);
+	return operator+(MinusOne * Other);
+}
+DynamicTensor DynamicTensor::operator-(float Other)
+{
+	DynamicTensor Scalar({ 1 }, 0, Ops->TensorPointer->GetDeviceNum());
+	Scalar.Fill(Other);
+	return operator-(Scalar);
 }
