@@ -14,14 +14,18 @@ q2 = torch.ones([3,1,2,1])*2
 q1.requires_grad = True
 q2.requires_grad = True
 
+for a in range(0,3):
 
-e1 = q1-q2*3.788
+    if a%2:
+        e1 = q1*q2
+    else:
+        e1 = q1+q2
 
-e1 = e1.sum([1,3])
-e1 = e1.view([1,-1])
+    e1 = e1.sum([1,3])
+    e1 = e1.view([1,-1])
 
-e1.backward(e1)
-print(e1)
-print(e1.shape)
-print(q1.grad)
-print(q2.grad)
+    e1.backward(e1)
+    print(e1)
+    print(e1.shape)
+    print(q1.grad)
+    print(q2.grad)

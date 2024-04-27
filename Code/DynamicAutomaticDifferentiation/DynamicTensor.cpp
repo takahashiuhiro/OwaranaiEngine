@@ -1,6 +1,17 @@
 #include "DynamicTensor.h"
 #include "../CommonMathMoudle/OpsType.h"
 
+DynamicOps::~DynamicOps()
+{
+	for (size_t a = 0; a < InputOpsList.size(); a++)
+	{
+		if (InputOpsList[a]->OutputOpsSet.find(this) != InputOpsList[a]->OutputOpsSet.end())
+		{
+			InputOpsList[a]->OutputOpsSet.erase(this);
+		}
+	}
+}
+
 DynamicTensor::DynamicTensor()
 {
 	OpsSetInMap();
@@ -82,13 +93,21 @@ DynamicTensor DynamicTensor::SetComputationalHistory(Tensor* ResTensor, std::vec
 	return Res;
 }
 
-void DynamicTensor::Backward(DynamicTensor* Loss)
+void DynamicTensor::Backward(DynamicTensor* Loss,bool ClearGrad)
 {
 	Log::Assert(Ops->OutputOpsSet.size() == 0, "DynamicTensor Backward Must Be Output Data");
 	std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>BackwardOpsMap;
 	std::map<DynamicOps*, std::set<DynamicOps*>>OutputSetSize;
 	GetAllOutputSizeBeforeBackward(OutputSetSize, Ops);
 	BackwardDFS(BackwardOpsMap, OutputSetSize,Loss, Ops);
+	if (ClearGrad)BackwardClearDFS(Ops);
+}
+
+void DynamicTensor::BackwardClearDFS(std::shared_ptr<DynamicOps>CurOps)
+{
+	if (CurOps->InputOpsList.size())CurOps->GradOps = nullptr;
+	else CurOps->GradOps->InputOpsList = {};
+	for (size_t a = 0; a < CurOps->InputOpsList.size(); a++)BackwardClearDFS(CurOps->InputOpsList[a]);
 }
 
 void DynamicTensor::BackwardDFS(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::map<DynamicOps*, std::set<DynamicOps*>>& OutputSetSize, DynamicTensor* Loss, std::shared_ptr<DynamicOps>CurOps)
@@ -109,7 +128,8 @@ void DynamicTensor::BackwardDFS(std::map<DynamicOps*, std::map<DynamicOps*, std:
 				ThisOpsGradRes = DynamicTensor::DynamicStdOps_Forward_Add({ ThisOpsGradRes, DynamicTensor(BackwardOpsMap[CurOps.get()][OutputList[a]]) },he(), true);
 			}
 			auto DynamicTensorGrad = std::make_shared<DynamicTensor>(ThisOpsGradRes.Ops);
-			CurOps->GradOps = DynamicTensorGrad->Ops;
+			if (CurOps->GradOps == nullptr)CurOps->GradOps = DynamicTensorGrad->Ops;
+			else CurOps->GradOps->TensorPointer = std::shared_ptr<Tensor>(CurOps->GradOps->TensorPointer->Add(DynamicTensorGrad->Ops->TensorPointer.get()));
 		}
 		for (size_t a = 0; a < CurOps->InputOpsList.size(); a++)
 		{
