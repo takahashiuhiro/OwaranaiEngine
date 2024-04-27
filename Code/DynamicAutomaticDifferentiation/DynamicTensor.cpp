@@ -128,7 +128,7 @@ void DynamicTensor::BackwardDFS(std::map<DynamicOps*, std::map<DynamicOps*, std:
 				ThisOpsGradRes = DynamicTensor::DynamicStdOps_Forward_Add({ ThisOpsGradRes, DynamicTensor(BackwardOpsMap[CurOps.get()][OutputList[a]]) },he(), true);
 			}
 			auto DynamicTensorGrad = std::make_shared<DynamicTensor>(ThisOpsGradRes.Ops);
-			if (CurOps->GradOps == nullptr)CurOps->GradOps = DynamicTensorGrad->Ops;
+			if (CurOps->GradOps == nullptr)CurOps->GradOps = DynamicTensorGrad->Ops;//梯度累计
 			else CurOps->GradOps->TensorPointer = std::shared_ptr<Tensor>(CurOps->GradOps->TensorPointer->Add(DynamicTensorGrad->Ops->TensorPointer.get()));
 		}
 		for (size_t a = 0; a < CurOps->InputOpsList.size(); a++)

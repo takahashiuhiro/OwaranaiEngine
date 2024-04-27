@@ -8,6 +8,7 @@ void DynamicTensor::OpsSetInMap()
 	BackwardOps[OpsType::BroadCastTo] = DynamicStdOps_Backward_BroadCastTo;
 	BackwardOps[OpsType::View] = DynamicStdOps_Backward_View;
 	BackwardOps[OpsType::EleMul] = DynamicStdOps_Backward_Elemul;
+	BackwardOps[OpsType::Softmax] = DynamicStdOps_Backward_Softmax;
 }
 
 
@@ -222,4 +223,25 @@ void DynamicTensor::DynamicStdOps_Backward_Elemul(std::map<DynamicOps*, std::map
 		DynamicTensor DynamicTensorRes = DynamicStdOps_Forward_Elemul({ DynamicTensor(CurOps->GradOps), DynamicTensor(CurOps->InputOpsList[0]) }, he(), true);
 		BackwardOpsMap[CurOps->InputOpsList[1].get()][CurOps.get()] = DynamicTensorRes.Ops;
 	}
+}
+
+DynamicTensor DynamicTensor::DynamicStdOps_Forward_Softmax(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad)
+{
+	int SoftmaxDim = InputParams["SoftmaxDim"].i();
+	auto ResTensorContent = InputList[0].Ops->TensorPointer->Softmax(SoftmaxDim);
+	return SetComputationalHistory(ResTensorContent, InputList, InputParams, OpsType::Softmax, RequiresGrad);
+}
+void DynamicTensor::DynamicStdOps_Backward_Softmax(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps)
+{
+	if (!CurOps->InputOpsList[0]->RequiresGrad)return;
+	int SoftmaxDim = CurOps->Params["SoftmaxDim"].i();
+	DynamicTensor MinusRes = (DynamicTensor(CurOps) * DynamicTensor(CurOps->GradOps)).Sum({ SoftmaxDim },true);
+	DynamicTensor Res = DynamicTensor(CurOps) * (DynamicTensor(CurOps->GradOps) - MinusRes);
+	BackwardOpsMap[CurOps->InputOpsList[0].get()][CurOps.get()] = Res.Ops;
+}
+DynamicTensor DynamicTensor::Softmax(int InputDim)
+{
+	he SoftmaxParams = he::NewDict();
+	SoftmaxParams["SoftmaxDim"] = InputDim;
+	return DynamicStdOps_Forward_Softmax({ *this }, SoftmaxParams, true);
 }
