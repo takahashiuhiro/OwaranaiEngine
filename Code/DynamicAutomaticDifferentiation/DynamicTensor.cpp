@@ -106,7 +106,11 @@ void DynamicTensor::Backward(DynamicTensor Loss,bool ClearGrad)
 void DynamicTensor::BackwardClearDFS(std::shared_ptr<DynamicOps>CurOps)
 {
 	if (CurOps->InputOpsList.size())CurOps->GradOps = nullptr;
-	else CurOps->GradOps->InputOpsList = {};
+	else
+	{
+		CurOps->GradOps->InputOpsList = {};
+		CurOps->GradOps->OutputOpsSet = {};
+	}
 	for (size_t a = 0; a < CurOps->InputOpsList.size(); a++)BackwardClearDFS(CurOps->InputOpsList[a]);
 }
 
@@ -125,11 +129,11 @@ void DynamicTensor::BackwardDFS(std::map<DynamicOps*, std::map<DynamicOps*, std:
 			DynamicTensor ThisOpsGradRes = DynamicTensor(BackwardOpsMap[CurOps.get()][OutputList[0]]);
 			for (size_t a = 1; a < OutputList.size(); a++)
 			{
-				ThisOpsGradRes = DynamicTensor::DynamicStdOps_Forward_Add({ ThisOpsGradRes, DynamicTensor(BackwardOpsMap[CurOps.get()][OutputList[a]]) },he(), true);
+				DynamicTensor PartRes = DynamicTensor(BackwardOpsMap[CurOps.get()][OutputList[a]]);
+				ThisOpsGradRes = DynamicTensor::DynamicStdOps_Forward_Add({ ThisOpsGradRes, PartRes },he(), true);
 			}
-			auto DynamicTensorGrad = std::make_shared<DynamicTensor>(ThisOpsGradRes.Ops);
-			if (CurOps->GradOps == nullptr)CurOps->GradOps = DynamicTensorGrad->Ops;//梯度累计
-			else CurOps->GradOps->TensorPointer = std::shared_ptr<Tensor>(CurOps->GradOps->TensorPointer->Add(DynamicTensorGrad->Ops->TensorPointer.get()));
+			if (CurOps->GradOps != nullptr)ThisOpsGradRes.Ops->TensorPointer = std::shared_ptr<Tensor>(CurOps->GradOps->TensorPointer->Add(ThisOpsGradRes.Ops->TensorPointer.get()));
+			CurOps->GradOps = ThisOpsGradRes.Ops;
 		}
 		for (size_t a = 0; a < CurOps->InputOpsList.size(); a++)
 		{

@@ -233,6 +233,10 @@ DynamicTensor DynamicTensor::DynamicStdOps_Forward_Softmax(std::vector<DynamicTe
 }
 void DynamicTensor::DynamicStdOps_Backward_Softmax(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps)
 {
+	/**
+	return DynamicTensor::D = {d_i, i \in [1,n]}
+	any d_i = I_i*(O_i - I \dot O)
+	*/
 	if (!CurOps->InputOpsList[0]->RequiresGrad)return;
 	int SoftmaxDim = CurOps->Params["SoftmaxDim"].i();
 	DynamicTensor MinusRes = (DynamicTensor(CurOps) * DynamicTensor(CurOps->GradOps)).Sum({ SoftmaxDim },true);
