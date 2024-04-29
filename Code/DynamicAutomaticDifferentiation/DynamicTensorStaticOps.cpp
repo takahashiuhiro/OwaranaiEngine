@@ -9,6 +9,7 @@ void DynamicTensor::OpsSetInMap()
 	BackwardOps[OpsType::View] = DynamicStdOps_Backward_View;
 	BackwardOps[OpsType::EleMul] = DynamicStdOps_Backward_Elemul;
 	BackwardOps[OpsType::Softmax] = DynamicStdOps_Backward_Softmax;
+	BackwardOps[OpsType::Pow] = DynamicStdOps_Backward_Pow;
 }
 
 
@@ -248,4 +249,27 @@ DynamicTensor DynamicTensor::Softmax(int InputDim)
 	he SoftmaxParams = he::NewDict();
 	SoftmaxParams["SoftmaxDim"] = InputDim;
 	return DynamicStdOps_Forward_Softmax({ *this }, SoftmaxParams, true);
+}
+
+DynamicTensor DynamicTensor::DynamicStdOps_Forward_Pow(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad)
+{
+	float EleExponent = InputParams["EleExponent"].f();
+	auto ResTensorContent = InputList[0].Ops->TensorPointer->Pow(EleExponent);
+	return SetComputationalHistory(ResTensorContent, InputList, InputParams, OpsType::Pow, RequiresGrad);
+}
+void DynamicTensor::DynamicStdOps_Backward_Pow(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps)
+{
+	if (!CurOps->InputOpsList[0]->RequiresGrad)return;
+	float CurEleExponent = CurOps->Params["EleExponent"].f();
+	he PowParams = he::NewDict();
+	PowParams["EleExponent"] = CurEleExponent - 1;
+	DynamicTensor Res = DynamicStdOps_Forward_Pow({ DynamicTensor(CurOps->InputOpsList[0])}, PowParams, true);
+	Res = DynamicTensor(CurOps->GradOps)*Res * CurEleExponent;
+	BackwardOpsMap[CurOps->InputOpsList[0].get()][CurOps.get()] = Res.Ops;
+}
+DynamicTensor DynamicTensor::Pow(float EleExponent)
+{
+	he PowParams = he::NewDict();
+	PowParams["EleExponent"] = EleExponent;
+	return DynamicStdOps_Forward_Pow({ *this }, PowParams, true);
 }

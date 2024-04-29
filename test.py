@@ -27,6 +27,7 @@ e1 = q1+q2
 #e1 = e1.sum([1,3])
 #e1 = e1.view([1,-1])
 e1 = nn.Softmax(dim=1)(e1)
+e1 = torch.pow(e1,3)
 e1.backward(e2)
 #print(e1)
 #print(e1.shape)

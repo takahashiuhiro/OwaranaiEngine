@@ -26,7 +26,7 @@ int main()
 	//e1 = e1.Sum({ 1,3 });
 	//e1 = e1.View({1,-1});
 	e1 = e1.Softmax(1);
-	
+	e1 = e1.Pow(3);
 	Tensor* loss = new Tensor({3,3,1},1);
 	loss->FillArray(1.);
 	loss->SetV({1,2,0},55.);
