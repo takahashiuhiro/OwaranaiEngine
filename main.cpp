@@ -10,6 +10,14 @@
 
 int main() 
 {
+
+	DynamicTensor ss({3,3},1);
+	ss.Fill(1);
+	ss.Ops->IsEval = true;
+	auto gg = DynamicTensor::Dropout(ss,0.4);
+	print(gg);
+	return 0;
+
 	DynamicTensor q1({1,3,1}, 1,0);
 	DynamicTensor q2({3,1,1}, 1,0);
 

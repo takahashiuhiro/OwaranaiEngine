@@ -53,6 +53,7 @@ public:
     /**Tensor内函数组装.*/
     void PrintData();
     void Fill(float InputValue);
+    void FillRandBernoulli(float P, int Seed = -1);
 
     /**计算图逻辑.*/
     static DynamicTensor SetComputationalHistory(Tensor* ResTensor, std::vector<DynamicTensor>InputList, he InputPrams,size_t InputOpsType, bool RequiresGrad);
@@ -105,5 +106,5 @@ public:
     DynamicTensor View(std::vector<int>Dims);
     DynamicTensor Softmax(int InputDim);
     DynamicTensor Pow(float EleExponent);
-
+    static DynamicTensor Dropout(DynamicTensor Input, float P, bool InPlace = false);
 };

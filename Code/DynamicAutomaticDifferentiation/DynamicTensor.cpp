@@ -76,6 +76,12 @@ void DynamicTensor::Fill(float InputValue)
 	Ops->TensorPointer->FillArray(InputValue);
 }
 
+void DynamicTensor::FillRandBernoulli(float P, int Seed)
+{
+	if (Seed == -1)Seed = std::chrono::system_clock::now().time_since_epoch().count();
+	Ops->TensorPointer->FillRandomValBernoulli(P, Seed);
+}
+
 DynamicTensor DynamicTensor::SetComputationalHistory(Tensor* ResTensor, std::vector<DynamicTensor>InputList, he InputPrams, size_t InputOpsType, bool RequiresGrad)
 {
 	bool MaxRequiresGrad = 0,MaxIsEval = 0;

@@ -40,3 +40,15 @@ DynamicTensor DynamicTensor::Pow(float EleExponent)
 	PowParams["EleExponent"] = EleExponent;
 	return DynamicStdOps_Forward_Pow({ *this }, PowParams, true);
 }
+
+DynamicTensor DynamicTensor::Dropout(DynamicTensor Input, float P, bool InPlace)
+{
+	if (Input.Ops->IsEval)return Input;
+	auto DropoutTensor = Input.Ops->TensorPointer->Copy();
+	DropoutTensor->FillRandomValBernoulli(1-P);
+	Tensor* DropoutTensorDotP = DropoutTensor->MulScalar(1 / (1-P));
+	delete DropoutTensor;
+	Input.Ops->TensorPointer = std::shared_ptr<Tensor>(DropoutTensorDotP->EleMul(Input.Ops->TensorPointer.get()));
+	delete DropoutTensorDotP;
+	return Input;
+}
