@@ -155,24 +155,6 @@ void DynamicTensor::DynamicStdOps_Backward_Sum(std::map<DynamicOps*, std::map<Dy
 	DynamicTensor DynamicTensorRes = DynamicStdOps_Forward_BroadCastTo({ DynamicTensor(CurOps->GradOps) }, InputParams, true);
 	BackwardOpsMap[CurOps->InputOpsList[0].get()][CurOps.get()] = DynamicTensorRes.Ops;
 }
-DynamicTensor DynamicTensor::Sum(std::vector<int>Dims, bool KeepDim)
-{
-	he SumParams = he::NewDict();
-	SumParams["SumDims"] = he::NewList();
-	for (size_t a = 0; a < Dims.size(); a++)SumParams["SumDims"].append(Dims[a]);
-	DynamicTensor Res = DynamicStdOps_Forward_Sum({ *this }, SumParams, true);
-	if (KeepDim)return Res;
-	std::map<int, int>DimsMp;
-	for (size_t a = 0; a < Dims.size(); a++)DimsMp[Dims[a]] = 1;
-	he ViewParams = he::NewDict();
-	ViewParams["ViewDims"] = he::NewList();
-	for (size_t a = 0; a < Res.Ops->TensorPointer->shape.size(); a++)
-	{
-		if (DimsMp.find(int(a)) == DimsMp.end())ViewParams["ViewDims"].append(int(Res.Ops->TensorPointer->shape[a]));
-		else continue;
-	}
-	return DynamicStdOps_Forward_View({ Res }, ViewParams, true);
-}
 
 DynamicTensor DynamicTensor::DynamicStdOps_Forward_View(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad)
 {
@@ -198,13 +180,6 @@ void DynamicTensor::DynamicStdOps_Backward_View(std::map<DynamicOps*, std::map<D
 	for (size_t a = 0; a < CurOps->InputOpsList[0]->TensorPointer->shape.size(); a++)InputParams["ViewDims"].append(int(CurOps->InputOpsList[0]->TensorPointer->shape[a]));
 	DynamicTensor DynamicTensorRes = DynamicStdOps_Forward_View({ DynamicTensor(CurOps->GradOps) }, InputParams, true);
 	BackwardOpsMap[CurOps->InputOpsList[0].get()][CurOps.get()] = DynamicTensorRes.Ops;
-}
-DynamicTensor DynamicTensor::View(std::vector<int>Dims)
-{
-	he ViewParams = he::NewDict();
-	ViewParams["ViewDims"] = he::NewList();
-	for (size_t a = 0; a < Dims.size(); a++)ViewParams["ViewDims"].append(Dims[a]);
-	return DynamicTensor::DynamicStdOps_Forward_View({ *this }, ViewParams, true);
 }
 
 DynamicTensor DynamicTensor::DynamicStdOps_Forward_Elemul(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad)
@@ -244,12 +219,6 @@ void DynamicTensor::DynamicStdOps_Backward_Softmax(std::map<DynamicOps*, std::ma
 	DynamicTensor Res = DynamicTensor(CurOps) * (DynamicTensor(CurOps->GradOps) - MinusRes);
 	BackwardOpsMap[CurOps->InputOpsList[0].get()][CurOps.get()] = Res.Ops;
 }
-DynamicTensor DynamicTensor::Softmax(int InputDim)
-{
-	he SoftmaxParams = he::NewDict();
-	SoftmaxParams["SoftmaxDim"] = InputDim;
-	return DynamicStdOps_Forward_Softmax({ *this }, SoftmaxParams, true);
-}
 
 DynamicTensor DynamicTensor::DynamicStdOps_Forward_Pow(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad)
 {
@@ -266,10 +235,4 @@ void DynamicTensor::DynamicStdOps_Backward_Pow(std::map<DynamicOps*, std::map<Dy
 	DynamicTensor Res = DynamicStdOps_Forward_Pow({ DynamicTensor(CurOps->InputOpsList[0])}, PowParams, true);
 	Res = DynamicTensor(CurOps->GradOps)*Res * CurEleExponent;
 	BackwardOpsMap[CurOps->InputOpsList[0].get()][CurOps.get()] = Res.Ops;
-}
-DynamicTensor DynamicTensor::Pow(float EleExponent)
-{
-	he PowParams = he::NewDict();
-	PowParams["EleExponent"] = EleExponent;
-	return DynamicStdOps_Forward_Pow({ *this }, PowParams, true);
 }
