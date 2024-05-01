@@ -1,5 +1,6 @@
 #include "CommonFuncHelpers.h"
 
+void print(bool Input) { std::cout << Input << std::endl; }
 void print(int Input){std::cout << Input << std::endl;}
 void print(std::string Input){std::cout << Input << std::endl;}
 void print(float Input){std::cout << Input << std::endl;}

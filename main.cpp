@@ -11,6 +11,14 @@
 int main() 
 {
 
+	he q = he::NewDict();
+	print(q.In(5));
+	q[5] = "gg";
+	print(q.In(5));
+	q.SplayDelete(5);
+	print(q.In(5));
+	return 0;
+
 	DynamicTensor ss({3,3},1);
 	ss.Fill(1);
 	ss.Ops->IsEval = true;

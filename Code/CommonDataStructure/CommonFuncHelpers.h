@@ -98,6 +98,7 @@ std::string LoadFromFileString(std::ifstream& OpenedFile)
     return ReturnString;
 }
 
+void print(bool Input);
 void print(int Input);
 void print(std::string Input);
 void print(float Input);
