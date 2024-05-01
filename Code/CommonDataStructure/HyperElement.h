@@ -154,6 +154,9 @@ struct he
     he& DictFromKtoV(he InputKey);
     DictFindDfsInfo SplayFind(he InputKey);//在splay上查询一个key在哪个内存块上，如果查不到返回-1
     DictFindDfsInfo SplayInputFindDfs(int RootIndex, int InputKey);//具体的dfs查询
+    bool In(he InputKey);//外部查询是否存在该key
+    bool In(std::string InputKey);
+    bool In(int InputKey);
     int SplayInsert(he InputKey, he InputValue);//在splay上插入一对k-v,返回内存块
     void SplayPrintForDebugArray();//debug用
     void SplayPrintForDebugTree();

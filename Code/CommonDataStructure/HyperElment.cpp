@@ -607,6 +607,10 @@ DictFindDfsInfo he::SplayFind(he InputKey)
     return ResIndex;
 }
 
+bool he::In(std::string InputKey){return In(he(InputKey));}
+bool he::In(int InputKey){return In(he(InputKey));}
+bool he::In(he InputKey){return SplayFind(InputKey).HasResult;}
+
 he& he::DictFromKtoV(he InputKey)
 {
     DictFindDfsInfo Res = SplayFind(InputKey);
