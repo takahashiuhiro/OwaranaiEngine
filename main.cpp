@@ -21,7 +21,12 @@ int main()
 	params["OutFeatures"] = 4;
 	params["Bias"] = 0;
 
-	//layer->Init(params);
-	layer->CreateNewLayer<Linear>("gg", params);
-	print(layer->SubLayers["gg"]->Forward({x})[0]);
+	layer->Init(params);
+	//layer->CreateNewLayer<Linear>("gg", params);
+	//print(layer->SubLayers["gg"]->Forward({x})[0]);
+	auto ty = layer->Parameters();
+	for (int a = 0; a < ty.size(); a++)
+	{
+		print(ty[a]);
+	}
 }
