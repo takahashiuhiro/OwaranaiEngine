@@ -11,3 +11,23 @@ std::vector<DynamicTensor> BaseDynamicLayer::Parameters()
 	}
 	return Res;
 }
+
+std::map<std::string, DynamicTensor> BaseDynamicLayer::StateDict()
+{
+	std::map<std::string, DynamicTensor>ResMp = {};
+	std::string PreStr = "";
+	StateDictDFS(ResMp, PreStr);
+	return ResMp;
+}
+
+void BaseDynamicLayer::StateDictDFS(std::map<std::string, DynamicTensor>& ResMp, std::string PreStr)
+{
+	for (auto& it : Weights)
+	{
+		ResMp[PreStr + it.first] = it.second;
+	}
+	for (auto& it : SubLayers)
+	{
+		it.second->StateDictDFS(ResMp, PreStr + it.first + std::string("."));
+	}
+}

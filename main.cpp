@@ -19,14 +19,16 @@ int main()
 	params["DeviceNum"] = 0;
 	params["InFeatures"] = 5;
 	params["OutFeatures"] = 4;
-	params["Bias"] = 0;
+	params["Bias"] = 1;
 
 	layer->Init(params);
-	//layer->CreateNewLayer<Linear>("gg", params);
+	layer->CreateNewLayer<Linear>("gg", params);
 	//print(layer->SubLayers["gg"]->Forward({x})[0]);
-	auto ty = layer->Parameters();
-	for (int a = 0; a < ty.size(); a++)
+	auto ty = layer->StateDict();
+	for (auto& it:ty)
 	{
-		print(ty[a]);
+		print(it.first);
+		print(it.second);
+		print(it.second.Copy());
 	}
 }

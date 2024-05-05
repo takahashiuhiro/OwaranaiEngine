@@ -66,6 +66,12 @@ DynamicTensor DynamicTensor::GetGrad()
 	return DynamicTensor(Ops->GradOps);
 }
 
+DynamicTensor DynamicTensor::Copy()
+{
+	DynamicTensor Res(std::shared_ptr<Tensor>(Ops->TensorPointer->Copy()), 0);
+	return Res;
+}
+
 void DynamicTensor::PrintData()
 {
 	Ops->TensorPointer->PrintData();
