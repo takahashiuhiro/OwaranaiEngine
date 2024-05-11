@@ -5,5 +5,5 @@
 class BaseDynamicOptimizer
 {
 public:
-
+	he Params;
 };
