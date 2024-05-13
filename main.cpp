@@ -1,6 +1,5 @@
 #include <memory>
 #include "Code/CommonDataStructure/HyperElement.h"
-#include "Code/DynamicAutomaticDifferentiation/DynamicTensor.h"
 #include <cmath>
 #include <fstream>
 #include <functional>
@@ -8,6 +7,7 @@
 #include <iostream>
 #include "Code/DynamicAutomaticDifferentiation/DynamicTensor.h"
 #include "Code/DynamicAutomaticDifferentiation/DynamicLayers/Linear.h"
+#include "Code/DynamicAutomaticDifferentiation/Optimizer.h"
 
 int main() 
 {
@@ -22,13 +22,30 @@ int main()
 	params["Bias"] = 1;
 
 	layer->Init(params);
-	layer->CreateNewLayer<Linear>("gg", params);
-	//print(layer->SubLayers["gg"]->Forward({x})[0]);
 	auto ty = layer->StateDict();
-	for (auto& it:ty)
+
+	auto sgd = Optimizer::CreateSGD(layer->Parameters(),10);
+
+	for (int a = 1; a < 3; a++)
 	{
-		print(it.first);
-		print(it.second);
-		print(it.second.Copy());
+		sgd.ZeroGrad();
+		auto gg = layer->Forward({ x })[0];
+		gg.Backward();
+		print("bencikaishi::");
+		for (auto& it : ty)
+		{
+			print(it.first);
+			print(it.second.GetGrad());
+			print(it.second);
+		}
+		sgd.Step();
+		for (auto& it : ty)
+		{
+			print(it.first);
+			print(it.second.GetGrad());
+			print(it.second);
+		}
+		print("bencijieshu::");
 	}
+
 }

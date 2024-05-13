@@ -1,8 +1,8 @@
 set(TARGET_NAME "DynamicAutomaticDifferentiation")
 project(${TARGET_NAME})
 
-file(GLOB CURRENT_HEADERS  *.h)
-file(GLOB CURRENT_SOURCES  *.cpp)
+file(GLOB_RECURSE CURRENT_HEADERS  *.h)
+file(GLOB_RECURSE CURRENT_SOURCES  *.cpp)
 
 source_group("Include" FILES ${CURRENT_HEADERS}) 
 source_group("Source" FILES ${CURRENT_SOURCES})

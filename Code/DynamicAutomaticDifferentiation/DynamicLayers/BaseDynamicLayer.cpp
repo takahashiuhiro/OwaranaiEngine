@@ -31,3 +31,16 @@ void BaseDynamicLayer::StateDictDFS(std::map<std::string, DynamicTensor>& ResMp,
 		it.second->StateDictDFS(ResMp, PreStr + it.first + std::string("."));
 	}
 }
+
+void BaseDynamicLayer::Eval()
+{
+	IsEval = true;
+	auto WeightsVec = Parameters();
+	for (auto& it : WeightsVec)it.Ops->IsEval = IsEval;
+}
+void BaseDynamicLayer::Train()
+{
+	IsEval = false;
+	auto WeightsVec = Parameters();
+	for (auto& it : WeightsVec)it.Ops->IsEval = IsEval;
+}

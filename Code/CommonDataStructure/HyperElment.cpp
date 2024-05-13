@@ -579,9 +579,7 @@ int he::DictGetIndexPre(int InputIndex){return 5*InputIndex+2;}
 
 DictFindDfsInfo he::SplayInputFindDfs(int RootIndex, int InputKey)
 {
-    //std::cout<<"gogo::"<<RootIndex<<std::endl;
     int NowKey = hash(MemoryArray[DictGetIndexKey(RootIndex)]);
-    //std::cout<<"gogo2::"<<MemoryArray[DictGetIndexKey(RootIndex)].DumpToString()<<std::endl;
     if(NowKey == InputKey)
     {
         return {1,RootIndex,-1};
@@ -649,7 +647,6 @@ int he::SplayInsert(he InputKey, he InputValue)
     {
         MemoryArray[DictGetIndexRight(FindRes.MemoryIndex)] = he(NewBlock);
     }
-    Splay(NewBlock);
     return NewBlock;
 }
 

@@ -57,7 +57,10 @@ DynamicTensor DynamicTensor::CreateVector(std::vector<float>InputData, bool Inpu
 
 DynamicTensor::~DynamicTensor()
 {
-	if(Ops->LeafNode == this)Ops->LeafNode = nullptr;
+	if(Ops != nullptr)
+	{
+		if(Ops->LeafNode == this)Ops->LeafNode = nullptr;
+	}
 }
 
 DynamicTensor DynamicTensor::GetGrad()
@@ -101,7 +104,7 @@ DynamicTensor DynamicTensor::SetComputationalHistory(Tensor* ResTensor, std::vec
 	for (size_t a = 0; a < InputList.size(); a++)MaxIsEval |= InputList[a].Ops->IsEval;
 	DynamicTensor Res(std::shared_ptr<Tensor>(ResTensor), MaxRequiresGrad&RequiresGrad&(!MaxIsEval));
 	Res.Ops->IsEval = MaxIsEval;
-	if (!RequiresGrad)return Res;
+	if ((!RequiresGrad)|| MaxIsEval)return Res;
 	Res.Ops->DynamicOpsType = InputOpsType;
 	Res.Ops->Params = InputPrams;
 	for (size_t a = 0; a < InputList.size(); a++)
