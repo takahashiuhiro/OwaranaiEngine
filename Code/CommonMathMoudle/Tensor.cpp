@@ -1275,3 +1275,51 @@ Tensor* Tensor::PositionalEncoding(int DModel, int MaxLen, size_t InputDeviceNum
     CombDivTerm->shape = ProtoShape;
     return CombDivTerm;
 }   
+
+std::vector<Tensor*> Tensor::GenerateSplitTensor(int SplitSize, int Dim)
+{
+    std::vector<int>SplitSections;
+    int ProtoDimSize = shape[Dim];
+    for(size_t a = 0; a < SplitSize ;a++)
+    {
+        if(a < (SplitSize-ProtoDimSize%SplitSize))SplitSections.push_back(ProtoDimSize/SplitSize);
+        else SplitSections.push_back(ProtoDimSize/SplitSize + 1);
+    }
+    return GenerateSplitTensor(SplitSections, Dim);
+}
+std::vector<Tensor*> Tensor::GenerateSplitTensor(std::vector<int> SplitSections, int Dim)
+{
+    std::vector<Tensor*>ReturnVec;
+    size_t FirstDim = 1;
+    for (size_t a = 0; a <= Dim; a++)FirstDim *= shape[a];
+    std::vector<size_t>CurDim;
+    size_t AllParts = 0;
+    for (size_t a = 0; a < SplitSections.size(); a++)AllParts += SplitSections[a];
+    for (size_t a = 0; a < SplitSections.size(); a++)CurDim.push_back((FirstDim * SplitSections[a]) / AllParts);
+    size_t LastSum = 0;
+    for (size_t a = 0; a < SplitSections.size(); a++)
+    {
+        Tensor* ThisTMPRes = GetUnitTensor({ CurDim[a],CurDim[a] }, GetDeviceNum());
+        if (LastSum != 0)
+        {
+            Tensor* ZeroPre = new Tensor({ CurDim[a], LastSum }, GetDeviceNum());
+            ZeroPre->FillArray(0);
+            Tensor* PreCurTensor = ZeroPre->TensorSplice(ThisTMPRes, 1);
+            delete ThisTMPRes;
+            delete ZeroPre;
+            ThisTMPRes = PreCurTensor;
+        }
+        if (LastSum + CurDim[a] < FirstDim)
+        {
+            Tensor* ZeroLast = new Tensor({ CurDim[a], FirstDim - CurDim[a] - LastSum }, GetDeviceNum());
+            ZeroLast->FillArray(0);
+            Tensor* LastCurTensor = ThisTMPRes->TensorSplice(ZeroLast,1);
+            delete ThisTMPRes;
+            delete ZeroLast;
+            ThisTMPRes = LastCurTensor;
+        }
+        LastSum += CurDim[a];
+        ReturnVec.push_back(ThisTMPRes);
+    }
+    return ReturnVec;
+}

@@ -139,4 +139,7 @@ public:
     static Tensor* ArithmeticSequence(std::vector<size_t> InputShape, float A1, float Arithmetic, size_t DeviceNum = 0);
     /**生成位置编码.*/
     static Tensor* PositionalEncoding(int DModel, int MaxLen, size_t DeviceNum = 0);
+    /**生成沿着split后的分割矩阵.*/
+    std::vector<Tensor*> GenerateSplitTensor(int SplitSize, int Dim=0);
+    std::vector<Tensor*> GenerateSplitTensor(std::vector<int> SplitSections, int Dim=0);
 };

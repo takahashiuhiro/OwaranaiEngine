@@ -11,41 +11,12 @@
 
 int main() 
 {
-	DynamicTensor x({ 3,3,5 }, 1);
-	x.Fill(3.4);
-
-	Linear* layer = new Linear();
-	he params = he::NewDict();
-	params["DeviceNum"] = 0;
-	params["InFeatures"] = 5;
-	params["OutFeatures"] = 4;
-	params["Bias"] = 1;
-
-	layer->Init(params);
-	auto ty = layer->StateDict();
-
-	auto sgd = Optimizer::CreateSGD(layer->Parameters(),10);
-
-	for (int a = 1; a < 3; a++)
+	Tensor* q = new Tensor({ 2,3,4 },1);
+	q->FillArray(1);
+	auto g = q->GenerateSplitTensor({ 1,2 }, 1);
+	for (auto we : g)
 	{
-		sgd.ZeroGrad();
-		auto gg = layer->Forward({ x })[0];
-		gg.Backward();
-		print("bencikaishi::");
-		for (auto& it : ty)
-		{
-			print(it.first);
-			print(it.second.GetGrad());
-			print(it.second);
-		}
-		sgd.Step();
-		for (auto& it : ty)
-		{
-			print(it.first);
-			print(it.second.GetGrad());
-			print(it.second);
-		}
-		print("bencijieshu::");
+		we->PrintData();
+		print("--");
 	}
-
 }
