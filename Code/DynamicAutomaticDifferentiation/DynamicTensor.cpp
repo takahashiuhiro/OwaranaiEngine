@@ -192,7 +192,11 @@ bool DynamicTensor::CheckPartialGradReady(std::map<DynamicOps*, std::map<Dynamic
 void DynamicTensor::GenEmptyGradDynamicTensor(DynamicTensor Loss)
 {
 	Tensor* GradResTensor;
-	if(Loss.Ops == nullptr)GradResTensor = Ops->TensorPointer->Copy();
+	if(Loss.Ops == nullptr)
+	{
+		GradResTensor = Ops->TensorPointer->Copy();
+		GradResTensor->FillArray(1.);
+	}
 	else GradResTensor = Loss.Ops->TensorPointer->Copy();
 	DynamicTensor DynamicTensorGrad(std::shared_ptr<Tensor>(GradResTensor), Ops->RequiresGrad);
 	Ops->GradOps = DynamicTensorGrad.Ops;

@@ -19,7 +19,7 @@ int main()
 
 
 	r = r.Sum();
-	print(r)
+	print(r);
 
 	r.Backward();
 	print(q.GetGrad());

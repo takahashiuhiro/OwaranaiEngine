@@ -3,6 +3,7 @@
 #include <string>
 #include <algorithm>
 #include <fstream>
+#include <vector>
 
 /**把数字变成字符串.*/
 template<typename T>
