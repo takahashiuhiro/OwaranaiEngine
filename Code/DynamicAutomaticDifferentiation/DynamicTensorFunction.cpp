@@ -2,6 +2,13 @@
 
 DynamicTensor DynamicTensor::Sum(std::vector<int>Dims, bool KeepDim)
 {
+	if (Dims.size() == 0)
+	{
+		for (size_t a = 0; a < Ops->TensorPointer->shape.size(); a++)
+		{
+			Dims.push_back(a);
+		}
+	}
 	he SumParams = he::NewDict();
 	SumParams["SumDims"] = he::NewList();
 	for (size_t a = 0; a < Dims.size(); a++)SumParams["SumDims"].append(Dims[a]);
@@ -51,4 +58,41 @@ DynamicTensor DynamicTensor::Dropout(DynamicTensor Input, float P, bool InPlace)
 	Input.Ops->TensorPointer = std::shared_ptr<Tensor>(DropoutTensorDotP->EleMul(Input.Ops->TensorPointer.get()));
 	delete DropoutTensorDotP;
 	return Input;
+}
+
+std::vector<DynamicTensor> DynamicTensor::Split(int SplitSize, int Dim)
+{
+	std::vector<int>SplitSections;
+	int ProtoDimSize = Ops->TensorPointer->shape[Dim];
+	for (size_t a = 0; a < SplitSize; a++)
+	{
+		if (a < (SplitSize - ProtoDimSize % SplitSize))SplitSections.push_back(ProtoDimSize / SplitSize);
+		else SplitSections.push_back(ProtoDimSize / SplitSize + 1);
+	}
+	return Split(SplitSections, Dim);
+}
+std::vector<DynamicTensor> DynamicTensor::Split(std::vector<int> SplitSections, int Dim)
+{
+	auto GenLeftMul = Ops->TensorPointer->GenerateSplitTensor(SplitSections, Dim);
+	std::vector<DynamicTensor>Res;
+	int PreDims = 1;
+	int LastDims = 1;
+	for (size_t a = 0; a < Ops->TensorPointer->shape.size(); a++)
+	{
+		if (a < Dim)PreDims *= Ops->TensorPointer->shape[a];
+		else LastDims *= Ops->TensorPointer->shape[a];
+	}
+	DynamicTensor ViewTensor = View({ PreDims , LastDims });
+	for (size_t a = 0; a < GenLeftMul.size(); a++)
+	{
+		DynamicTensor ResTMPTensor = ViewTensor % DynamicTensor(std::shared_ptr<Tensor>(GenLeftMul[a]));
+		std::vector<int> ReturnShape;
+		for (size_t b = 0; b < Ops->TensorPointer->shape.size(); b++)
+		{
+			if (b != Dim)ReturnShape.push_back(Ops->TensorPointer->shape[b]);
+			else ReturnShape.push_back(SplitSections[a]);
+		}
+		Res.push_back(ResTMPTensor.View(ReturnShape));
+	}
+	return Res;
 }

@@ -106,4 +106,12 @@ void print(double Input);
 void print(const char* Input);
 void print(size_t Input);
 template<typename T>
+void print(std::vector<T> Input)
+{
+    for(size_t a = 0;a<Input.size();a++)
+    {
+        print(Input[a]);
+    }
+}
+template<typename T>
 void print(T Input){Input.PrintData();}

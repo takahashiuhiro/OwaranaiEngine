@@ -8,7 +8,16 @@ import random
 import tqdm
 
 q = torch.Tensor([1,2,3,4,5,6,7,8,9,10,11,12.])
-q = q.view([2,3,2])
-e = q.split([2,1],1)
-for asdasd in e:
-    print(asdasd)
+q.requires_grad = True
+
+g = q.view([2,3,2])
+e = g.split([1,1,1],1)
+print(e[0])
+print(e[1])
+print(e[2])
+
+r = e[0]*e[1]*e[2]
+
+r = r.sum([1,2])
+print(r)
+

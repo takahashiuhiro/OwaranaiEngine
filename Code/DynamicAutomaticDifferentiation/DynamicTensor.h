@@ -104,9 +104,11 @@ public:
     static void DynamicStdOps_Backward_Pow(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps);
 
     /**函数.*/
-    DynamicTensor Sum(std::vector<int>Dims, bool KeepDim = false);
+    DynamicTensor Sum(std::vector<int>Dims = {}, bool KeepDim = false);
     DynamicTensor View(std::vector<int>Dims);
     DynamicTensor Softmax(int InputDim);
     DynamicTensor Pow(float EleExponent);
     static DynamicTensor Dropout(DynamicTensor Input, float P, bool InPlace = false);
+    std::vector<DynamicTensor> Split(int SplitSize, int Dim = 0);
+    std::vector<DynamicTensor> Split(std::vector<int> SplitSections, int Dim = 0);
 };
