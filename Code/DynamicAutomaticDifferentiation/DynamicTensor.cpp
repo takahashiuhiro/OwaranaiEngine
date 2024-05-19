@@ -130,8 +130,11 @@ void DynamicTensor::BackwardClearDFS(std::shared_ptr<DynamicOps>CurOps)
 	if (CurOps->InputOpsList.size())CurOps->GradOps = nullptr;
 	else
 	{
-		CurOps->GradOps->InputOpsList = {};
-		CurOps->GradOps->OutputOpsSet = {};
+		if(CurOps->RequiresGrad)
+		{
+			CurOps->GradOps->InputOpsList = {};
+			CurOps->GradOps->OutputOpsSet = {};
+		}
 	}
 	for (size_t a = 0; a < CurOps->InputOpsList.size(); a++)BackwardClearDFS(CurOps->InputOpsList[a]);
 }
