@@ -1291,29 +1291,31 @@ std::vector<Tensor*> Tensor::GenerateSplitTensor(std::vector<int> SplitSections,
 {
     std::vector<Tensor*>ReturnVec;
     size_t FirstDim = 1;
-    for (size_t a = 0; a <= Dim; a++)FirstDim *= shape[a];
+    size_t SecondDim = 1;
+    for (size_t a = 0; a < Dim; a++)FirstDim *= shape[a];
+    for(size_t a = Dim;a < shape.size();a++)SecondDim*=shape[a];
     std::vector<size_t>CurDim;
     size_t AllParts = 0;
     for (size_t a = 0; a < SplitSections.size(); a++)AllParts += SplitSections[a];
-    for (size_t a = 0; a < SplitSections.size(); a++)CurDim.push_back((FirstDim * SplitSections[a]) / AllParts);
+    for (size_t a = 0; a < SplitSections.size(); a++)CurDim.push_back((SecondDim * SplitSections[a]) / AllParts);
     size_t LastSum = 0;
     for (size_t a = 0; a < SplitSections.size(); a++)
     {
         Tensor* ThisTMPRes = GetUnitTensor({ CurDim[a],CurDim[a] }, GetDeviceNum());
         if (LastSum != 0)
         {
-            Tensor* ZeroPre = new Tensor({ CurDim[a], LastSum }, GetDeviceNum());
+            Tensor* ZeroPre = new Tensor({ LastSum,CurDim[a]}, GetDeviceNum());
             ZeroPre->FillArray(0);
-            Tensor* PreCurTensor = ZeroPre->TensorSplice(ThisTMPRes, 1);
+            Tensor* PreCurTensor = ZeroPre->TensorSplice(ThisTMPRes, 0);
             delete ThisTMPRes;
             delete ZeroPre;
             ThisTMPRes = PreCurTensor;
         }
-        if (LastSum + CurDim[a] < FirstDim)
+        if (LastSum + CurDim[a] < SecondDim)
         {
-            Tensor* ZeroLast = new Tensor({ CurDim[a], FirstDim - CurDim[a] - LastSum }, GetDeviceNum());
+            Tensor* ZeroLast = new Tensor({ SecondDim - CurDim[a] - LastSum,CurDim[a] }, GetDeviceNum());
             ZeroLast->FillArray(0);
-            Tensor* LastCurTensor = ThisTMPRes->TensorSplice(ZeroLast,1);
+            Tensor* LastCurTensor = ThisTMPRes->TensorSplice(ZeroLast,0);
             delete ThisTMPRes;
             delete ZeroLast;
             ThisTMPRes = LastCurTensor;
@@ -1322,4 +1324,39 @@ std::vector<Tensor*> Tensor::GenerateSplitTensor(std::vector<int> SplitSections,
         ReturnVec.push_back(ThisTMPRes);
     }
     return ReturnVec;
+}
+
+std::vector<Tensor*> Tensor::TensorSplit(int SplitSize, int Dim)
+{
+    std::vector<int>SplitSections;
+    int ProtoDimSize = shape[Dim];
+    for (size_t a = 0; a < SplitSize; a++)
+    {
+        if (a < (SplitSize - ProtoDimSize % SplitSize))SplitSections.push_back(ProtoDimSize / SplitSize);
+        else SplitSections.push_back(ProtoDimSize / SplitSize + 1);
+    }
+    return TensorSplit(SplitSections, Dim);
+}
+std::vector<Tensor*> Tensor::TensorSplit(std::vector<int> SplitSections, int Dim)
+{
+    auto GenLeftMul = GenerateSplitTensor(SplitSections, Dim);
+    std::vector<Tensor*>Res;
+    size_t PreDims = 1;
+    size_t LastDims = 1;
+    for (size_t a = 0; a < shape.size(); a++)
+    {
+        if (a < Dim)PreDims *= shape[a];
+        else LastDims *= shape[a];
+    }
+    Tensor* ViewTensor = View({ PreDims,LastDims });
+    for (size_t a = 0; a < GenLeftMul.size(); a++)
+    {
+        Tensor* ResTMPTensor = ViewTensor->Matmul(GenLeftMul[a]); 
+        auto ReturnShape = shape;
+        ReturnShape[Dim] = SplitSections[a];
+        Res.push_back(ResTMPTensor->View(ReturnShape));
+        delete ResTMPTensor;
+    }
+    delete ViewTensor;
+    return Res;
 }

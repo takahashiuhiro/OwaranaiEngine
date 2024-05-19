@@ -142,4 +142,7 @@ public:
     /**生成沿着split后的分割矩阵.*/
     std::vector<Tensor*> GenerateSplitTensor(int SplitSize, int Dim=0);
     std::vector<Tensor*> GenerateSplitTensor(std::vector<int> SplitSections, int Dim=0);
+    /**生成沿着指定dim进行split后的矩阵vec.*/
+    std::vector<Tensor*> TensorSplit(int SplitSize, int Dim = 0);
+    std::vector<Tensor*> TensorSplit(std::vector<int> SplitSections, int Dim = 0);
 };
