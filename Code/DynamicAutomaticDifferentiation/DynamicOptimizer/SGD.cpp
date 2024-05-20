@@ -10,11 +10,11 @@ void SGD::Step()
 	std::vector<DynamicTensor>GradList;
 	if (std::abs(WeightDecay) > eps)
 	{
-		for (size_t a = 0; a < Parameters.size(); a++)GradList.push_back(Parameters[a].GetGrad().Copy() + Parameters[a].Copy() * WeightDecay);
+		for (size_t a = 0; a < Parameters.size(); a++)GradList.push_back(Parameters[a].Grad().Copy() + Parameters[a].Copy() * WeightDecay);
 	}
 	else
 	{
-		for (size_t a = 0; a < Parameters.size(); a++)GradList.push_back(Parameters[a].GetGrad().Copy());
+		for (size_t a = 0; a < Parameters.size(); a++)GradList.push_back(Parameters[a].Grad().Copy());
 	}
 	if (std::abs(Momentum) > eps)
 	{

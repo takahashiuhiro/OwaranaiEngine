@@ -22,5 +22,5 @@ int main()
 	print(r);
 
 	r.Backward();
-	print(q.GetGrad());
+	print(q.Grad());
 }

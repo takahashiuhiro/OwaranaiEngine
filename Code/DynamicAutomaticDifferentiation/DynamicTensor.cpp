@@ -63,7 +63,7 @@ DynamicTensor::~DynamicTensor()
 	}
 }
 
-DynamicTensor DynamicTensor::GetGrad()
+DynamicTensor DynamicTensor::Grad()
 {
 	Log::Assert(Ops->GradOps != nullptr, "This DynamicTensor Has No Grad");
 	return DynamicTensor(Ops->GradOps);

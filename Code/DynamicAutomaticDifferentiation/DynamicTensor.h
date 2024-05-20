@@ -48,7 +48,7 @@ public:
     ~DynamicTensor();//析构函数释放内存
 
     /**公共函数.*/
-    DynamicTensor GetGrad();
+    DynamicTensor Grad();
     DynamicTensor Copy();//复制一个空的只有张量的值.
 
     /**Tensor内函数组装.*/
