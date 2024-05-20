@@ -7,16 +7,20 @@ import typing
 import random
 import tqdm
 
+def cc(a):
+    b = torch.exp(-2*a)
+    return (1-b)*((1+b)**(-1))
+
 ggq = torch.nn.MSELoss()
 
-q = torch.Tensor([1,2,3,4,5,6,7,8,9,10,11,12.])
+q = torch.Tensor([1,2,3,4,5,6,77,8,9,10,11,12.])
 
 
 g = q.view([2,3,2])
 g.requires_grad = True
 
 
-r = torch.exp(g)
+r = cc(g)
 r=r.sum()
 
 r.backward( torch.tensor(1, dtype=torch.float))

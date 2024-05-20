@@ -104,7 +104,8 @@ DynamicTensor DynamicTensor::Eleexp(float EleBaseNum)
 	return DynamicStdOps_Forward_Eleexp({ *this }, EleexpParams, true);
 }
 
-//DynamicTensor DynamicTensor::Tanh()
-//{
-//
-//}
+DynamicTensor DynamicTensor::Tanh()
+{
+	DynamicTensor ExpTMP =  (DynamicTensor(Ops) * (-2)).Eleexp(M_E);
+	return (ExpTMP * (-1) + 1) * ((ExpTMP + 1.).Pow(-1.));
+}
