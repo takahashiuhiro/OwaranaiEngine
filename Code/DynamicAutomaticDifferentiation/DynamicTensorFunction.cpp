@@ -96,3 +96,15 @@ std::vector<DynamicTensor> DynamicTensor::Split(std::vector<int> SplitSections, 
 	}
 	return Res;
 }
+
+DynamicTensor DynamicTensor::Eleexp(float EleBaseNum)
+{
+	he EleexpParams = he::NewDict();
+	EleexpParams["EleBaseNum"] = EleBaseNum;
+	return DynamicStdOps_Forward_Eleexp({ *this }, EleexpParams, true);
+}
+
+//DynamicTensor DynamicTensor::Tanh()
+//{
+//
+//}

@@ -10,6 +10,7 @@ void DynamicTensor::OpsSetInMap()
 	BackwardOps[OpsType::EleMul] = DynamicStdOps_Backward_Elemul;
 	BackwardOps[OpsType::Softmax] = DynamicStdOps_Backward_Softmax;
 	BackwardOps[OpsType::Pow] = DynamicStdOps_Backward_Pow;
+	BackwardOps[OpsType::EleExp] = DynamicStdOps_Backward_Eleexp;
 }
 
 
@@ -234,5 +235,19 @@ void DynamicTensor::DynamicStdOps_Backward_Pow(std::map<DynamicOps*, std::map<Dy
 	PowParams["EleExponent"] = CurEleExponent - 1;
 	DynamicTensor Res = DynamicStdOps_Forward_Pow({ DynamicTensor(CurOps->InputOpsList[0])}, PowParams, true);
 	Res = DynamicTensor(CurOps->GradOps)*Res * CurEleExponent;
+	BackwardOpsMap[CurOps->InputOpsList[0].get()][CurOps.get()] = Res.Ops;
+}
+
+DynamicTensor DynamicTensor::DynamicStdOps_Forward_Eleexp(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad)
+{
+	float EleBaseNum = InputParams["EleBaseNum"].f();
+	auto ResTensorContent = InputList[0].Ops->TensorPointer->EleExp(EleBaseNum);
+	return SetComputationalHistory(ResTensorContent, InputList, InputParams, OpsType::EleExp, RequiresGrad);
+}
+void DynamicTensor::DynamicStdOps_Backward_Eleexp(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps)
+{
+	if (!CurOps->InputOpsList[0]->RequiresGrad)return;
+	float EleBaseNum = CurOps->Params["EleBaseNum"].f();
+	DynamicTensor Res = DynamicTensor(CurOps) * DynamicTensor(CurOps->GradOps) * std::log(EleBaseNum);
 	BackwardOpsMap[CurOps->InputOpsList[0].get()][CurOps.get()] = Res.Ops;
 }

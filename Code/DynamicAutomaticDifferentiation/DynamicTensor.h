@@ -103,6 +103,9 @@ public:
     static DynamicTensor DynamicStdOps_Forward_Pow(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad = false);
     static void DynamicStdOps_Backward_Pow(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps);
 
+    static DynamicTensor DynamicStdOps_Forward_Eleexp(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad = false);
+    static void DynamicStdOps_Backward_Eleexp(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps);
+
     /**函数.*/
     DynamicTensor Sum(std::vector<int>Dims = {}, bool KeepDim = false);
     DynamicTensor View(std::vector<int>Dims);
@@ -111,4 +114,6 @@ public:
     static DynamicTensor Dropout(DynamicTensor Input, float P, bool InPlace = false);
     std::vector<DynamicTensor> Split(int SplitSize, int Dim = 0);
     std::vector<DynamicTensor> Split(std::vector<int> SplitSections, int Dim = 0);
+    DynamicTensor Eleexp(float EleBaseNum);
+    //DynamicTensor Tanh();
 };
