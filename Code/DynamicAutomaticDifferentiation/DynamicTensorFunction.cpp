@@ -109,3 +109,11 @@ DynamicTensor DynamicTensor::Tanh()
 	DynamicTensor ExpTMP =  (DynamicTensor(Ops) * (-2)).Eleexp(M_E);
 	return (ExpTMP * (-1) + 1) * ((ExpTMP + 1.).Pow(-1.));
 }
+
+//DynamicTensor DynamicTensor::Cat(std::vector<DynamicTensor>InputTensors, int Dim)
+//{
+//	for (size_t a = 0; a < InputTensors.size(); a++)
+//	{
+//
+//	}
+//}

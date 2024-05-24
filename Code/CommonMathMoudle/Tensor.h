@@ -145,4 +145,7 @@ public:
     /**生成沿着指定dim进行split后的矩阵vec.*/
     std::vector<Tensor*> TensorSplit(int SplitSize, int Dim = 0);
     std::vector<Tensor*> TensorSplit(std::vector<int> SplitSections, int Dim = 0);
+    /**生成沿着cat后的合成矩阵.*/
+    static std::vector<Tensor*> GenerateCatTensor(std::vector<Tensor*>InputTensors, int Dim = 0);
+    static Tensor* TensorCat(std::vector<Tensor*>InputTensors, int Dim = 0);
 };

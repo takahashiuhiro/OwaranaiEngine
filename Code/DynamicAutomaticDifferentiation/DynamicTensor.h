@@ -116,4 +116,5 @@ public:
     std::vector<DynamicTensor> Split(std::vector<int> SplitSections, int Dim = 0);
     DynamicTensor Eleexp(float EleBaseNum);
     DynamicTensor Tanh();
+    //static DynamicTensor Cat(std::vector<DynamicTensor>InputTensors, int Dim = 0);
 };

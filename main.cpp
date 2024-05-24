@@ -11,16 +11,10 @@
 
 int main() 
 {
-	DynamicTensor q = DynamicTensor(std::shared_ptr<Tensor>(new Tensor({ 2,3,2 }, 0, { 1,2,3,4,5,6,77,8,9,10,11,12. })),1);
-	//q->FillArray(1);
+	Tensor* q = new Tensor({ 2,3 }, 0, { 1,2,3,4,5,6. });
+	Tensor* w = new Tensor({ 2,4 }, 0, { 1,2,3,4,5,6.,7,8 });
+	Tensor* e = new Tensor({ 2,5 }, 0, { 1,2,3,4,5,6.,7,8,9,10 });
 
-
-	//auto r = q.Eleexp(M_E);
-
-	auto r = q.Tanh();
-	r = r.Sum();
-	print(r);
-		
-	r.Backward();
-	print(q.Grad());
+	Tensor::TensorCat({ q,w,e }, 1)->PrintData();
+	//print(Tensor::TensorCat({ q,w,e }, 0)->shape);
 }

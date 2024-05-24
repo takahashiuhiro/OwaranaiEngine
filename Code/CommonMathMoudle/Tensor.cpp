@@ -1358,5 +1358,85 @@ std::vector<Tensor*> Tensor::TensorSplit(std::vector<int> SplitSections, int Dim
         delete ResTMPTensor;
     }
     delete ViewTensor;
+    for (size_t a = 0; a < GenLeftMul.size(); a++)delete GenLeftMul[a];
     return Res;
+}
+
+std::vector<Tensor*> Tensor::GenerateCatTensor(std::vector<Tensor*>InputTensors, int Dim)
+{
+    std::vector<Tensor*>Res;
+    int TargetDim = 0;
+    for (size_t a = 0; a < InputTensors.size(); a++)TargetDim += InputTensors[a]->shape[Dim];
+    for (size_t a = 0; a < InputTensors[0]->shape.size(); a++)
+    {
+        if(a>Dim)TargetDim*=InputTensors[0]->shape[a];
+    }
+    size_t PreDim = 0;
+    for (size_t a = 0; a < InputTensors.size(); a++)
+    {
+        size_t FirstDim = 1;
+        size_t LastDim = 1;
+        for (size_t b = 0; b < InputTensors[a]->shape.size(); b++)
+        {
+            if (b < Dim)FirstDim *= InputTensors[a]->shape[b];
+            else LastDim *= InputTensors[a]->shape[b];
+        }
+        Tensor* ThisTMPRes = GetUnitTensor({ LastDim, LastDim }, InputTensors[a]->GetDeviceNum());
+        if (PreDim != 0)
+        {
+            Tensor* ZeroPre = new Tensor({ LastDim,PreDim }, InputTensors[a]->GetDeviceNum());
+            ZeroPre->FillArray(0);
+            Tensor* PreCurTensor = ZeroPre->TensorSplice(ThisTMPRes, 1);
+            delete ThisTMPRes;
+            delete ZeroPre;
+            ThisTMPRes = PreCurTensor;
+        }
+        if (PreDim + LastDim < TargetDim)
+        {
+            Tensor* ZeroPre = new Tensor({ LastDim,TargetDim-PreDim- LastDim }, InputTensors[a]->GetDeviceNum());
+            ZeroPre->FillArray(0);
+            Tensor* PreCurTensor = ThisTMPRes->TensorSplice(ZeroPre, 1);
+            delete ThisTMPRes;
+            delete ZeroPre;
+            ThisTMPRes = PreCurTensor;
+        }
+        Res.push_back(ThisTMPRes);
+        PreDim += LastDim;
+    }
+    return Res;
+}
+
+Tensor* Tensor::TensorCat(std::vector<Tensor*>InputTensors, int Dim)
+{
+    auto GenRightMul = GenerateCatTensor(InputTensors, Dim);
+    int TargetDim = 0;
+    for (size_t a = 0; a < InputTensors.size(); a++)TargetDim += InputTensors[a]->shape[Dim];
+    Tensor* Res = nullptr;
+    for (size_t a = 0; a < InputTensors.size(); a++)
+    {
+        size_t FirstDim = 1;
+        size_t LastDim = 1;
+        for (size_t b = 0; b < InputTensors[a]->shape.size(); b++)
+        {
+            if (b < Dim)FirstDim *= InputTensors[a]->shape[b];
+            else LastDim *= InputTensors[a]->shape[b];
+        }
+        Tensor* ViewTensor = InputTensors[a]->View({ FirstDim, LastDim });
+        Tensor* ThisResTensor = ViewTensor->Matmul(GenRightMul[a]);
+        delete ViewTensor;
+        if (Res == nullptr)Res = ThisResTensor;
+        else
+        {
+            Tensor* TMPTensor = Res->Add(ThisResTensor);
+            delete ThisResTensor;
+            delete Res;
+            Res = TMPTensor;
+        }
+    }
+    for (size_t a = 0; a < GenRightMul.size(); a++)delete GenRightMul[a];
+    std::vector<size_t>TrueShape = InputTensors[0]->shape;
+    TrueShape[Dim] = TargetDim;
+    Tensor* TMPRes = Res->View(TrueShape);
+    delete Res;
+    return TMPRes;
 }
