@@ -135,3 +135,9 @@ DynamicTensor DynamicTensor::Cat(std::vector<DynamicTensor>InputTensors, int Dim
 	ReturnShape[Dim] = TargetDim;
 	return Res.View(ReturnShape);
 }
+
+DynamicTensor DynamicTensor::GELU()
+{
+	auto Self = DynamicTensor(Ops);
+	return (Self * 0.5) * (((Self + Self.Pow(3.) * 0.044715) * std::pow(2. / M_PI, 0.5)).Tanh() + 1);
+}

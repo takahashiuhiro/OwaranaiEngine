@@ -21,18 +21,23 @@ e = torch.Tensor([1,2,3,4,5,6,7,8,9,10.])
 q = q.view([2,3])
 q.requires_grad = True
 
-w = w.view([2,4])
-w.requires_grad = True
+#w = w.view([2,4])
+#w.requires_grad = True
+#
+#e = e.view([2,5])
+#e.requires_grad = True
+#
+#r = torch.cat([q,w,e],1)
+#print(r)
+#r=r.sum()
+#
+#r.backward()
+#print(r)
+#print(q.grad)
+#print(w.grad)
+#print(e.grad)
 
-e = e.view([2,5])
-e.requires_grad = True
-
-r = torch.cat([q,w,e],1)
-print(r)
-r=r.sum()
-
+gg = torch.nn.GELU()
+r = gg(q).sum()
 r.backward()
-print(r)
 print(q.grad)
-print(w.grad)
-print(e.grad)

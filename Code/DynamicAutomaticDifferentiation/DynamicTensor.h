@@ -117,4 +117,5 @@ public:
     DynamicTensor Eleexp(float EleBaseNum);
     DynamicTensor Tanh();
     static DynamicTensor Cat(std::vector<DynamicTensor>InputTensors, int Dim = 0);
+    DynamicTensor GELU();
 };
