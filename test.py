@@ -13,17 +13,26 @@ def cc(a):
 
 ggq = torch.nn.MSELoss()
 
-q = torch.Tensor([1,2,3,4,5,6,77,8,9,10,11,12.])
+q = torch.Tensor([1,2,3,4,5,6.])
+w = torch.Tensor([1,2,3,4,5,6,7,8.])
+e = torch.Tensor([1,2,3,4,5,6,7,8,9,10.])
 
 
-g = q.view([2,3,2])
-g.requires_grad = True
+q = q.view([2,3])
+q.requires_grad = True
 
+w = w.view([2,4])
+w.requires_grad = True
 
-r = cc(g)
+e = e.view([2,5])
+e.requires_grad = True
+
+r = torch.cat([q,w,e],1)
+print(r)
 r=r.sum()
 
-r.backward( torch.tensor(1, dtype=torch.float))
+r.backward()
 print(r)
-print(g.grad)
-
+print(q.grad)
+print(w.grad)
+print(e.grad)

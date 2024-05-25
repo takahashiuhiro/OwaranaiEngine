@@ -110,10 +110,28 @@ DynamicTensor DynamicTensor::Tanh()
 	return (ExpTMP * (-1) + 1) * ((ExpTMP + 1.).Pow(-1.));
 }
 
-//DynamicTensor DynamicTensor::Cat(std::vector<DynamicTensor>InputTensors, int Dim)
-//{
-//	for (size_t a = 0; a < InputTensors.size(); a++)
-//	{
-//
-//	}
-//}
+DynamicTensor DynamicTensor::Cat(std::vector<DynamicTensor>InputTensors, int Dim)
+{
+	std::vector<Tensor*>TensorVer;
+	for (auto& It : InputTensors)TensorVer.push_back(It.Ops->TensorPointer.get());
+	auto GenRightMat = Tensor::GenerateCatTensor(TensorVer, Dim);
+	DynamicTensor Res;
+	int TargetDim = 0;
+	for (size_t a = 0; a < InputTensors.size(); a++)TargetDim += InputTensors[a].Ops->TensorPointer->shape[Dim];
+	for (size_t a = 0; a < InputTensors.size(); a++)
+	{
+		size_t FirstDim = 1;
+		size_t LastDim = 1;
+		for (size_t b = 0; b < InputTensors[a].Ops->TensorPointer->shape.size(); b++)
+		{
+			if (b < Dim)FirstDim *= InputTensors[a].Ops->TensorPointer->shape[b];
+			else LastDim *= InputTensors[a].Ops->TensorPointer->shape[b];
+		}
+		if (a == 0)Res = InputTensors[a].View({ (int)FirstDim, (int)LastDim }) % DynamicTensor(std::shared_ptr<Tensor>(GenRightMat[a]));
+		else Res = Res + InputTensors[a].View({ (int)FirstDim, (int)LastDim }) % DynamicTensor(std::shared_ptr<Tensor>(GenRightMat[a]));
+	}
+	std::vector<int> ReturnShape;
+	for (size_t a = 0; a < InputTensors[0].Ops->TensorPointer->shape.size(); a++)ReturnShape.push_back(InputTensors[0].Ops->TensorPointer->shape[a]);
+	ReturnShape[Dim] = TargetDim;
+	return Res.View(ReturnShape);
+}
