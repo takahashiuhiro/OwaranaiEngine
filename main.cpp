@@ -31,8 +31,9 @@ int main()
 	//print(q.Grad());
 	//print(w.Grad());
 	//print(e.Grad());
-	auto r = q.GELU().Sum();
-	r.Backward();
-
-	print(q.Grad());
+	//auto r = q.GELU().Sum();
+	//r.Backward();
+	//
+	//print(q.Grad());
+	print(q.Mean({ 0,1 },1));
 }

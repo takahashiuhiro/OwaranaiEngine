@@ -141,3 +141,10 @@ DynamicTensor DynamicTensor::GELU()
 	auto Self = DynamicTensor(Ops);
 	return (Self * 0.5) * (((Self + Self.Pow(3.) * 0.044715) * std::pow(2. / M_PI, 0.5)).Tanh() + 1);
 }
+
+DynamicTensor DynamicTensor::Mean(std::vector<int>InputDims, bool KeepDim)
+{
+	float MeanPartial = 1;
+	for (size_t a = 0; a < InputDims.size(); a++)MeanPartial *= Ops->TensorPointer->shape[InputDims[a]];
+	return Sum(InputDims, KeepDim)*(1./ MeanPartial);
+}

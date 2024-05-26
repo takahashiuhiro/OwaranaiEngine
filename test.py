@@ -37,7 +37,9 @@ q.requires_grad = True
 #print(w.grad)
 #print(e.grad)
 
-gg = torch.nn.GELU()
-r = gg(q).sum()
-r.backward()
-print(q.grad)
+#gg = torch.nn.GELU()
+#r = gg(q).sum()
+#r.backward()
+#print(q.grad)
+
+print(q.mean([0,1],True))
