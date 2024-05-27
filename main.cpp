@@ -18,15 +18,15 @@ int main()
 	//Tensor::TensorCat({ q,w,e }, 1)->PrintData();
 	//print(Tensor::TensorCat({ q,w,e }, 0)->shape);
 
-	DynamicTensor q(std::shared_ptr<Tensor>(new Tensor({ 2,3 }, 0, { 1,2,3,4,5,6. })), true);
+	DynamicTensor q(std::shared_ptr<Tensor>(new Tensor({ 4,4 }, 0, { 0.2035,  1.2959,  1.8101, -0.4644,1.5027, -0.3270,  0.5905,  0.6538,-1.5745,  1.3330, -0.5596, -0.6548,0.1264, -0.5080,  1.6420,  0.1992 })), true);
 	//DynamicTensor w(std::shared_ptr<Tensor>(new Tensor({ 2,4 }, 0, { 1,2,3,4,5,6.,7,8 })), true);
 	//DynamicTensor e(std::shared_ptr<Tensor>(new Tensor({ 2,5 }, 0, { 1,2,3,4,5,6.,7,8,9,10 })), true);
 	//
-	//auto r = DynamicTensor::Cat({ q,w,e },1);
-	//print(r);
-	//r = r.Sum();
-	//
-	//r.Backward();
+	auto r = q.Var({ 1 },1);
+	print(r);
+	r = r.Sum();
+	print(r);
+	r.Backward();
 	//print(r);
 	//print(q.Grad());
 	//print(w.Grad());
@@ -35,5 +35,5 @@ int main()
 	//r.Backward();
 	//
 	//print(q.Grad());
-	print(q.Mean({ 0,1 },1));
+	print(q.Grad());
 }

@@ -7,39 +7,19 @@ import typing
 import random
 import tqdm
 
-def cc(a):
-    b = torch.exp(-2*a)
-    return (1-b)*((1+b)**(-1))
-
-ggq = torch.nn.MSELoss()
-
-q = torch.Tensor([1,2,3,4,5,6.])
-w = torch.Tensor([1,2,3,4,5,6,7,8.])
-e = torch.Tensor([1,2,3,4,5,6,7,8,9,10.])
 
 
-q = q.view([2,3])
+q = torch.tensor(
+         [[ 0.2035,  1.2959,  1.8101, -0.4644],
+          [ 1.5027, -0.3270,  0.5905,  0.6538],
+          [-1.5745,  1.3330, -0.5596, -0.6548],
+          [ 0.1264, -0.5080,  1.6420,  0.1992]])
+
 q.requires_grad = True
+r = torch.var(q, dim=1, keepdim=True)
+print(r)
+r = r.sum()
+print(r)
+r.backward()
+print(q.grad)
 
-#w = w.view([2,4])
-#w.requires_grad = True
-#
-#e = e.view([2,5])
-#e.requires_grad = True
-#
-#r = torch.cat([q,w,e],1)
-#print(r)
-#r=r.sum()
-#
-#r.backward()
-#print(r)
-#print(q.grad)
-#print(w.grad)
-#print(e.grad)
-
-#gg = torch.nn.GELU()
-#r = gg(q).sum()
-#r.backward()
-#print(q.grad)
-
-print(q.mean([0,1],True))
