@@ -36,4 +36,11 @@ int main()
 	//
 	//print(q.Grad());
 	print(q.Grad());
+
+
+	he qweqwe = he::NewList(std::vector<std::string>{ "hh", "yy", "ww" });
+	print(qweqwe);
+	std::vector<std::string>rr;
+	qweqwe.v(rr);
+	print(rr);
 }

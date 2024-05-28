@@ -38,6 +38,18 @@ float he::f()
     Log::Assert(CheckType(heType::FLOAT), std::string("he TYPE ERROR, V TYPE IS NOT FLOAT"));
     return InterVfloat;
 }
+void he::v(std::vector<std::string>& Res)
+{
+    Log::Assert(ElementType == heType::LIST, "only he can  convert to std::vector");
+    for (he a = 0; a < size(); a = a + 1)
+    {
+        if ((*this)[a].ElementType == heType::STRING)Res.push_back((*this)[a].s());
+        else
+        {
+            Log::Assert(false, "this he can not convert to std::vector");
+        }
+    }
+}
 void he::w(int Input)
 {
     InterVint = Input;

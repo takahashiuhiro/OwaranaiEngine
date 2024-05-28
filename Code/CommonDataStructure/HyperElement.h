@@ -70,6 +70,21 @@ struct he
     int i();
     std::string s();
     float f();
+    void v(std::vector<std::string>& Res);
+    template<typename T>
+    void v(std::vector<T>&Res)
+    {
+        Log::Assert(ElementType==heType::LIST, "only he can  convert to std::vector");
+        for (he a = 0; a < size(); a = a+1)
+        {
+            if ((*this)[a].ElementType == heType::INT)Res.push_back((*this)[a].i());
+            else if ((*this)[a].ElementType == heType::FLOAT)Res.push_back((*this)[a].f());
+            else
+            {
+                Log::Assert(false, "this he can not convert to std::vector");
+            }
+        }
+    }
 
     /**基础类型写入.*/
     void w(int Input);
@@ -133,6 +148,14 @@ struct he
 
     /**list类型管理.*/
     static he NewList(int InputLength = 0);
+    template<typename T>
+    static he NewList(std::vector<T>Input)
+    {
+        he Res = NewList();
+        for (auto& it : Input)Res.append(it);
+        return Res;
+    }
+
     void append(int Other);
     void append(std::string Other);
     void append(float Other);
