@@ -1,9 +1,18 @@
 #pragma once
 #include "BaseDynamicLayer.h"
 
+/*
+*@Params
+* InFeatures 输入维度.
+* OutFeatures 输出维度.
+* Default:
+* Bias = true 是否有偏置.
+.*/
+
 class Linear :public BaseDynamicLayer
 {
 public:
+	virtual void SetLayerParams();
 	virtual void Init(he InputParams);
 	virtual std::vector<DynamicTensor> Forward(std::vector<DynamicTensor>InputForwardList, he InputParams = he());
 

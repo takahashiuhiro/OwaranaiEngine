@@ -17,14 +17,6 @@
 
 https://github.com/takahashiuhiro/OwaranaiEngine/blob/main/doc.md 
 
-## 关于项目完成度和目标  
-
-transformer施工中..
-
-## 关于快速上手  
-
-todo
-
 ## 关于本项目的配置  
 
 (必须)C++ 11  
@@ -51,3 +43,5 @@ git clone https://github.com/takahashiuhiro/OwaranaiEngine.git
 右键解决方案 生成  
 ctrl+F5编译运行  
 
+## 项目备忘录 
+1. Linear和LayerNorm的Dynamic版还没测试  

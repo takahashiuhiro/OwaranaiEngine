@@ -44,3 +44,16 @@ void BaseDynamicLayer::Train()
 	auto WeightsVec = Parameters();
 	for (auto& it : WeightsVec)it.Ops->IsEval = IsEval;
 }
+
+void BaseDynamicLayer::SetCommonDefaultParams()
+{
+	if (Params.In("DeviceNum"))DeviceNum = Params["DeviceNum"].i();
+	else DeviceNum = 0;
+}
+
+void BaseDynamicLayer::SetParams(he InputParams)
+{
+	Params = InputParams;
+	SetCommonDefaultParams();
+	SetLayerParams();
+}

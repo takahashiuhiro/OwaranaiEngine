@@ -50,6 +50,7 @@ public:
     /**公共函数.*/
     DynamicTensor Grad();
     DynamicTensor Copy();//复制一个空的只有张量的值.
+    std::vector<size_t>& Shape();
 
     /**Tensor内函数组装.*/
     void PrintData();

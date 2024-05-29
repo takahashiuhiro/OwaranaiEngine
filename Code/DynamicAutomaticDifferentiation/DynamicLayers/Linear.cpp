@@ -1,20 +1,15 @@
 #include "Linear.h"
 
-/*
-*@Params
-* DeviceNum 设备计数.
-* InFeatures 输入维度.
-* OutFeatures 输出维度.
-* Bias 是否有偏置.
-.*/
-
+void Linear::SetLayerParams()
+{
+	InFeatures = Params["InFeatures"].i();
+	OutFeatures = Params["OutFeatures"].i();
+	if (Params.In("Bias"))Bias = Params["Bias"].i();
+	else Bias = true;
+}
 void Linear::Init(he InputParams)
 {
-	Params = InputParams;
-	DeviceNum = InputParams["DeviceNum"].i();
-	InFeatures = InputParams["InFeatures"].i();
-	OutFeatures = InputParams["OutFeatures"].i();
-	Bias = InputParams["Bias"].i();
+	SetParams(InputParams);
 	Weights["Weight"] = DynamicTensor({ InFeatures , OutFeatures }, true, DeviceNum);
 	Weights["Weight"].FillRandValUniform(-std::sqrt(1. / InFeatures), std::sqrt(1. / InFeatures));
 	if (Bias)

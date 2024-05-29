@@ -1,5 +1,11 @@
 #include "../DynamicTensor.h"
 
+/*
+*@Params
+* Default
+* DeviceNum = 0 CPU\GPU.
+.*/
+
 class BaseDynamicLayer
 {
 public:
@@ -21,7 +27,10 @@ public:
 	void StateDictDFS(std::map<std::string, DynamicTensor>& ResMp, std::string PreStr);
 	void Eval();
 	void Train();
+	void SetCommonDefaultParams();
+	void SetParams(he InputParams);
 
+	virtual void SetLayerParams() = 0;
 	virtual void Init(he InputParams) = 0;
 	virtual std::vector<DynamicTensor> Forward(std::vector<DynamicTensor>InputForwardList, he InputParams = he()) = 0;
 };

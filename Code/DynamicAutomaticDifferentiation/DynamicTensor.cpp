@@ -75,6 +75,12 @@ DynamicTensor DynamicTensor::Copy()
 	return Res;
 }
 
+std::vector<size_t>& DynamicTensor::Shape()
+{
+	Log::Assert(Ops != nullptr, "this ops of dynamictensor is nullptr, so you can't read its shape..");
+	return Ops->TensorPointer->shape;
+}
+
 void DynamicTensor::PrintData()
 {
 	Ops->TensorPointer->PrintData();
