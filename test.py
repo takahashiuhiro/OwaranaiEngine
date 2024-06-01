@@ -8,18 +8,21 @@ import random
 import tqdm
 
 
+    
 
 q = torch.tensor(
-         [[ 0.2035,  1.2959,  1.8101, -0.4644],
-          [ 1.5027, -0.3270,  0.5905,  0.6538],
-          [-1.5745,  1.3330, -0.5596, -0.6548],
-          [ 0.1264, -0.5080,  1.6420,  0.1992]])
+         [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24.])
+q = q.view([3,2,4])
 
 q.requires_grad = True
-r = torch.var(q, dim=1, keepdim=True)
-print(r)
-r = r.sum()
-print(r)
+
+g = torch.nn.LayerNorm([2,4])
+
+asd = g(q)
+print(asd)
+r = asd.sum()
 r.backward()
+
+print(r)
 print(q.grad)
 

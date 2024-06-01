@@ -120,5 +120,5 @@ public:
     static DynamicTensor Cat(std::vector<DynamicTensor>InputTensors, int Dim = 0);
     DynamicTensor GELU();
     DynamicTensor Mean(std::vector<int>InputDims, bool KeepDim = false);
-    DynamicTensor Var(std::vector<int>InputDims, bool KeepDim = false, float correction = 1);
+    DynamicTensor Var(std::vector<int>InputDims, bool KeepDim = false, float Correction = 1);
 };

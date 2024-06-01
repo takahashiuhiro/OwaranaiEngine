@@ -2,7 +2,7 @@
 
 void LayerNorm::SetLayerParams()
 {
-	Params.v(NormalizedShape);
+	Params["NormalizedShape"].v(NormalizedShape);
 	if (Params.In("eps"))eps = Params["eps"].f();
 	else eps = 1e-5;
 	if (Params.In("ElementwiseAffine"))ElementwiseAffine = Params["ElementwiseAffine"].i();
@@ -27,8 +27,8 @@ void LayerNorm::Init(he InputParams)
 std::vector<DynamicTensor> LayerNorm::Forward(std::vector<DynamicTensor>InputForwardList, he InputParams)
 {
 	std::vector<int>MeanDims;
-	for (size_t a = InputForwardList[0].Shape().size() - NormalizedShape.size(); a < InputForwardList[0].Shape().size(); a++)MeanDims.push_back(InputForwardList[0].Shape()[a]);
-	auto Res = (InputForwardList[0] - InputForwardList[0].Mean(MeanDims, true))*(InputForwardList[0].Var(MeanDims, true) + eps).Pow(-0.5);
+	for (size_t a = InputForwardList[0].Shape().size() - NormalizedShape.size(); a < InputForwardList[0].Shape().size(); a++)MeanDims.push_back(a);
+	auto Res = (InputForwardList[0] - InputForwardList[0].Mean(MeanDims, true))*(InputForwardList[0].Var(MeanDims, true,0) + eps).Pow(-0.5);
 	if (!ElementwiseAffine)return { Res };
 	if (!Bias)return { Res * Weights["Weight"] };
 	return { Res * Weights["Weight"] + Weights["Bias"] };

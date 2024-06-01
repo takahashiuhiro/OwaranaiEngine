@@ -149,10 +149,10 @@ DynamicTensor DynamicTensor::Mean(std::vector<int>InputDims, bool KeepDim)
 	return Sum(InputDims, KeepDim)*(1./ MeanPartial);
 }
 
-DynamicTensor DynamicTensor::Var(std::vector<int>InputDims, bool KeepDim, float correction)
+DynamicTensor DynamicTensor::Var(std::vector<int>InputDims, bool KeepDim, float Correction)
 {
 	auto Self = DynamicTensor(Ops);
 	float SumDimRes = 1;
 	for (size_t a = 0; a < InputDims.size(); a++)SumDimRes *= Ops->TensorPointer->shape[InputDims[a]];
-	return (Self - Self.Mean(InputDims, true)).Pow(2.).Sum(InputDims, KeepDim) * (1. / (SumDimRes - correction));
+	return (Self - Self.Mean(InputDims, true)).Pow(2.).Sum(InputDims, KeepDim) * (1. / (SumDimRes - Correction));
 }
