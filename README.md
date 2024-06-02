@@ -44,6 +44,6 @@ git clone https://github.com/takahashiuhiro/OwaranaiEngine.git
 ctrl+F5编译运行  
 
 ## 项目备忘录 
-1. Linear和LayerNorm的Dynamic版还没测试  
+1. MLP和FFN  
 2. 多头attention
 3. hyperelement的splay还没写

@@ -9,7 +9,7 @@
 * ElementwiseAffine = true 元素仿射.
 * Bias = true 偏置.
 .*/
-//未测试!!!
+
 class LayerNorm : public BaseDynamicLayer
 {
 public:
