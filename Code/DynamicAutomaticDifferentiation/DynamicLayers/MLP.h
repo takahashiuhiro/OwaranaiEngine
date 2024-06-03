@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseDynamicLayer.h"
+#include "Linear.h"
 #include "LayerNorm.h"
 
 /*
@@ -15,5 +16,16 @@
 
 class MLP : public BaseDynamicLayer
 {
+	virtual void SetLayerParams();
+	virtual void InitContent();
+	virtual std::vector<DynamicTensor> Forward(std::vector<DynamicTensor>InputForwardList, he InputParams = he());
 
+	int InChannels;
+	std::vector<int>HiddenChannels;
+	std::string NormLayer;
+	std::string ActivationLayer;
+	bool Bias;
+	float Dropout;
+
+	std::vector<std::string>SubLayerLinearNames;
 };

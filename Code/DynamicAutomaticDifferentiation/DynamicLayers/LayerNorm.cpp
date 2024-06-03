@@ -10,9 +10,8 @@ void LayerNorm::SetLayerParams()
 	if (Params.In("Bias"))Bias = Params["Bias"].i();
 	else Bias = true;
 }
-void LayerNorm::Init(he InputParams)
+void LayerNorm::InitContent()
 {
-	SetParams(InputParams);
 	if (ElementwiseAffine)
 	{
 		Weights["Weight"] = DynamicTensor(NormalizedShape, true, DeviceNum);

@@ -57,3 +57,9 @@ void BaseDynamicLayer::SetParams(he InputParams)
 	SetCommonDefaultParams();
 	SetLayerParams();
 }
+
+void BaseDynamicLayer::Init(he InputParams)
+{
+	SetParams(InputParams);
+	InitContent();
+}

@@ -7,9 +7,8 @@ void Linear::SetLayerParams()
 	if (Params.In("Bias"))Bias = Params["Bias"].i();
 	else Bias = true;
 }
-void Linear::Init(he InputParams)
+void Linear::InitContent()
 {
-	SetParams(InputParams);
 	Weights["Weight"] = DynamicTensor({ InFeatures , OutFeatures }, true, DeviceNum);
 	Weights["Weight"].FillRandValUniform(-std::sqrt(1. / InFeatures), std::sqrt(1. / InFeatures));
 	if (Bias)

@@ -14,7 +14,7 @@ class LayerNorm : public BaseDynamicLayer
 {
 public:
 	virtual void SetLayerParams();
-	virtual void Init(he InputParams);
+	virtual void InitContent();
 	virtual std::vector<DynamicTensor> Forward(std::vector<DynamicTensor>InputForwardList, he InputParams = he());
 
 	std::vector<size_t>NormalizedShape;
