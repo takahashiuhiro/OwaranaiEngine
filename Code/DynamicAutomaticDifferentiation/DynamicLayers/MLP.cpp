@@ -25,10 +25,28 @@ void MLP::InitContent()
 		std::string ThisLinearName = std::string("Linear") + NumberToString(a);
 		CreateNewLayer<Linear>(ThisLinearName, LinearParam);
 		SubLayerLinearNames.push_back(ThisLinearName);
-		//todo
+		if (NormLayer != "None")
+		{
+			he NormParam = he::NewDict();
+			std::string ThisNormName = NormLayer + NumberToString(a);
+			if (NormLayer == "LayerNorm")
+			{
+				NormParam["NormalizedShape"] = he::NewList<int>({ HiddenChannels[a] });
+				CreateNewLayer<LayerNorm>(ThisNormName, NormParam);
+			}
+			SubLayerNormNames.push_back(ThisNormName);
+		}
 	}
 }
 std::vector<DynamicTensor> MLP::Forward(std::vector<DynamicTensor>InputForwardList, he InputParams)
 {
-	return {};
+	auto x = InputForwardList[0];
+	for (size_t a = 0; a < SubLayerLinearNames.size(); a++)
+	{
+		x = SubLayers[SubLayerLinearNames[a]]->Forward({ x })[0];
+		if(NormLayer != "None")x = SubLayers[SubLayerNormNames[a]]->Forward({ x })[0];
+		if (ActivationLayer == "GELU")x = x.GELU();
+		x = DynamicTensor::Dropout(x, Dropout);
+	}
+	return { x };
 }

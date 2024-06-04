@@ -16,13 +16,8 @@ q = q.view([3,2,4])
 
 q.requires_grad = True
 
-g = torch.nn.LayerNorm([2,4])
-
-asd = g(q)
-print(asd)
-r = asd.sum()
-r.backward()
-
+a = torchvision.ops.MLP(4,[4,6,2])
+r = a(q)
 print(r)
 print(q.grad)
 

@@ -28,4 +28,5 @@ class MLP : public BaseDynamicLayer
 	float Dropout;
 
 	std::vector<std::string>SubLayerLinearNames;
+	std::vector<std::string>SubLayerNormNames;
 };
