@@ -46,3 +46,4 @@ extern "C" void FillOnehotDataInCPP(float* OutputData, size_t BaseShape, size_t 
 extern "C" void TrigonometricFunctionsInCPP(float* OutputData, size_t OutputShapeCount, size_t FunType);
 /**按照最后一维生成等差数列.*/
 extern "C" void ArithmeticSequenceInCPP(float* OutputData, size_t* OutputShape, size_t OutputShapeSize, float A1, float Arithmetic);
+extern "C" void GenerateTrilOnesInCPP(float* OutputData, size_t OutputShapeCount, size_t Row, size_t Col, int Diagonal);

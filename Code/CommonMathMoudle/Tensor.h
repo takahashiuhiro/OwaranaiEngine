@@ -148,4 +148,8 @@ public:
     /**生成沿着cat后的合成矩阵.*/
     static std::vector<Tensor*> GenerateCatTensor(std::vector<Tensor*>InputTensors, int Dim = 0);
     static Tensor* TensorCat(std::vector<Tensor*>InputTensors, int Dim = 0);
+    /**生成下三角的全1矩阵. */
+    static Tensor* GenerateTrilOnes(std::vector<size_t> InputShape, int Diagonal = 0, size_t DeviceNum = 0);
+    /**把矩阵变为下三角矩阵. */
+    Tensor* Tril(int Diagonal = 0);
 };

@@ -1440,3 +1440,39 @@ Tensor* Tensor::TensorCat(std::vector<Tensor*>InputTensors, int Dim)
     delete Res;
     return TMPRes;
 }
+
+Tensor* Tensor::GenerateTrilOnes(std::vector<size_t> InputShape, int Diagonal, size_t DeviceNum)
+{
+    //保留下三角
+    Tensor* ReturnTensor = new Tensor(InputShape, DeviceNum);
+    size_t ShapeLen = ReturnTensor->shape.size();
+    if(ReturnTensor->GetDeviceNum())
+    {
+        #ifdef CUDA_USEFUL
+        GenerateTrilOnesInCPP(ReturnTensor->GetDevicePointer(), ReturnTensor->ShapeCount, ReturnTensor->shape[ShapeLen-2], ReturnTensor->shape[ShapeLen-1], Diagonal);
+        #endif
+    }
+    else
+    {
+
+        size_t Row = ReturnTensor->shape[ShapeLen-2];
+        size_t Col = ReturnTensor->shape[ShapeLen-1];
+        for(size_t Index = 0;Index < ReturnTensor->ShapeCount;Index++)
+        {
+            size_t TrueIndex = Index%(Row*Col);
+            int ThisRow = TrueIndex/Col;
+            int ThisCol = TrueIndex%Col;
+            if(ThisCol <= ThisRow + Diagonal)ReturnTensor->GetDevicePointer()[Index] = 1;
+            else ReturnTensor->GetDevicePointer()[Index] = 0;
+        }
+    }
+    return ReturnTensor;
+}
+
+Tensor* Tensor::Tril(int Diagonal)
+{
+    Tensor* TrilOnes = GenerateTrilOnes(shape, Diagonal, GetDeviceNum());
+    Tensor* ResTensor = EleMul(TrilOnes);
+    delete TrilOnes;
+    return ResTensor;
+}

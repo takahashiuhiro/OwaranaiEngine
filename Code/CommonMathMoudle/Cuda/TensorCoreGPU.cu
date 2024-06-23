@@ -433,6 +433,23 @@ __global__ void ArithmeticSequenceKernel(float* OutputData, size_t* OutputShape,
   OutputData[Index] = CurIndex*Arithmetic + A1;
 }
 
+__global__ void GenerateTrilOnesKernel(float* OutputData,size_t OutputShapeCount, size_t Row, size_t Col, int Diagonal)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= OutputShapeCount)return;
+  size_t TrueIndex = Index%(Row*Col);
+  int ThisRow = TrueIndex/Col;
+  int ThisCol = TrueIndex%Col;
+  if(ThisCol <= ThisRow + Diagonal)OutputData[Index] = 1;
+  else OutputData[Index] = 0;
+}
+
+void GenerateTrilOnesInCPP(float* OutputData,size_t OutputShapeCount, size_t Row, size_t Col, int Diagonal)
+{
+  CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
+  GenerateTrilOnesKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, OutputShapeCount, Row, Col, Diagonal);
+}
+
 void ArithmeticSequenceInCPP(float* OutputData, size_t* OutputShape, size_t OutputShapeSize, float A1, float Arithmetic)
 {
   size_t OutputShapeCount = 1;
