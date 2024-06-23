@@ -121,4 +121,5 @@ public:
     DynamicTensor GELU();
     DynamicTensor Mean(std::vector<int>InputDims, bool KeepDim = false);
     DynamicTensor Var(std::vector<int>InputDims, bool KeepDim = false, float Correction = 1);
+    DynamicTensor Tril(int Diagonal = 0);
 };

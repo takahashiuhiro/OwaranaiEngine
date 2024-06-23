@@ -156,3 +156,10 @@ DynamicTensor DynamicTensor::Var(std::vector<int>InputDims, bool KeepDim, float 
 	for (size_t a = 0; a < InputDims.size(); a++)SumDimRes *= Ops->TensorPointer->shape[InputDims[a]];
 	return (Self - Self.Mean(InputDims, true)).Pow(2.).Sum(InputDims, KeepDim) * (1. / (SumDimRes - Correction));
 }
+
+DynamicTensor DynamicTensor::Tril(int Diagonal)
+{
+	auto Self = DynamicTensor(Ops);
+	Tensor* TensorTrilOnes = Tensor::GenerateTrilOnes(Shape(), Diagonal, Ops->TensorPointer->GetDeviceNum());
+	return Self*DynamicTensor(std::shared_ptr<Tensor>(TensorTrilOnes));
+}
