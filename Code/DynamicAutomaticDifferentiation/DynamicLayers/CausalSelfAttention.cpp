@@ -22,7 +22,9 @@ void CausalSelfAttention::InitContent()
     CProJParams["OutFeatures"] = NEmbd;
     CProJParams["Bias"] = Bias;
     CreateNewLayer<Linear>("CProj", CProJParams);
-    
+    auto BiasTensor = DynamicTensor({1,1,BlockSize*1U, BlockSize*1U},0,DeviceNum);
+    BiasTensor.Fill(1.);
+    Buffers["Bias"] = BiasTensor.Tril();
 }
 
 std::vector<DynamicTensor> CausalSelfAttention::Forward(std::vector<DynamicTensor>InputForwardList, he InputParams)
