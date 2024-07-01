@@ -152,4 +152,6 @@ public:
     static Tensor* GenerateTrilOnes(std::vector<size_t> InputShape, int Diagonal = 0, size_t DeviceNum = 0);
     /**把矩阵变为下三角矩阵. */
     Tensor* Tril(int Diagonal = 0);
+    /**任意两维的转置. */
+    Tensor* Transpose(int FirstDim, int SecondDim);
 };

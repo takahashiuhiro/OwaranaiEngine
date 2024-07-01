@@ -7,15 +7,13 @@ import typing
 import random
 import tqdm
 
+res = []
+for a in range(1,211):res.append(a)
+
+q = torch.Tensor(res)
+q = q.view([2,3,5,7])
 
 
-q = torch.Tensor([1,2,3,4,5,6,7,8,9.])
-q=q.view([3,3])
-q.requires_grad = True
+print(q)
+print(q.transpose(0,2).contiguous())
 
-e = torch.tril(q,1).sum()
-
-e.backward()
-
-print(q.grad)
-print(e)

@@ -47,3 +47,4 @@ extern "C" void TrigonometricFunctionsInCPP(float* OutputData, size_t OutputShap
 /**按照最后一维生成等差数列.*/
 extern "C" void ArithmeticSequenceInCPP(float* OutputData, size_t* OutputShape, size_t OutputShapeSize, float A1, float Arithmetic);
 extern "C" void GenerateTrilOnesInCPP(float* OutputData, size_t OutputShapeCount, size_t Row, size_t Col, int Diagonal);
+extern "C" void TransposeInCPP(float* OutputData, float* InputData, size_t* OutputShape, size_t OutputShapeSize, int FirstDim, int SecondDim);

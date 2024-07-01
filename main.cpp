@@ -9,10 +9,12 @@
 
 int main()
 {
-	Tensor* q = new Tensor({3,3}, 0, {1,2,3,4,5,6,7,8,9.});
-	auto r = DynamicTensor(std::shared_ptr<Tensor>(q), true);
-	auto e = r.Tril(1).Sum();
-	e.Backward();
-	print(r.Grad());
-	print(e);
+	std::vector<float>cont;
+	for(int a=0;a<210;a++)cont.push_back(a+1);
+	Tensor* q = new Tensor({2,3,5,7}, 1, cont);
+	q->PrintData();
+	//print("---");
+	q->Transpose(0,2)->PrintData();
+
+	//q->Transpose(0,2);
 }

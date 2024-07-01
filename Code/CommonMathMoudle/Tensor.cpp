@@ -1476,3 +1476,60 @@ Tensor* Tensor::Tril(int Diagonal)
     delete TrilOnes;
     return ResTensor;
 }
+
+Tensor* Tensor::Transpose(int FirstDim, int SecondDim)
+{
+    auto ReturnShape = shape;
+    if(FirstDim < 0)FirstDim = shape[shape.size()-FirstDim];
+    if(SecondDim < 0)SecondDim = shape[shape.size()-SecondDim];
+    ReturnShape[FirstDim] = shape[SecondDim];
+    ReturnShape[SecondDim] = shape[FirstDim];
+    Tensor* ReturnTensor = View(ReturnShape);
+    CudaDimVec OutputShapeArray = TransformFromStdVector(ReturnTensor->shape, ReturnTensor->shape.size());
+    size_t* OutputShapePointer = OutputShapeArray.Shape;
+    if(ReturnTensor->GetDeviceNum())
+    {
+        #ifdef CUDA_USEFUL
+        TransposeInCPP(ReturnTensor->GetDevicePointer(), GetDevicePointer(), OutputShapePointer, shape.size(), FirstDim, SecondDim);
+        #endif
+    }
+    else
+    {
+        int LeftDim = std::min(FirstDim, SecondDim);//最左边的维度
+        int RightDim = std::max(FirstDim, SecondDim);//最右边的维度
+        int MidRightElement = 1;//所有的要变换的维度的元素个数
+        int RightElement = 1;//比要变换的右边的维度还小的
+        int MidElement = 1;//中间的维度
+        int OutputShapeSize = shape.size();
+        int OutputShapeCount = ShapeCount;
+        size_t* OutputShape = OutputShapePointer;
+        auto OutputData = ReturnTensor->GetDevicePointer();
+        auto InputData = GetDevicePointer();
+        for(size_t a=0;a<OutputShapeSize;a++)
+        {
+          if(a < LeftDim)continue;
+          MidRightElement*=OutputShape[a];
+          if(a > RightDim)RightElement*=OutputShape[a];
+          if(a < RightDim&&a > LeftDim)MidElement*=OutputShape[a];
+        }
+        for(int Index = 0;Index < OutputShapeCount;Index++)
+        {
+            float*  InputShape = (float*)malloc(OutputShapeSize * sizeof(float));
+            for(size_t a=0;a<OutputShapeSize;a++)InputShape[a] = OutputShape[a];
+            InputShape[FirstDim] = OutputShape[SecondDim];
+            InputShape[SecondDim] = OutputShape[FirstDim];
+            int NowIndex = Index%MidRightElement;
+            int UseIndex = NowIndex/RightElement;//右边都是行向量
+            int ReduIndex = NowIndex%RightElement;
+            int ADim = UseIndex/(MidElement*RightDim);
+            int BDim = (UseIndex%(MidElement*RightDim))/RightDim;
+            int CDim = UseIndex%RightDim;
+            int InputUseIndex = CDim*(MidElement*OutputShape[LeftDim]) + BDim*OutputShape[LeftDim] + ADim;
+            int InputNowIndex = InputUseIndex*RightElement + ReduIndex;
+            int InputIndex = InputNowIndex+(int(Index/MidRightElement))*MidRightElement;
+            OutputData[Index] = InputData[InputIndex];
+            free(InputShape);
+        }
+    }
+    return ReturnTensor;
+}

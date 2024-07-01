@@ -444,6 +444,54 @@ __global__ void GenerateTrilOnesKernel(float* OutputData,size_t OutputShapeCount
   else OutputData[Index] = 0;
 }
 
+__global__ void TransposeKernel(float* OutputData, float* InputData, size_t* OutputShape, size_t OutputShapeSize, int FirstDim, int SecondDim)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  size_t OutputShapeCount = 1;
+  int LeftDim = min(FirstDim, SecondDim);//最左边的维度
+  int RightDim = max(FirstDim, SecondDim);//最右边的维度
+  int MidRightElement = 1;//所有的要变换的维度的元素个数
+  int RightElement = 1;//比要变换的右边的维度还小的
+  int MidElement = 1;//中间的维度
+  for(size_t a=0;a<OutputShapeSize;a++)
+  {
+    OutputShapeCount*=OutputShape[a];
+    if(a < LeftDim)continue;
+    MidRightElement*=OutputShape[a];
+    if(a > RightDim)RightElement*=OutputShape[a];
+    if(a < RightDim&&a > LeftDim)MidElement*=OutputShape[a];
+  }
+  if(Index >= OutputShapeCount)return;
+  //交换维度得到输入的shape
+  float*  InputShape = (float*)malloc(OutputShapeSize * sizeof(float));
+  for(size_t a=0;a<OutputShapeSize;a++)InputShape[a] = OutputShape[a];
+  InputShape[FirstDim] = OutputShape[SecondDim];
+  InputShape[SecondDim] = OutputShape[FirstDim];
+  int NowIndex = Index%MidRightElement;
+  int UseIndex = NowIndex/RightElement;//右边都是行向量
+  int ReduIndex = NowIndex%RightElement;
+  int ADim = UseIndex/(MidElement*RightDim);
+  int BDim = (UseIndex%(MidElement*RightDim))/RightDim;
+  int CDim = UseIndex%RightDim;
+  int InputUseIndex = CDim*(MidElement*OutputShape[LeftDim]) + BDim*OutputShape[LeftDim] + ADim;
+  int InputNowIndex = InputUseIndex*RightElement + ReduIndex;
+  int InputIndex = InputNowIndex+(int(Index/MidRightElement))*MidRightElement;
+  OutputData[Index] = InputData[InputIndex];
+  free(InputShape);
+}
+
+void TransposeInCPP(float* OutputData, float* InputData, size_t* OutputShape, size_t OutputShapeSize, int FirstDim, int SecondDim)
+{
+  size_t OutputShapeCount = 1;
+  for(size_t a=0;a<OutputShapeSize;a++)OutputShapeCount*=OutputShape[a];
+  CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
+  size_t *OutputShapeCuda;
+  cudaMalloc((void**)&OutputShapeCuda, OutputShapeSize*sizeof(size_t));
+  cudaMemcpy(OutputShapeCuda,OutputShape,sizeof(size_t)*OutputShapeSize,cudaMemcpyHostToDevice);
+  TransposeKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, InputData, OutputShapeCuda, OutputShapeSize, FirstDim, SecondDim);
+  cudaFree(OutputShapeCuda);
+}
+
 void GenerateTrilOnesInCPP(float* OutputData,size_t OutputShapeCount, size_t Row, size_t Col, int Diagonal)
 {
   CudaPair CudaPairInput = GetCudaPair(OutputShapeCount);
@@ -459,6 +507,7 @@ void ArithmeticSequenceInCPP(float* OutputData, size_t* OutputShape, size_t Outp
   cudaMalloc((void**)&OutputShapeCuda, OutputShapeSize*sizeof(size_t));
   cudaMemcpy(OutputShapeCuda,OutputShape,sizeof(size_t)*OutputShapeSize,cudaMemcpyHostToDevice);
   ArithmeticSequenceKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, OutputShapeCuda, OutputShapeSize, A1, Arithmetic);
+  cudaFree(OutputShapeCuda);
 }
 
 void TrigonometricFunctionsInCPP(float* OutputData, size_t OutputShapeCount, size_t FunType)
