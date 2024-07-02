@@ -7,13 +7,16 @@ import typing
 import random
 import tqdm
 
+test_shape = [2,3]
+summ=1
+for a in test_shape:summ*=a
 res = []
-for a in range(1,211):res.append(a)
+for a in range(1,summ+1):res.append(a)
 
 q = torch.Tensor(res)
-q = q.view([2,3,5,7])
+q = q.view(test_shape)
 
 
 print(q)
-print(q.transpose(0,2).contiguous())
+print(q.transpose(0,1).contiguous())
 

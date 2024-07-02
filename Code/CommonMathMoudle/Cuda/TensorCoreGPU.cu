@@ -463,21 +463,16 @@ __global__ void TransposeKernel(float* OutputData, float* InputData, size_t* Out
   }
   if(Index >= OutputShapeCount)return;
   //交换维度得到输入的shape
-  float*  InputShape = (float*)malloc(OutputShapeSize * sizeof(float));
-  for(size_t a=0;a<OutputShapeSize;a++)InputShape[a] = OutputShape[a];
-  InputShape[FirstDim] = OutputShape[SecondDim];
-  InputShape[SecondDim] = OutputShape[FirstDim];
   int NowIndex = Index%MidRightElement;
   int UseIndex = NowIndex/RightElement;//右边都是行向量
   int ReduIndex = NowIndex%RightElement;
-  int ADim = UseIndex/(MidElement*RightDim);
-  int BDim = (UseIndex%(MidElement*RightDim))/RightDim;
-  int CDim = UseIndex%RightDim;
+  int ADim = UseIndex/(MidElement*OutputShape[RightDim]);
+  int BDim = (UseIndex%(MidElement*OutputShape[RightDim]))/OutputShape[RightDim];
+  int CDim = UseIndex%OutputShape[RightDim];
   int InputUseIndex = CDim*(MidElement*OutputShape[LeftDim]) + BDim*OutputShape[LeftDim] + ADim;
   int InputNowIndex = InputUseIndex*RightElement + ReduIndex;
   int InputIndex = InputNowIndex+(int(Index/MidRightElement))*MidRightElement;
   OutputData[Index] = InputData[InputIndex];
-  free(InputShape);
 }
 
 void TransposeInCPP(float* OutputData, float* InputData, size_t* OutputShape, size_t OutputShapeSize, int FirstDim, int SecondDim)
