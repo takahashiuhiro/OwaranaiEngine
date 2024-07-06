@@ -13,3 +13,4 @@ const size_t OpsType::GenerateSign = 9;//生成符号矩阵，没有反向
 const size_t OpsType::Pow = 10;//幂次
 const size_t OpsType::EleExp = 11;//指数函数
 const size_t OpsType::View = 12;//改变张量shape
+const size_t OpsType::Transpose = 13;//交换shape

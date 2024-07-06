@@ -163,3 +163,14 @@ DynamicTensor DynamicTensor::Tril(int Diagonal)
 	Tensor* TensorTrilOnes = Tensor::GenerateTrilOnes(Shape(), Diagonal, Ops->TensorPointer->GetDeviceNum());
 	return Self*DynamicTensor(std::shared_ptr<Tensor>(TensorTrilOnes));
 }
+
+DynamicTensor DynamicTensor::Transpose(int Dim0, int Dim1)
+{
+	auto Self = DynamicTensor(Ops);
+	he TranposeParams = he::NewDict();
+	if(Dim0<0)Dim0 = Ops->TensorPointer->shape[Ops->TensorPointer->shape.size()-Dim0];
+	if(Dim1<0)Dim1 = Ops->TensorPointer->shape[Ops->TensorPointer->shape.size()-Dim1];
+	TranposeParams["Dim0"] = Dim0;
+	TranposeParams["Dim1"] = Dim1;
+	return DynamicStdOps_Forward_Transpose({Self}, TranposeParams, true);
+}

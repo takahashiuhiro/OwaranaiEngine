@@ -107,7 +107,12 @@ public:
     static DynamicTensor DynamicStdOps_Forward_Eleexp(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad = false);
     static void DynamicStdOps_Backward_Eleexp(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps);
 
+    static DynamicTensor DynamicStdOps_Forward_Transpose(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad = false);
+    static void DynamicStdOps_Backward_Transpose(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps);
+
     /**函数.*/
+
+    // 求和
     DynamicTensor Sum(std::vector<int>Dims = {}, bool KeepDim = false);
     DynamicTensor View(std::vector<int>Dims);
     DynamicTensor Softmax(int InputDim);
@@ -120,6 +125,9 @@ public:
     static DynamicTensor Cat(std::vector<DynamicTensor>InputTensors, int Dim = 0);
     DynamicTensor GELU();
     DynamicTensor Mean(std::vector<int>InputDims, bool KeepDim = false);
+    // 方差
     DynamicTensor Var(std::vector<int>InputDims, bool KeepDim = false, float Correction = 1);
+    // 除下三角外的部分都为0
     DynamicTensor Tril(int Diagonal = 0);
+    DynamicTensor Transpose(int Dim0, int Dim1);
 };
