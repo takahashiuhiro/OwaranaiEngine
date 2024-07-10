@@ -9,21 +9,17 @@
 
 int main()
 {
-	std::vector<float>cont;
-	std::vector<size_t>test_shape = {2,3,4,5};
-	size_t summ=1;
-	for(auto&it:test_shape)summ*=it;
-	for(int a=0;a<summ;a++)cont.push_back(a+1);
-	Tensor* qw = new Tensor(test_shape, 0, cont);
+	auto BiasTensor = DynamicTensor({3,3},0,0);
+    BiasTensor.Fill(1.);
+    BiasTensor = BiasTensor.Tril();
 
-	DynamicTensor q(std::shared_ptr<Tensor>(qw), 1);
-	auto ee = DynamicTensor(std::shared_ptr<Tensor>(qw->Transpose(1,2)));
+	Tensor* r = new Tensor({3,3},0,{1,2,3,4,5,6,7,8,9.});
+	DynamicTensor q = DynamicTensor(std::shared_ptr<Tensor>(r), 1);
 
-	auto qq = q.Transpose(1,2);
+	auto e = q.MaskedFill(BiasTensor, 99);
 
-	qq.Backward(ee);
+	e.Backward(DynamicTensor(std::shared_ptr<Tensor>(r->Copy())));
 
-	print(qq);
+	print(e);
 	print(q.Grad());
-
 }

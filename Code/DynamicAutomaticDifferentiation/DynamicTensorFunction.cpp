@@ -174,3 +174,10 @@ DynamicTensor DynamicTensor::Transpose(int Dim0, int Dim1)
 	TranposeParams["Dim1"] = Dim1;
 	return DynamicStdOps_Forward_Transpose({Self}, TranposeParams, true);
 }
+
+DynamicTensor DynamicTensor::MaskedFill(DynamicTensor Mask, float Value)
+{
+	DynamicTensor Ones({1}, 0, Mask.Ops->TensorPointer->GetDeviceNum());
+	Ones.Fill(1);
+	return DynamicTensor(Ops)*(Ones - Mask)+Mask*Value;
+}

@@ -130,4 +130,5 @@ public:
     // 除下三角外的部分都为0
     DynamicTensor Tril(int Diagonal = 0);
     DynamicTensor Transpose(int Dim0, int Dim1);
+    DynamicTensor MaskedFill(DynamicTensor Mask, float Value);
 };
