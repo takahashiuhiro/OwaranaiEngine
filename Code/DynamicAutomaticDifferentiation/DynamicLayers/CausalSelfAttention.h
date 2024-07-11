@@ -1,6 +1,15 @@
 #pragma once
 #include "BaseDynamicLayer.h"
 
+/*
+*@Params
+* NHead 多头.
+* NEmbd 嵌入长度.
+* Dropout dropout比例.
+* BlockSize 下三角阵的大小.
+* Bias 偏置.
+.*/
+
 class CausalSelfAttention : public BaseDynamicLayer
 {
     virtual void SetLayerParams();

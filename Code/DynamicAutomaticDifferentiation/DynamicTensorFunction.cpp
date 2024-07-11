@@ -37,6 +37,7 @@ DynamicTensor DynamicTensor::View(std::vector<int>Dims)
 DynamicTensor DynamicTensor::Softmax(int InputDim)
 {
 	he SoftmaxParams = he::NewDict();
+	if(InputDim<0)InputDim = Shape()[Shape().size()+InputDim];
 	SoftmaxParams["SoftmaxDim"] = InputDim;
 	return DynamicStdOps_Forward_Softmax({ *this }, SoftmaxParams, true);
 }

@@ -103,6 +103,11 @@ void DynamicTensor::FillRandValUniform(float MinV, float MaxV, int Seed)
 	Ops->TensorPointer->FillRandomValUniform(MinV, MaxV, Seed);
 }
 
+size_t DynamicTensor::GetDeviceNum()
+{
+	return Ops->TensorPointer->GetDeviceNum();
+}
+
 DynamicTensor DynamicTensor::SetComputationalHistory(Tensor* ResTensor, std::vector<DynamicTensor>InputList, he InputPrams, size_t InputOpsType, bool RequiresGrad)
 {
 	bool MaxRequiresGrad = 0,MaxIsEval = 0;

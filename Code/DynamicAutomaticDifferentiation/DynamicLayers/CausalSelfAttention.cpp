@@ -29,7 +29,6 @@ void CausalSelfAttention::InitContent()
 
 std::vector<DynamicTensor> CausalSelfAttention::Forward(std::vector<DynamicTensor>InputForwardList, he InputParams)
 {
-    //todo
     DynamicTensor X = InputForwardList[0];
     Log::Assert(X.Shape().size()==3, "Size of shape of inputs of CausalSelfAttention must be 3");
     int B = X.Shape()[0];
@@ -40,6 +39,13 @@ std::vector<DynamicTensor> CausalSelfAttention::Forward(std::vector<DynamicTenso
     DynamicTensor K = QKV[1].View({B,T,NHead,C/NHead}).Transpose(1,2);
     DynamicTensor V = QKV[2].View({B,T,NHead,C/NHead}).Transpose(1,2);
     DynamicTensor Att = (Q%K.Transpose(-2,-1))*(1./std::sqrt(K.Shape()[K.Shape().size()-1]));
-    
-    return {};
+    DynamicTensor Ones({1},0,X.GetDeviceNum());
+    Ones.Fill(1);
+    Att = Att.MaskedFill(Ones-Buffers["Bias"], -1e9);
+    Att = Att.Softmax(-1);
+    Att = DynamicTensor::Dropout(Att, Dropout);
+    DynamicTensor Y = Att%V;
+    Y = Y.Transpose(1,2).View({B,T,C});
+    Y = DynamicTensor::Dropout(SubLayers["CProj"]->Forward({Y})[0], Dropout);
+    return {Y};
 }
