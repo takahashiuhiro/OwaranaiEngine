@@ -37,7 +37,7 @@ DynamicTensor DynamicTensor::View(std::vector<int>Dims)
 DynamicTensor DynamicTensor::Softmax(int InputDim)
 {
 	he SoftmaxParams = he::NewDict();
-	if(InputDim<0)InputDim = Shape()[Shape().size()+InputDim];
+	if(InputDim<0)InputDim = Shape().size()+InputDim;
 	SoftmaxParams["SoftmaxDim"] = InputDim;
 	return DynamicStdOps_Forward_Softmax({ *this }, SoftmaxParams, true);
 }
@@ -65,10 +65,18 @@ std::vector<DynamicTensor> DynamicTensor::Split(int SplitSize, int Dim)
 {
 	std::vector<int>SplitSections;
 	int ProtoDimSize = Ops->TensorPointer->shape[Dim];
-	for (size_t a = 0; a < SplitSize; a++)
+	while(ProtoDimSize)
 	{
-		if (a < (SplitSize - ProtoDimSize % SplitSize))SplitSections.push_back(ProtoDimSize / SplitSize);
-		else SplitSections.push_back(ProtoDimSize / SplitSize + 1);
+		if(ProtoDimSize > SplitSize)
+		{
+			SplitSections.push_back(SplitSize);
+			ProtoDimSize -= SplitSize;
+		}
+		else
+		{
+			SplitSections.push_back(ProtoDimSize);
+			ProtoDimSize = 0;
+		}
 	}
 	return Split(SplitSections, Dim);
 }
@@ -165,15 +173,14 @@ DynamicTensor DynamicTensor::Tril(int Diagonal)
 	return Self*DynamicTensor(std::shared_ptr<Tensor>(TensorTrilOnes));
 }
 
-DynamicTensor DynamicTensor::Transpose(int Dim0, int Dim1)
+DynamicTensor DynamicTensor::Transpose(int Dim0, int Dim1, int DebugFlag)
 {
-	auto Self = DynamicTensor(Ops);
 	he TranposeParams = he::NewDict();
-	if(Dim0<0)Dim0 = Ops->TensorPointer->shape[Ops->TensorPointer->shape.size()-Dim0];
-	if(Dim1<0)Dim1 = Ops->TensorPointer->shape[Ops->TensorPointer->shape.size()-Dim1];
+	if(Dim0<0)Dim0 = Ops->TensorPointer->shape.size()+Dim0;
+	if(Dim1<0)Dim1 = Ops->TensorPointer->shape.size()+Dim1;
 	TranposeParams["Dim0"] = Dim0;
 	TranposeParams["Dim1"] = Dim1;
-	return DynamicStdOps_Forward_Transpose({Self}, TranposeParams, true);
+	return DynamicStdOps_Forward_Transpose({*this}, TranposeParams, true);
 }
 
 DynamicTensor DynamicTensor::MaskedFill(DynamicTensor Mask, float Value)

@@ -9,17 +9,28 @@
 
 int main()
 {
-	auto BiasTensor = DynamicTensor({3,3},0,0);
-    BiasTensor.Fill(1.);
-    BiasTensor = BiasTensor.Tril();
+	he params = he::NewDict();
+	params["NHead"] = 3;
+	params["NEmbd"] = 6;
+	params["Dropout"] = 0.;
+	params["BlockSize"] = 40;
+	params["Bias"] = 0;
 
-	Tensor* r = new Tensor({3,3},0,{1,2,3,4,5,6,7,8,9.});
-	DynamicTensor q = DynamicTensor(std::shared_ptr<Tensor>(r), 1);
+	BaseDynamicLayer* ly = new CausalSelfAttention();
+	ly->Init(params);
+	ly->SubLayers["CAttn"]->Weights["Weight"].Fill(1);
+	ly->SubLayers["CProj"]->Weights["Weight"].Fill(1.5);
 
-	auto e = q.MaskedFill(BiasTensor, 99);
+	DynamicTensor x({4,5,6},1,0);
+	x.Fill(1);
 
-	e.Backward(DynamicTensor(std::shared_ptr<Tensor>(r->Copy())));
+	auto res = ly->Forward({x})[0].Sum();
 
-	print(e);
-	print(q.Grad());
+	//DynamicTensor xx({4,5,6},0,0);
+	//xx.Fill(1);
+	//print(res);
+	res.Backward();
+
+	print(res);
+	print(x.Grad());
 }

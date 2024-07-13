@@ -130,6 +130,6 @@ public:
     DynamicTensor Var(std::vector<int>InputDims, bool KeepDim = false, float Correction = 1);
     // 除下三角外的部分都为0
     DynamicTensor Tril(int Diagonal = 0);
-    DynamicTensor Transpose(int Dim0, int Dim1);
+    DynamicTensor Transpose(int Dim0, int Dim1, int DebugFlag = false);
     DynamicTensor MaskedFill(DynamicTensor Mask, float Value);
 };
