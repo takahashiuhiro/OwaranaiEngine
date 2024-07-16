@@ -36,13 +36,14 @@ int main()
 
 	auto sgd = Optimizer::CreateSGD(ly->Parameters(), 0.01);
 
-	for(int a=0;a<inputx.size();a++)
+	for(int a=0;a<inputx.size()+10;a++)
 	{
-		auto res = ly->Forward({inputx[a]})[0];
-		auto lossres = (res-outputx[a]).Pow(2).Sum()*(1./res.Ops->TensorPointer->ShapeCount);
+		auto res = ly->Forward({inputx[a%2]})[0];
+		auto lossres = (res-outputx[a%2]).Pow(2).Sum()*(1./res.Ops->TensorPointer->ShapeCount);
 		lossres.Backward();
 		sgd.Step();
 		print(res);
 		print(lossres);
 	}
+	print(ly->Forward({inputx[0]})[0]);
 }

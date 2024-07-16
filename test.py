@@ -47,6 +47,36 @@ class CausalSelfAttention(nn.Module):
         y = self.resid_dropout(self.c_proj(y))
         return y
 
+class MLP(nn.Module):
+
+    def __init__(self, config):
+        super().__init__()
+        self.c_fc    = nn.Linear(config.n_embd, 4 * config.n_embd, bias=config.bias)
+        self.gelu    = nn.GELU()
+        self.c_proj  = nn.Linear(4 * config.n_embd, config.n_embd, bias=config.bias)
+        self.dropout = nn.Dropout(config.dropout)
+
+    def forward(self, x):
+        x = self.c_fc(x)
+        x = self.gelu(x)
+        x = self.c_proj(x)
+        x = self.dropout(x)
+        return x
+
+class Block(nn.Module):
+
+    def __init__(self, config):
+        super().__init__()
+        self.ln_1 = nn.LayerNorm(config.n_embd, bias=config.bias)
+        self.attn = CausalSelfAttention(config)
+        self.ln_2 = nn.LayerNorm(config.n_embd, bias=config.bias)
+        self.mlp = MLP(config)
+
+    def forward(self, x):
+        x = x + self.attn(self.ln_1(x))
+        x = x + self.mlp(self.ln_2(x))
+        return x
+
 class config(object):
     def __init__(self):
         self.dropout = 0
@@ -56,15 +86,15 @@ class config(object):
         self.block_size = 40
 
 cfg = config()
-ly = CausalSelfAttention(cfg)
+ly = Block(cfg)
 
-with torch.no_grad():  # 禁用梯度计算
-    gg = torch.ones(ly.c_attn.weight.shape)
-    gg[1,2] = 987
-    ly.c_attn.weight = nn.Parameter(gg)
-    ly.c_attn.bias = nn.Parameter(torch.ones(ly.c_attn.bias.shape)*0.3)
-    ly.c_proj.weight = nn.Parameter(torch.ones(ly.c_proj.weight.shape)*1.5)
-    ly.c_proj.bias = nn.Parameter(torch.ones(ly.c_proj.bias.shape)*2)
+#with torch.no_grad():  # 禁用梯度计算
+#    gg = torch.ones(ly.c_attn.weight.shape)
+#    gg[1,2] = 987
+#    ly.c_attn.weight = nn.Parameter(gg)
+#    ly.c_attn.bias = nn.Parameter(torch.ones(ly.c_attn.bias.shape)*0.3)
+#    ly.c_proj.weight = nn.Parameter(torch.ones(ly.c_proj.weight.shape)*1.5)
+#    ly.c_proj.bias = nn.Parameter(torch.ones(ly.c_proj.bias.shape)*2)
 
 
 optimizer = optim.SGD(ly.parameters(), lr=0.01) 
@@ -88,8 +118,8 @@ criterion = nn.MSELoss()
 
 for epoch in range(num_epochs):
     # 前向传播
-    outputs = ly(inputx[epoch])
-    loss = criterion(outputs, outputx[epoch])
+    outputs = ly(inputx[epoch%2])
+    loss = criterion(outputs, outputx[epoch%2])
     
     # 反向传播和优化
     optimizer.zero_grad()   # 清零梯度
