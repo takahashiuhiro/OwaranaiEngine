@@ -22,6 +22,7 @@ public:
 	void CreateNewLayer(std::string LayerName,he InputParams)
 	{
 		SubLayers[LayerName] = std::make_shared<T>();
+		InputParams["DeviceNum"] = int(DeviceNum);
 		SubLayers[LayerName]->Init(InputParams);
 	}
 
