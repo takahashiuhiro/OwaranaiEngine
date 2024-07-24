@@ -57,7 +57,9 @@ public:
     void Fill(float InputValue);
     void FillRandBernoulli(float P, int Seed = -1);
     void FillRandValUniform(float MinV = 0, float MaxV = 1, int Seed = -1);
+    void FillRandomValNormal(float MeanV = 0, float VarianceV = 1,int Seed = -1);
     size_t GetDeviceNum();
+    static DynamicTensor CreateOnehotTensor(std::vector<int> InputShape, std::vector<int>InputData, int TokenLength = 0,bool RequiresGrad = false, size_t DeviceNum = 0);
 
     /**计算图逻辑.*/
     static DynamicTensor SetComputationalHistory(Tensor* ResTensor, std::vector<DynamicTensor>InputList, he InputPrams,size_t InputOpsType, bool RequiresGrad);

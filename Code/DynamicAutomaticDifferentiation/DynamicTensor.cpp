@@ -103,9 +103,24 @@ void DynamicTensor::FillRandValUniform(float MinV, float MaxV, int Seed)
 	Ops->TensorPointer->FillRandomValUniform(MinV, MaxV, Seed);
 }
 
+void DynamicTensor::FillRandomValNormal(float MeanV, float VarianceV,int Seed)
+{
+	if (Seed == -1)Seed = std::chrono::system_clock::now().time_since_epoch().count();
+	Ops->TensorPointer->FillRandomValNormal(MeanV, VarianceV, Seed);
+}
+
 size_t DynamicTensor::GetDeviceNum()
 {
 	return Ops->TensorPointer->GetDeviceNum();
+}
+
+DynamicTensor DynamicTensor::CreateOnehotTensor(std::vector<int> InputShape, std::vector<int>InputData, int TokenLength,bool RequiresGrad, size_t DeviceNum)
+{
+	std::vector<size_t>ConvInputShape;
+	for(auto&it:InputShape)ConvInputShape.push_back(it);
+	std::vector<size_t>ConvInputData;
+	for(auto&it:InputData)ConvInputData.push_back(it);
+	return DynamicTensor(std::shared_ptr<Tensor>(Tensor::CreateOnehotTensor(ConvInputShape, ConvInputData, TokenLength, DeviceNum)), 0);
 }
 
 DynamicTensor DynamicTensor::SetComputationalHistory(Tensor* ResTensor, std::vector<DynamicTensor>InputList, he InputPrams, size_t InputOpsType, bool RequiresGrad)
