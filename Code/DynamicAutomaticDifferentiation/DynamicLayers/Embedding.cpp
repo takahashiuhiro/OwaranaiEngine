@@ -41,7 +41,7 @@ void Embedding::InitContent()
     {
         DynamicTensor AllOneTensor = DynamicTensor({1,(size_t)EmbeddingDim},0,DeviceNum);
         AllOneTensor.Fill(1.);
-        Buffers["VecAllOneConst"] = (DynamicTensor::CreateOnehotTensor({1}, {(size_t)PaddingIdx}, NumEmbeddings, 0, DeviceNum).Transpose(-1,-2)*AllOneTensor)*(-1) + 1;
+        Buffers["VecAllOneConst"] = (DynamicTensor::CreateOnehotTensor({1}, {PaddingIdx}, NumEmbeddings, 0, DeviceNum).Transpose(-1,-2)*AllOneTensor)*(-1) + 1;
     }
 }
 
