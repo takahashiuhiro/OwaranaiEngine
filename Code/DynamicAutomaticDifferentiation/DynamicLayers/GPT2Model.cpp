@@ -26,8 +26,10 @@ void GPT2Model::InitContent()
     WPEParams["EmbeddingDim"] = NEmbd;
     CreateNewLayer<Embedding>("WPE", WPEParams);
     he TransformerBlockParams = he::NewDict();
+    TransformerBlockParams["NHead"] = NHead;
     TransformerBlockParams["NEmbd"] = NEmbd;
     TransformerBlockParams["Dropout"] = Dropout;
+    TransformerBlockParams["BlockSize"] = BlockSize;
     TransformerBlockParams["Bias"] = Bias;
     for(int a=0;a < NLayers;a++)
     {
@@ -45,10 +47,16 @@ void GPT2Model::InitContent()
     LMHeadParams["Bias"] = 0;
     CreateNewLayer<Linear>("LMHead", LMHeadParams);
     SubLayers["WTE"]->Weights["Weight"] = SubLayers["LMHead"]->Weights["Weight"];//这一句原文自己也不知道能不能跑不行就删了
-    
+    Apply(InitWeights, static_cast<BaseDynamicLayer*>(this));
 }
 
 std::vector<DynamicTensor> GPT2Model::Forward(std::vector<DynamicTensor>InputForwardList, he InputParams)
 {
 
+}
+
+void GPT2Model::InitWeights(BaseDynamicLayer* CurLayer)
+{
+    //todo
+    //print(CurLayer->SubLayers.size());
 }

@@ -17,4 +17,6 @@ public:
     int Bias;
 
     std::vector<std::string>TransformerBlockLayerNames;
+
+    static void InitWeights(BaseDynamicLayer* CurLayer);
 };

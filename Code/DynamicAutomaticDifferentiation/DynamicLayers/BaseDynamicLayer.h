@@ -35,6 +35,22 @@ public:
 	void SetParams(he InputParams);
 	void Init(he InputParams);
 
+	//递归在所有的子layer中执行一个函数，被执行的函数第一个参数必须是this
+	template <typename Func, typename... Args>
+	void Apply(Func FuncIns, Args&&... ArgsIns) 
+	{
+		auto ArgsTuple = std::make_tuple(std::forward<Args>(ArgsIns)...);
+		std::apply(FuncIns, ArgsTuple);
+		auto CurPointer = std::get<0>(ArgsTuple);
+		for(auto&SubLayerPair:CurPointer->SubLayers)
+		{
+			ArgsTuple = ReplaceElement<0>(ArgsTuple, SubLayerPair.second.get());
+			std::apply([this, FuncIns](auto&&... UnpackedArgs) {
+                this->Apply(FuncIns, std::forward<decltype(UnpackedArgs)>(UnpackedArgs)...);
+            }, ArgsTuple);
+		}
+	}
+
 	virtual void SetLayerParams() = 0;
 	virtual void InitContent() = 0;
 	virtual std::vector<DynamicTensor> Forward(std::vector<DynamicTensor>InputForwardList, he InputParams = he()) = 0;

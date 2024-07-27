@@ -6,3 +6,4 @@
 #include "CausalSelfAttention.h"
 #include "TransformerBlock.h"
 #include "Embedding.h"
+#include "GPT2Model.h"

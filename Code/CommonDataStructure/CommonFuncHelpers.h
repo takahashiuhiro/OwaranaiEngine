@@ -4,6 +4,10 @@
 #include <algorithm>
 #include <fstream>
 #include <vector>
+#include <tuple>
+#include <utility>
+#include <fstream>
+#include <functional>
 
 /**把数字变成字符串.*/
 template<typename T>
@@ -116,3 +120,34 @@ void print(std::vector<T> Input)
 }
 template<typename T>
 void print(T Input){Input.PrintData();}
+
+template<typename NewType, typename Tuple, std::size_t... I>
+auto replace_first_element_impl(Tuple&& TupleIns, NewType&& NewValue, std::index_sequence<I...>) 
+{
+    // 创建一个新的元组，第一个元素替换为 new_value，其他元素保持不变
+    return std::make_tuple(std::forward<NewType>(NewValue), std::get<I + 1>(std::forward<Tuple>(TupleIns))...);
+}
+
+// 辅助函数模板，用于替换元组中的第 h 个元素
+template<std::size_t H, typename NewType, typename Tuple, std::size_t... I, std::size_t... J>
+auto ReplaceElementImpl(Tuple&& TupleIns, NewType&& NewValue, std::index_sequence<I...>, std::index_sequence<J...>) 
+{
+    return std::make_tuple(
+        std::get<I>(std::forward<Tuple>(TupleIns))...,       // 前面的元素
+        std::forward<NewType>(NewValue),                 // 新元素
+        std::get<H + 1 + J>(std::forward<Tuple>(TupleIns))... // 后面的元素
+    );
+}
+
+// 主函数模板，用于替换元组中的第 h 个元素
+template<std::size_t H, typename NewType, typename... Args>
+auto ReplaceElement(const std::tuple<Args...>& TupleIns, NewType&& NewValue) {
+    constexpr auto size = sizeof...(Args);
+    static_assert(H < size, "Index out of bounds");
+    return ReplaceElementImpl<H>(
+        TupleIns,
+        std::forward<NewType>(NewValue),
+        std::make_index_sequence<H>{},               // 前面元素的索引
+        std::make_index_sequence<size - H - 1>{}     // 后面元素的索引
+    );
+}
