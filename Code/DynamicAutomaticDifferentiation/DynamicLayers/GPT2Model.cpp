@@ -1,4 +1,8 @@
 #include "GPT2Model.h"
+#include "Embedding.h"
+#include "TransformerBlock.h"
+#include "Linear.h"
+#include "LayerNorm.h"
 
 void GPT2Model::SetLayerParams()
 {
@@ -13,6 +17,34 @@ void GPT2Model::SetLayerParams()
 
 void GPT2Model::InitContent()
 {
+    he WTEParams = he::NewDict();
+    WTEParams["NumEmbeddings"] = VocabSize;
+    WTEParams["EmbeddingDim"] = NEmbd;
+    CreateNewLayer<Embedding>("WTE", WTEParams);
+    he WPEParams = he::NewDict();
+    WPEParams["NumEmbeddings"] = BlockSize;
+    WPEParams["EmbeddingDim"] = NEmbd;
+    CreateNewLayer<Embedding>("WPE", WPEParams);
+    he TransformerBlockParams = he::NewDict();
+    TransformerBlockParams["NEmbd"] = NEmbd;
+    TransformerBlockParams["Dropout"] = Dropout;
+    TransformerBlockParams["Bias"] = Bias;
+    for(int a=0;a < NLayers;a++)
+    {
+        std::string TMPLayerName = std::string("TransformerBlock_") + NumberToString(a);
+        CreateNewLayer<TransformerBlock>(TMPLayerName, TransformerBlockParams);
+        TransformerBlockLayerNames.push_back(TMPLayerName);
+    }
+    he LNFParams = he::NewDict();
+    LNFParams["NormalizedShape"] = he::NewList<int>({NEmbd});
+    LNFParams["Bias"] = Bias;
+    CreateNewLayer<LayerNorm>("LNF", LNFParams);
+    he LMHeadParams = he::NewDict();
+    LMHeadParams["InFeatures"] = VocabSize;
+    LMHeadParams["OutFeatures"] = NEmbd;
+    LMHeadParams["Bias"] = 0;
+    CreateNewLayer<Linear>("LMHead", LMHeadParams);
+    SubLayers["WTE"]->Weights["Weight"] = SubLayers["LMHead"]->Weights["Weight"];//这一句原文自己也不知道能不能跑不行就删了
     
 }
 

@@ -15,4 +15,6 @@ public:
     int NEmbd;
     float Dropout; 
     int Bias;
+
+    std::vector<std::string>TransformerBlockLayerNames;
 };
