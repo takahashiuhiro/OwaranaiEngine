@@ -12,4 +12,5 @@ int main()
     Params["Dropout"] = float(1.);
     Params["Bias"] = 1;
     q->Init(Params);
+    print(q->GetNumParams());
 }

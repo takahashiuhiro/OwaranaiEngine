@@ -53,13 +53,24 @@ public:
     std::vector<size_t>& Shape();
 
     /**Tensor内函数组装.*/
+    //打印数据
     void PrintData();
+    //填充标量
     void Fill(float InputValue);
+    //填充伯努利分布
     void FillRandBernoulli(float P, int Seed = -1);
+    //填充均匀分布
     void FillRandValUniform(float MinV = 0, float MaxV = 1, int Seed = -1);
+    //填充高斯分布
     void FillRandomValNormal(float MeanV = 0, float VarianceV = 1,int Seed = -1);
+    //得到设备号
     size_t GetDeviceNum();
+    //创建一个onehot张量
     static DynamicTensor CreateOnehotTensor(std::vector<int> InputShape, std::vector<int>InputData, int TokenLength = 0,bool RequiresGrad = false, size_t DeviceNum = 0);
+    //返回一个tensor的参数量
+    int Numel();
+    //创建一个新的等差数列张量
+    
 
     /**计算图逻辑.*/
     static DynamicTensor SetComputationalHistory(Tensor* ResTensor, std::vector<DynamicTensor>InputList, he InputPrams,size_t InputOpsType, bool RequiresGrad);

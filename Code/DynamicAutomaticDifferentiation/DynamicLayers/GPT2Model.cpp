@@ -48,15 +48,39 @@ void GPT2Model::InitContent()
     CreateNewLayer<Linear>("LMHead", LMHeadParams);
     SubLayers["WTE"]->Weights["Weight"] = SubLayers["LMHead"]->Weights["Weight"];//这一句原文自己也不知道能不能跑不行就删了
     Apply(InitWeights, static_cast<BaseDynamicLayer*>(this));
+    Apply(InitWeightsCProj, static_cast<BaseDynamicLayer*>(this), NLayers);
 }
 
 std::vector<DynamicTensor> GPT2Model::Forward(std::vector<DynamicTensor>InputForwardList, he InputParams)
 {
-
+    int B = InputParams["BatchSize"].i();
+    int T = InputParams["TextureLength"].i();
+    
 }
 
 void GPT2Model::InitWeights(BaseDynamicLayer* CurLayer)
 {
-    //todo
-    //print(CurLayer->SubLayers.size());
+    if(typeid(*CurLayer) == typeid(Linear))
+    {
+        CurLayer->Weights["Weight"].FillRandomValNormal(0, 0.02);
+        if(CurLayer->Weights.find("Bias")!=CurLayer->Weights.end())
+        {
+            CurLayer->Weights["Bias"].Fill(0);
+        }
+    }
+    else if(typeid(*CurLayer) == typeid(Embedding))
+    {
+        CurLayer->Weights["Weight"].FillRandomValNormal(0, 0.02);
+    }
+}
+
+void GPT2Model::InitWeightsCProj(BaseDynamicLayer* CurLayer, int ConfigNLayers)
+{
+    for(auto&SubLayerPair:CurLayer->SubLayers)
+    {
+        if(SubLayerPair.first == "CProj")
+        {
+            SubLayerPair.second->Weights["Weight"].FillRandomValNormal(0, 0.2/std::sqrt(2*ConfigNLayers));
+        }
+    }
 }

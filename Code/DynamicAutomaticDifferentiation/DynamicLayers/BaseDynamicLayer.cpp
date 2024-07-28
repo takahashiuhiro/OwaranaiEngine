@@ -63,3 +63,10 @@ void BaseDynamicLayer::Init(he InputParams)
 	SetParams(InputParams);
 	InitContent();
 }
+
+float BaseDynamicLayer::GetNumParams()
+{
+	float Res = 0;
+	for(auto&it:Parameters())Res += it.Numel()*1e-6;
+	return Res;
+}

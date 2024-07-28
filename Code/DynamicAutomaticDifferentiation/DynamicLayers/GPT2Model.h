@@ -19,4 +19,8 @@ public:
     std::vector<std::string>TransformerBlockLayerNames;
 
     static void InitWeights(BaseDynamicLayer* CurLayer);
+    static void InitWeightsCProj(BaseDynamicLayer* CurLayer, int ConfigNLayers);
+
+    
+
 };

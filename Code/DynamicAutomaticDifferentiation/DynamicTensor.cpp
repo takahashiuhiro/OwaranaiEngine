@@ -123,6 +123,11 @@ DynamicTensor DynamicTensor::CreateOnehotTensor(std::vector<int> InputShape, std
 	return DynamicTensor(std::shared_ptr<Tensor>(Tensor::CreateOnehotTensor(ConvInputShape, ConvInputData, TokenLength, DeviceNum)), 0);
 }
 
+int DynamicTensor::Numel()
+{
+	return Ops->TensorPointer->ShapeCount;
+}
+
 DynamicTensor DynamicTensor::SetComputationalHistory(Tensor* ResTensor, std::vector<DynamicTensor>InputList, he InputPrams, size_t InputOpsType, bool RequiresGrad)
 {
 	bool MaxRequiresGrad = 0,MaxIsEval = 0;
