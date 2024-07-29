@@ -47,11 +47,11 @@ void Embedding::InitContent()
 
 std::vector<DynamicTensor> Embedding::Forward(std::vector<DynamicTensor>InputForwardList, he InputParams)
 {
-    int BatchSize = InputParams["BatchSize"].i();
-    int TextureLength = InputParams["TextureLength"].i();
+    std::vector<int>XShape;
+    InputParams["XShape"].v(XShape);
     std::vector<int>XData;
     InputParams["XData"].v(XData);
-    DynamicTensor X = DynamicTensor::CreateOnehotTensor({BatchSize, TextureLength}, XData, NumEmbeddings, true, DeviceNum);
+    DynamicTensor X = DynamicTensor::CreateOnehotTensor(XShape, XData, NumEmbeddings, true, DeviceNum);
     if(PaddingIdxSwitch)return {X%(Weights["Weight"]*Buffers["VecAllOneConst"])};
     return {X%Weights["Weight"]};
 }

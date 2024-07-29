@@ -70,7 +70,8 @@ public:
     //返回一个tensor的参数量
     int Numel();
     //创建一个新的等差数列张量
-    
+    static DynamicTensor Arange(float Start, float End, float Step = 1, bool RequiresGrad = false, size_t DeviceNum = 0);
+
 
     /**计算图逻辑.*/
     static DynamicTensor SetComputationalHistory(Tensor* ResTensor, std::vector<DynamicTensor>InputList, he InputPrams,size_t InputOpsType, bool RequiresGrad);

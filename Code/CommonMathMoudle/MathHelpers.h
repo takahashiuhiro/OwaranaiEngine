@@ -32,5 +32,14 @@ T BinaryExp(T Base, int Num)
     return Res;
 }
 
-
+template<typename T, typename Y>
+std::vector<T> MathArange(T Start, T End, Y Step)
+{
+    std::vector<T>Res;
+    for(T It = Start;It < End;It = It + Step)
+    {
+        Res.push_back(It);
+    }
+    return Res;
+}
 

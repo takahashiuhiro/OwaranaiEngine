@@ -55,7 +55,25 @@ std::vector<DynamicTensor> GPT2Model::Forward(std::vector<DynamicTensor>InputFor
 {
     int B = InputParams["BatchSize"].i();
     int T = InputParams["TextureLength"].i();
-    
+    Log::Assert(T <= BlockSize, "Block Size is Not Enough For Length.");
+
+    he TokEmbParams = he::NewDict();
+    TokEmbParams["XShape"] = he::NewList<int>({B, T});
+    TokEmbParams["XData"] = InputParams["IDXData"];
+    DynamicTensor TokEmb = SubLayers["WTE"]->Forward({}, TokEmbParams)[0];
+
+    he PosEmbParams = he::NewDict();
+    PosEmbParams["XShape"] = he::NewList<int>({T});
+    PosEmbParams["XData"] = he::NewList(MathArange(0, T, 1));
+    DynamicTensor PosEmb = SubLayers["WPE"]->Forward({}, PosEmbParams)[0];
+
+    auto X = DynamicTensor::Dropout(TokEmb + PosEmb, Dropout);
+    for(auto&TransformerBlockLayerName:TransformerBlockLayerNames)
+    {
+        X = SubLayers[TransformerBlockLayerName]->Forward({X})[0];
+    }
+    X = SubLayers["LNF"]->Forward({X})[0];
+    return {X};
 }
 
 void GPT2Model::InitWeights(BaseDynamicLayer* CurLayer)

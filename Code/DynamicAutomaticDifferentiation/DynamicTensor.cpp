@@ -128,6 +128,13 @@ int DynamicTensor::Numel()
 	return Ops->TensorPointer->ShapeCount;
 }
 
+DynamicTensor DynamicTensor::Arange(float Start, float End, float Step, bool RequiresGrad, size_t DeviceNum)
+{
+	auto TensorContent = Tensor::ArithmeticSequence({size_t((End-1e-6 - Start)/Step)+1}, Start, Step, DeviceNum);
+	DynamicTensor Res(std::shared_ptr<Tensor>(TensorContent), RequiresGrad);
+	return Res;
+}
+
 DynamicTensor DynamicTensor::SetComputationalHistory(Tensor* ResTensor, std::vector<DynamicTensor>InputList, he InputPrams, size_t InputOpsType, bool RequiresGrad)
 {
 	bool MaxRequiresGrad = 0,MaxIsEval = 0;
