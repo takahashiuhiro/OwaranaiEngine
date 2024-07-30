@@ -189,3 +189,17 @@ DynamicTensor DynamicTensor::MaskedFill(DynamicTensor Mask, float Value)
 	Ones.Fill(1);
 	return DynamicTensor(Ops)*(Ones - Mask)+Mask*Value;
 }
+
+DynamicTensor DynamicTensor::CrossEntropy(DynamicTensor Input, DynamicTensor Target, DynamicTensor Weight, std::string Reduction, float LabelSmoothing)
+{
+	int ClassNum = Target.Numel();
+	if(Weight.Ops == nullptr)
+	{
+		Tensor* WeightContent = new Tensor({1, (size_t)ClassNum}, Input.GetDeviceNum());
+		Weight = DynamicTensor(std::shared_ptr<Tensor>(WeightContent), false);
+		Weight.Fill(1./ClassNum);
+	}
+	auto ExpTensor = Input.Eleexp(M_E);
+	auto ExpTensorSum = ExpTensor.Sum({(int)ExpTensor.Shape().size()-1}, true).Pow(-1);
+	//todo
+}

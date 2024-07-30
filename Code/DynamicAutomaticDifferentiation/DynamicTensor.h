@@ -146,4 +146,5 @@ public:
     DynamicTensor Tril(int Diagonal = 0);
     DynamicTensor Transpose(int Dim0, int Dim1, int DebugFlag = false);
     DynamicTensor MaskedFill(DynamicTensor Mask, float Value);
+    static DynamicTensor CrossEntropy(DynamicTensor Input, DynamicTensor Target, DynamicTensor Weight = DynamicTensor(), std::string Reduction = "Mean", float LabelSmoothing =0);
 };

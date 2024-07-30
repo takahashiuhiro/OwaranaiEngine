@@ -1528,3 +1528,22 @@ Tensor* Tensor::Transpose(int FirstDim, int SecondDim)
     }
     return ReturnTensor;
 }
+
+Tensor* Tensor::EleLog()
+{
+    Tensor* ReturnTensor = Copy();
+    if(ReturnTensor->GetDeviceNum())
+    {
+        #ifdef CUDA_USEFUL
+        EleLogInCPP(ReturnTensor->GetDevicePointer(), ShapeCount);
+        #endif
+    }
+    else
+    {
+        for(size_t Index = 0;Index < ShapeCount; Index++)
+        {
+            ReturnTensor->GetDevicePointer()[Index] = std::log(GetDevicePointer()[Index]);
+        }
+    }
+    return ReturnTensor;
+}

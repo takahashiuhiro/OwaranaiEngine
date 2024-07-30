@@ -13,6 +13,10 @@ int main()
     //Params["Bias"] = 1;
     //q->Init(Params);
     //print(q->GetNumParams());
+    Tensor* q = new Tensor({2,3}, 1, {1,2,3,4,5,M_E});
+    q->PrintData();
+    q = q->EleLog();
+    q->PrintData();
 
-    print(MathArange(1.,2.5+1e-8,0.5));
+    //print(MathArange(1.,2.5+1e-8,0.5));
 }

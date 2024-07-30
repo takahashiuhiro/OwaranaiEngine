@@ -475,6 +475,19 @@ __global__ void TransposeKernel(float* OutputData, float* InputData, size_t* Out
   OutputData[Index] = InputData[InputIndex];
 }
 
+__global__ void EleLogKernel(float* OutputData, size_t OutputShapeSize)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= OutputShapeSize)return;
+  OutputData[Index] = log(OutputData[Index]);
+}
+
+void EleLogInCPP(float* OutputData, size_t OutputShapeSize)
+{
+  CudaPair CudaPairInput = GetCudaPair(OutputShapeSize);
+  EleLogKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, OutputShapeSize);
+}
+
 void TransposeInCPP(float* OutputData, float* InputData, size_t* OutputShape, size_t OutputShapeSize, int FirstDim, int SecondDim)
 {
   size_t OutputShapeCount = 1;

@@ -154,4 +154,6 @@ public:
     Tensor* Tril(int Diagonal = 0);
     /**任意两维的转置. */
     Tensor* Transpose(int FirstDim, int SecondDim);
+    /**对所有元素取log. */
+    Tensor* EleLog();
 };
