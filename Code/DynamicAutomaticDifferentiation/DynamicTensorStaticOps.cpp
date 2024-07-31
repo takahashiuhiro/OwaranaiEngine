@@ -12,6 +12,7 @@ void DynamicTensor::OpsSetInMap()
 	BackwardOps[OpsType::Pow] = DynamicStdOps_Backward_Pow;
 	BackwardOps[OpsType::EleExp] = DynamicStdOps_Backward_Eleexp;
 	BackwardOps[OpsType::Transpose] = DynamicStdOps_Backward_Transpose;
+	BackwardOps[OpsType::EleLog] = DynamicStdOps_Backward_EleLog;
 }
 
 
@@ -266,5 +267,17 @@ void DynamicTensor::DynamicStdOps_Backward_Transpose(std::map<DynamicOps*, std::
 	int Dim0 = CurOps->Params["Dim0"].i();
 	int Dim1 = CurOps->Params["Dim1"].i();
 	DynamicTensor Res = DynamicTensor(CurOps->GradOps).Transpose(Dim0, Dim1);
+	BackwardOpsMap[CurOps->InputOpsList[0].get()][CurOps.get()] = Res.Ops;
+}
+
+DynamicTensor DynamicTensor::DynamicStdOps_Forward_EleLog(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad)
+{
+	auto ResTensorContent = InputList[0].Ops->TensorPointer->EleLog();
+	return SetComputationalHistory(ResTensorContent, InputList, InputParams, OpsType::EleLog, RequiresGrad); 
+}
+void DynamicTensor::DynamicStdOps_Backward_EleLog(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps)
+{
+	if (!CurOps->InputOpsList[0]->RequiresGrad)return;
+	DynamicTensor Res = DynamicTensor(CurOps->GradOps)*DynamicTensor(CurOps->InputOpsList[0]).Pow(-1);
 	BackwardOpsMap[CurOps->InputOpsList[0].get()][CurOps.get()] = Res.Ops;
 }

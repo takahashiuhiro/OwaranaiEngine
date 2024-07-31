@@ -125,6 +125,9 @@ public:
     static DynamicTensor DynamicStdOps_Forward_Transpose(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad = false);
     static void DynamicStdOps_Backward_Transpose(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps);
 
+    static DynamicTensor DynamicStdOps_Forward_EleLog(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad = false);
+    static void DynamicStdOps_Backward_EleLog(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps);
+
     /**函数.*/
 
     // 求和
@@ -146,5 +149,7 @@ public:
     DynamicTensor Tril(int Diagonal = 0);
     DynamicTensor Transpose(int Dim0, int Dim1, int DebugFlag = false);
     DynamicTensor MaskedFill(DynamicTensor Mask, float Value);
-    static DynamicTensor CrossEntropy(DynamicTensor Input, DynamicTensor Target, DynamicTensor Weight = DynamicTensor(), std::string Reduction = "Mean", float LabelSmoothing =0);
+    DynamicTensor EleLog();
+    static DynamicTensor CrossEntropy(DynamicTensor Input, DynamicTensor Target, std::string Reduction = "Mean", DynamicTensor Weight = DynamicTensor(), float LabelSmoothing =0);
+
 };

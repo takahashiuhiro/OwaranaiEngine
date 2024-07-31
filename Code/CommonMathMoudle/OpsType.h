@@ -18,6 +18,7 @@ struct OpsType
     static const size_t EleExp ;//指数函数
     static const size_t View;//改变张量shape
     static const size_t Transpose;//交换shape
+    static const size_t EleLog;//对元素取log
 
     static const std::string DumpToString(size_t InputOpsType)
     {

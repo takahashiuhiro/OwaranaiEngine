@@ -112,7 +112,7 @@ void Tensor::PrintData()
             else break;
         }
     }
-    //std::cout<<std::endl;
+    if(shape.size()<2)std::cout<<std::endl;
     ToDevice(ProtoDeviceNum);
 }
 

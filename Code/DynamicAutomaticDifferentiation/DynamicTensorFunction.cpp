@@ -190,16 +190,23 @@ DynamicTensor DynamicTensor::MaskedFill(DynamicTensor Mask, float Value)
 	return DynamicTensor(Ops)*(Ones - Mask)+Mask*Value;
 }
 
-DynamicTensor DynamicTensor::CrossEntropy(DynamicTensor Input, DynamicTensor Target, DynamicTensor Weight, std::string Reduction, float LabelSmoothing)
+DynamicTensor DynamicTensor::EleLog()
 {
-	int ClassNum = Target.Numel();
+	auto Self = DynamicTensor(Ops);
+	return DynamicStdOps_Forward_EleLog({Self}, he(), true);
+}
+
+DynamicTensor DynamicTensor::CrossEntropy(DynamicTensor Input, DynamicTensor Target, std::string Reduction, DynamicTensor Weight, float LabelSmoothing)
+{
 	if(Weight.Ops == nullptr)
 	{
-		Tensor* WeightContent = new Tensor({1, (size_t)ClassNum}, Input.GetDeviceNum());
-		Weight = DynamicTensor(std::shared_ptr<Tensor>(WeightContent), false);
-		Weight.Fill(1./ClassNum);
+		Weight = DynamicTensor(Input.Shape(), false ,Input.GetDeviceNum());
+		Weight.Fill(1.);
 	}
 	auto ExpTensor = Input.Eleexp(M_E);
-	auto ExpTensorSum = ExpTensor.Sum({(int)ExpTensor.Shape().size()-1}, true).Pow(-1);
-	//todo
+	auto ExpTensorSum = ExpTensor.Sum({1}, true).Pow(-1);
+	auto MiniBatchRes = (ExpTensor*ExpTensorSum).EleLog()*Target*Weight;
+	auto MiniBatchResSum = MiniBatchRes.Sum()*(-1);
+	if(Reduction == "Sum")return MiniBatchResSum;
+	else return MiniBatchResSum*(1./Input.Shape()[0]);
 }
