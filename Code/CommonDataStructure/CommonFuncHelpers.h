@@ -110,6 +110,7 @@ void print(float Input);
 void print(double Input);
 void print(const char* Input);
 void print(size_t Input);
+void print(char Input);
 template<typename T>
 void print(std::vector<T> Input)
 {
@@ -151,3 +152,5 @@ auto ReplaceElement(const std::tuple<Args...>& TupleIns, NewType&& NewValue) {
         std::make_index_sequence<size - H - 1>{}     // 后面元素的索引
     );
 }
+
+std::vector<std::string> LoadTxtFromFile(std::string InputName);

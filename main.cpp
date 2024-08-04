@@ -15,5 +15,8 @@ int main()
     GPTX a;
     a.Init<GPT2Model>(Params);
     //a.LanguageModel->Load("gg.oeh");
-    print(a.LanguageModel->Parameters());
+    //print(a.LanguageModel->Parameters());
+
+    a.GenTokenIdxTable("../DataSet/1.烤鸭场景描述.txt");
+
 }
