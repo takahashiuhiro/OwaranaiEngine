@@ -64,6 +64,35 @@ void BaseDynamicLayer::Init(he InputParams)
 	InitContent();
 }
 
+void BaseDynamicLayer::Save(std::string InputName)
+{
+	auto StateDictParamsMp = StateDict();
+	std::ofstream OpenedFile(InputName, std::ios::binary);
+	Log::Assert(OpenedFile.is_open(), std::string("This File Is Not Opened::") + InputName);
+	size_t StateDictSize = StateDictParamsMp.size();
+	OpenedFile.write(reinterpret_cast<const char*>(&StateDictSize), sizeof(StateDictSize));
+	for(auto&it:StateDictParamsMp)
+	{
+		SaveToFileString(OpenedFile, it.first);
+		it.second.Ops->TensorPointer->SaveToFile(OpenedFile);
+	}
+	OpenedFile.close();
+}
+
+void BaseDynamicLayer::Load(std::string InputName)
+{
+	auto StateDictParamsMp = StateDict();
+	std::ifstream OpenedFile(InputName, std::ios::binary);
+	Log::Assert(OpenedFile.is_open(), std::string("This File Is Not Opened::") + InputName);
+	size_t StateDictSize;
+	OpenedFile.read(reinterpret_cast<char*>(&StateDictSize), sizeof(StateDictSize));
+	for(size_t a = 0;a<StateDictSize;a++)
+	{
+		std::string WeightName = LoadFromFileString(OpenedFile);
+		StateDictParamsMp[WeightName].Ops->TensorPointer->LoadFromFile(OpenedFile);
+	}
+}
+
 float BaseDynamicLayer::GetNumParams()
 {
 	float Res = 0;

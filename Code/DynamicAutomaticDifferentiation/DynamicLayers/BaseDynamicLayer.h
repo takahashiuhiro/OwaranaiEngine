@@ -34,6 +34,8 @@ public:
 	void SetCommonDefaultParams();
 	void SetParams(he InputParams);
 	void Init(he InputParams);
+	void Save(std::string InputName);
+	void Load(std::string InputName);
 
 	//递归在所有的子layer中执行一个函数，被执行的函数第一个参数必须是this
 	template <typename Func, typename... Args>
