@@ -6,8 +6,9 @@
 #include <vector>
 #include <tuple>
 #include <utility>
-#include <fstream>
 #include <functional>
+#include <random>
+#include <iterator>
 
 /**把数字变成字符串.*/
 template<typename T>
@@ -153,4 +154,11 @@ auto ReplaceElement(const std::tuple<Args...>& TupleIns, NewType&& NewValue) {
     );
 }
 
-std::vector<std::string> LoadTxtFromFile(std::string InputName);
+//从文件里读字符串
+std::vector<std::string> LoadStringFromFile(std::string InputName);
+
+//把字符串存文件里
+void SaveStringToFile(std::vector<std::string> StringVec,std::string InputName);
+
+//生成start到end的num个不重复整型
+std::vector<int> GenerateUniqueRandomNumbers(int Num, int Start, int End);
