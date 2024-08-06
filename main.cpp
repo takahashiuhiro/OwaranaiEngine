@@ -29,6 +29,6 @@ int main()
     std::cout<<"参数量: "<<a.LanguageModel->GetNumParams()<<" m"<<std::endl;
 
     a.LoadTokenIdxTable("../DataSet/pkduck/pkduck.table.oe");
-    //a.LanguageModel->Load("../Application/GPTX/GPT2.weight.oe");
+    a.LanguageModel->Load("../Application/GPTX/GPT2.weight.oe");
     a.TrainConversation("../DataSet/pkduck/pkduck.data.oe");
 }
