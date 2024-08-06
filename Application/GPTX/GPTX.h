@@ -27,7 +27,4 @@ struct GPTX
     //训练对话
     void TrainConversation(std::string InputName);
 
-    //根据数据生成loss
-    DynamicTensor GetLoss();
-
 };

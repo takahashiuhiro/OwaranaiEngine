@@ -107,17 +107,23 @@ void GPTX::TrainConversation(std::string InputName)
         }
     }
 
+    auto OptimizerIns = Optimizer::CreateSGD(LanguageModel->Parameters());
+
     int B = 10, T = 70;
     he TrainParams = he::NewDict();
-    TrainParams["BatchSize"] = B;
-    TrainParams["TextureLength"] = T;
+    TrainParams["XShape"] = he::NewList<int>({B,T});
 
-    for(int a=0;a<1;a++)
+    for(int a=0;a<100;a++)
     {
         auto TokenIndexVec = TextToVector(TrainSetIndex, B, T);
-        TrainParams["IDXData"] = he::NewList(TokenIndexVec);
-        DynamicTensor ThisRes = LanguageModel->Forward({},TrainParams)[0];
-        //todo
+        TrainParams["XData"] = he::NewList(TokenIndexVec);
+        DynamicTensor X = LanguageModel->Forward({},TrainParams)[0];
+        DynamicTensor Y = DynamicTensor::CreateOnehotTensor({B,T}, TokenIndexVec, LanguageModel->Params["VocabSize"].i(), false, X.GetDeviceNum());
+
+        auto LossRes = DynamicTensor::CrossEntropy(X,Y);
+        //print(X.GetDeviceNum());
+        LossRes.Backward();
+        OptimizerIns.Step();
     }
     
 }

@@ -42,8 +42,8 @@ void GPT2Model::InitContent()
     LNFParams["Bias"] = Bias;
     CreateNewLayer<LayerNorm>("LNF", LNFParams);
     he LMHeadParams = he::NewDict();
-    LMHeadParams["InFeatures"] = VocabSize;
-    LMHeadParams["OutFeatures"] = NEmbd;
+    LMHeadParams["InFeatures"] = NEmbd;
+    LMHeadParams["OutFeatures"] = VocabSize;
     LMHeadParams["Bias"] = 0;
     CreateNewLayer<Linear>("LMHead", LMHeadParams);
     SubLayers["WTE"]->Weights["Weight"] = SubLayers["LMHead"]->Weights["Weight"];//这一句原文自己也不知道能不能跑不行就删了
@@ -53,13 +53,13 @@ void GPT2Model::InitContent()
 
 std::vector<DynamicTensor> GPT2Model::Forward(std::vector<DynamicTensor>InputForwardList, he InputParams)
 {
-    int B = InputParams["BatchSize"].i();
-    int T = InputParams["TextureLength"].i();
+    int B = InputParams["XShape"][0].i();
+    int T = InputParams["XShape"][1].i();
     Log::Assert(T <= BlockSize, "Block Size is Not Enough For Length.");
 
     he TokEmbParams = he::NewDict();
     TokEmbParams["XShape"] = he::NewList<int>({B, T});
-    TokEmbParams["XData"] = InputParams["IDXData"];
+    TokEmbParams["XData"] = InputParams["XData"];
     DynamicTensor TokEmb = SubLayers["WTE"]->Forward({}, TokEmbParams)[0];
 
     he PosEmbParams = he::NewDict();
@@ -73,6 +73,7 @@ std::vector<DynamicTensor> GPT2Model::Forward(std::vector<DynamicTensor>InputFor
         X = SubLayers[TransformerBlockLayerName]->Forward({X})[0];
     }
     X = SubLayers["LNF"]->Forward({X})[0];
+    X = SubLayers["LMHead"]->Forward({X})[0];
     return {X};
 }
 
