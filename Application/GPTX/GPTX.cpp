@@ -107,23 +107,52 @@ void GPTX::TrainConversation(std::string InputName)
         }
     }
 
-    auto OptimizerIns = Optimizer::CreateSGD(LanguageModel->Parameters());
+    auto OptimizerIns = Optimizer::CreateSGD(LanguageModel->Parameters(), 0.0001);
 
     int B = 10, T = 70;
     he TrainParams = he::NewDict();
     TrainParams["XShape"] = he::NewList<int>({B,T});
 
-    for(int a=0;a<100;a++)
-    {
-        auto TokenIndexVec = TextToVector(TrainSetIndex, B, T);
-        TrainParams["XData"] = he::NewList(TokenIndexVec);
-        DynamicTensor X = LanguageModel->Forward({},TrainParams)[0];
-        DynamicTensor Y = DynamicTensor::CreateOnehotTensor({B,T}, TokenIndexVec, LanguageModel->Params["VocabSize"].i(), false, X.GetDeviceNum());
+    double HisLoss = 1e5;
 
-        auto LossRes = DynamicTensor::CrossEntropy(X,Y);
-        //print(X.GetDeviceNum());
-        LossRes.Backward();
-        OptimizerIns.Step();
+    for(int Epoch=0;Epoch < 1500;Epoch++)
+    {
+        auto ThisEpochIndex = GenerateUniqueRandomNumbers(TrainSetIndex.size(), 0, TrainSetIndex.size()-1);
+        int StartIndex = 0;
+        float NewLoss = 0;
+
+        while(StartIndex+B<ThisEpochIndex.size())
+        {
+            std::vector<int> BatchVec;
+            int ThisB = 0;
+            for(int a=StartIndex;a < std::min((int)ThisEpochIndex.size(), StartIndex+B); a++)
+            {
+                BatchVec.push_back(ThisEpochIndex[a]);
+                ThisB++;
+            }
+            StartIndex += ThisB;
+            auto TokenIndexVec = TextToVector(TrainSetIndex, ThisB, T, BatchVec);
+            TrainParams["XData"] = he::NewList(TokenIndexVec);
+            DynamicTensor X = LanguageModel->Forward({},TrainParams)[0];
+            DynamicTensor Y = DynamicTensor::CreateOnehotTensor({ThisB,T}, TokenIndexVec, LanguageModel->Params["VocabSize"].i(), false, X.GetDeviceNum());
+            auto LossRes = DynamicTensor::CrossEntropy(X,Y);
+
+            NewLoss += LossRes.Ops->TensorPointer->GetV({0})*B;
+            OptimizerIns.ZeroGrad();
+            LossRes.Backward();
+            OptimizerIns.Step();
+            //print(LossRes);
+        }
+
+        NewLoss = NewLoss/ThisEpochIndex.size();
+
+        if(HisLoss > NewLoss)
+        {
+            HisLoss = NewLoss;
+            if(Epoch)LanguageModel->Save("../Application/GPTX/GPT2.weight.oe");
+        }
+
+        std::cout<<"Epoch: "<<Epoch<<"\t"<<"cur: "<<NewLoss<<"\t"<<"best: "<<HisLoss<<std::endl;
+
     }
-    
 }

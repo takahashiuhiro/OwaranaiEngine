@@ -19,5 +19,5 @@ struct CudaPair
 CudaPair GetCudaPair(size_t Size) 
 {
   size_t NumBlocks = (Size + THREAD_NUM - 1) / THREAD_NUM;
-  return CudaPair(dim3(THREAD_NUM, 1, 1), dim3(NumBlocks, 1, 1));
+  return CudaPair(dim3(NumBlocks, 1, 1),dim3(THREAD_NUM, 1, 1));
 }
