@@ -13,6 +13,15 @@
 
 在计算图中采用了显式的图结构, 可以打印出计算图的邻接表以及每个计算节点的梯度. 如果采用的算子有多阶导数就可以求多阶导数。
 
+## 关于本框架测试
+
+### GPT2 拟合测试
+训练过程可见: https://github.com/takahashiuhiro/OwaranaiEngine/blob/main/Application/GPTX/test_res/test.md
+模型可以正常拟合数据集并在训练集上输出有一定逻辑的结果，loss曲线也和基于torch的GPT2相似，OwaranaiEngine在该模型下被验证可用。
+
+测试过程中使用OwaranaiEngine重写了基于torch的gpt参考了该链接的代码，并且在单元测试中有很大的帮助。在这里需要感谢
+https://github.com/karpathy/nanoGPT/tree/master
+
 ## 关于项目文档  
 
 https://github.com/takahashiuhiro/OwaranaiEngine/blob/main/doc.md 
@@ -44,5 +53,4 @@ git clone https://github.com/takahashiuhiro/OwaranaiEngine.git
 ctrl+F5编译运行  
 
 ## 项目备忘录 
-1. cross entropy  
-2. hyperelement的splay还没写
+1. hyperelement的splay还没写

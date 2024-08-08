@@ -40,7 +40,7 @@ std::vector<int> GenerateUniqueRandomNumbers(int Num, int Start, int End)
 {
     int n = End - Start + 1;
     std::vector<int> Numbers(n);
-    for(int a=0;a<n;a++)Numbers[a] = Start+a-1;
+    for(int a=0;a<n;a++)Numbers[a] = Start+a;
     std::random_device rd;
     std::mt19937 g(rd());
     std::shuffle(Numbers.begin(), Numbers.end(), g);
