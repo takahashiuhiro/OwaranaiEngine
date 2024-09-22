@@ -8,19 +8,14 @@ import random
 import tqdm
 import torch.optim as optim
 
-dd = [1,2,3,4,5,math.e,7,8,math.pi,math.pi*2, math.e*3,math.e*4]
-ds = [2,2,3]
-
-qq = torch.Tensor(dd).view(ds)
-
-tg = torch.Tensor(dd).view(ds)
-
-qq.requires_grad = True
-
-g = F.cross_entropy(qq,target = tg,reduction = "sum")
-
-g.backward()
-
-print(qq)
-print(g)
-print(qq.grad)
+a = [1,2,3,4.]
+b = [4,3,2,1.]
+dta = torch.Tensor(a).view([2,2])
+dtb = torch.Tensor(b).view([2,2])
+dta.requires_grad = True
+dtb.requires_grad = True
+dtc = (dta@dtb).sum()
+print(dtc)
+dtc.backward()
+print(dta.grad)
+print(dtb.grad)

@@ -33,13 +33,13 @@ struct DevicePointerManager
         InitDevicePointerManager(DeviceNum, ShapeCount);
     }
 
-    void InitDevicePointerManager(size_t DeviceNum, size_t ShapeCount)
+    void InitDevicePointerManager(size_t InputDeviceNum, size_t ShapeCount)
     {
         for(size_t a=0;a<MaxDeviceNum;a++)
         {
             DataPointers.push_back(nullptr);
         }
-        SetDevice(DeviceNum, ShapeCount);
+        SetDevice(InputDeviceNum, ShapeCount);
     }
 
     ~DevicePointerManager()

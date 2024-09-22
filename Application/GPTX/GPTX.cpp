@@ -227,7 +227,7 @@ void GPTX::GenConversation(std::string InputSentense)
         //print(idx);
         IndexVec.push_back(idx);
 
-        if(idx==0||idx==TokenIdxTable["。"].i())break;
+        if(idx==0||idx==TokenIdxTable["."].i())break;
         ReturnStr += TokenIdxTable[idx].s();
     }
 
