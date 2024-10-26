@@ -2,6 +2,7 @@
 #include "BaseDynamicLayer.h"
 #include "Linear.h"
 #include "LayerNorm.h"
+#include "BatchNorm.h"
 #include "MLP.h"
 #include "CausalSelfAttention.h"
 #include "TransformerBlock.h"
