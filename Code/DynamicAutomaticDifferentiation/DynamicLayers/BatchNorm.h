@@ -3,7 +3,7 @@
 
 /*
 *@Params
-* NormalizedShape 归一化.
+* NumFeatures 通道的数量，位于第二个维度.
 * Default:
 * eps =1e-5 误差.
 * ElementwiseAffine = true 元素仿射.
