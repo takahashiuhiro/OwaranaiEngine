@@ -210,3 +210,24 @@ DynamicTensor DynamicTensor::CrossEntropy(DynamicTensor Input, DynamicTensor Tar
 	if(Reduction == "Sum")return MiniBatchResSum;
 	else return MiniBatchResSum*(1./Input.Shape()[0]);
 }
+
+DynamicTensor DynamicTensor::Sigmoid()
+{
+	auto Self = DynamicTensor(Ops);
+	return  ((Self*(-1)).Eleexp(M_E)+ 1).Pow(-1.);
+}
+
+DynamicTensor DynamicTensor::GaussianCdf(float InputMean, float InputStd, int Terms)
+{
+	auto Self = DynamicTensor(Ops);
+	DynamicTensor ErfApprox = Self*0;
+	for(int a=0;a<Terms;a++)
+	{
+		float Coe = Factorial(a)*(2*a+1);
+		if(a%2)Coe = -1/Coe;
+		else Coe = 1/Coe;
+		ErfApprox = ErfApprox+Self.Pow(2*a+1)*Coe;
+	}
+	DynamicTensor CDF = ErfApprox*(1./std::sqrt(M_PI)) + 0.5;
+	return CDF;
+}

@@ -2,6 +2,7 @@
 #include "HyperElement.h"
 #include "../DynamicAutomaticDifferentiation/DynamicTensor.h"
 
+template<typename LoaderDataType>
 struct BaseDataloader
 {
     BaseDataloader(){};
@@ -34,14 +35,80 @@ struct BaseDataloader
     /**按照预先分好的batch拿数据，每次拿到一个batch. */
     std::vector<size_t> GetBatchIndex();
 
-    std::pair<DynamicTensor,DynamicTensor> GetAllData();
-    std::pair<DynamicTensor,DynamicTensor> GetBatchData();
+    
+    LoaderDataType GetAllData();
+    LoaderDataType GetBatchData();
 
     /**需要如何初始化. */
     virtual void InitDetail() = 0;
     /**需要知道一共有多少数据. */
     virtual size_t GetDataAllNum() = 0;
     /**将数据和输出转化为张量. */
-    virtual std::pair<DynamicTensor,DynamicTensor> ChangeDataToTensor(std::vector<size_t>DataIndexs) = 0;
+    virtual LoaderDataType ChangeDataToTensor(std::vector<size_t>DataIndexs) = 0;
 
 };
+
+template<typename LoaderDataType>
+void BaseDataloader<LoaderDataType>::Init(he InputParams)
+{
+    DataLoaderParams = InputParams;
+    InitCommon();
+    InitDetail();
+    SetBatchSize();
+}
+
+template<typename LoaderDataType>
+void BaseDataloader<LoaderDataType>::InitCommon()
+{
+    if (DataLoaderParams.In("DeviceNum"))DeviceNum = DataLoaderParams["DeviceNum"].i();
+	else DeviceNum = 0;
+    if (DataLoaderParams.In("RequiresGrad"))RequiresGrad = DataLoaderParams["RequiresGrad"].i();
+	else RequiresGrad = 0;
+}
+
+template<typename LoaderDataType>
+std::vector<size_t> BaseDataloader<LoaderDataType>::GetAllIndex()
+{
+    std::vector<size_t>Res;
+    size_t DataNum = GetDataAllNum();
+    for(size_t a=0;a<DataNum;a++)Res.push_back(a);
+    return Res;
+}
+
+template<typename LoaderDataType>
+void BaseDataloader<LoaderDataType>::SetBatchSize(int InputBatchSize, bool IsReset)
+{
+    size_t DataNum = GetDataAllNum();
+    if(IsReset)
+    {
+        BatchIndex = 0;
+        BatchList = GenerateUniqueRandomNumbers(DataNum+1, 0, DataNum);
+    }
+    BatchSize = InputBatchSize;
+}
+
+template<typename LoaderDataType>
+std::vector<size_t> BaseDataloader<LoaderDataType>::GetBatchIndex()
+{
+    std::vector<size_t>Res;
+    int ProtoBatchIndex = BatchIndex;
+    for(;;)
+    {
+        if(Res.size() >= BatchSize || BatchIndex > BatchList.size() - 1)break;
+        Res.push_back(BatchList[BatchIndex]);
+        BatchIndex ++;
+    }
+    return Res;
+}
+
+template<typename LoaderDataType>
+LoaderDataType BaseDataloader<LoaderDataType>::GetAllData()
+{
+    return ChangeDataToTensor(GetAllIndex());
+}
+
+template<typename LoaderDataType>
+LoaderDataType BaseDataloader<LoaderDataType>::GetBatchData()
+{
+    return ChangeDataToTensor(GetBatchIndex());
+}

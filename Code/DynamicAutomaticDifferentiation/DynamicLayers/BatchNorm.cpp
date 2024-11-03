@@ -31,6 +31,6 @@ std::vector<DynamicTensor> BatchNorm::Forward(std::vector<DynamicTensor>InputFor
     auto ViewX = InputForwardList[0].View({ProtoShape[0],ProtoShape[1], -1});
 	auto Res = (ViewX - ViewX.Mean(MeanDims, true))*(ViewX.Var(MeanDims, true,0) + eps).Pow(-0.5);
 	if (!ElementwiseAffine)return { Res.View(ProtoShape) };
-	if (!Bias)return { Res.View(ProtoShape) * Weights["Weight"] };
-	return { Res.View(ProtoShape) * Weights["Weight"] + Weights["Bias"] };
+	if (!Bias)return { (Res * Weights["Weight"]).View(ProtoShape) };
+	return { (Res* Weights["Weight"] + Weights["Bias"]).View(ProtoShape) };
 }

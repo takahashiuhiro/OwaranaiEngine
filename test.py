@@ -8,9 +8,43 @@ import random
 import tqdm
 import torch.optim as optim
 
-# With Learnable Parameters
-m = nn.BatchNorm2d(2, affine=False)
-input = torch.Tensor([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24.])
-output = m(input.view([2,2,2,3]))
+import torch
 
-print(output)
+def gaussian_cdf(x, mean=0.0, std=1.0, terms=3):
+    """
+    Compute the CDF of a normal distribution using a Taylor series approximation of the error function.
+    
+    Parameters:
+    - x (torch.Tensor): The input value or tensor of values.
+    - mean (float): The mean of the Gaussian distribution.
+    - std (float): The standard deviation of the Gaussian distribution.
+    - terms (int): The number of terms in the Taylor series for the error function.
+    
+    Returns:
+    - torch.Tensor: The CDF value(s) for the input.
+    """
+    
+    # Standardize the input to the standard normal form
+    #z = (x - mean) / (std * torch.sqrt(torch.tensor(2.0)))
+    z = x
+    
+    # Initialize erf_approx as a tensor with the same shape as z, filled with zeros
+    erf_approx = torch.zeros_like(z)
+    
+    # Compute the Taylor series expansion of the error function
+    for k in range(terms):
+        coef = ((-1)**k * z**(2 * k + 1)) / (torch.factorial(torch.tensor(k)) * (2 * k + 1))
+        erf_approx += coef
+    
+    # Compute the CDF using the approximation of the error function
+    cdf = 0.5 * (1 + (2 / torch.sqrt(torch.tensor(torch.pi))) * erf_approx)
+    
+    return cdf
+
+# Example usage
+mean = 0.0
+std = 1.0
+terms = 3
+x = torch.tensor([0.0, 0.5, 1.0, -0.5, -1.0])  # Example input tensor
+result = gaussian_cdf(x, mean=mean, std=std, terms=terms)
+print(result)

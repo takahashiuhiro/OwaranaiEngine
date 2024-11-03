@@ -43,3 +43,11 @@ std::vector<T> MathArange(T Start, T End, Y Step)
     return Res;
 }
 
+template<typename T>
+T Factorial(T InputNum)
+{
+    T Res = 1;
+    for(T a=1;a <= InputNum;a=a+1)Res = Res*a;
+    return Res;
+}
+

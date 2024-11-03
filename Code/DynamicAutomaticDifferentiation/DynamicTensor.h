@@ -128,7 +128,7 @@ public:
     static DynamicTensor DynamicStdOps_Forward_EleLog(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad = false);
     static void DynamicStdOps_Backward_EleLog(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps);
 
-    /**函数.*/
+    /**可导函数.*/
 
     // 求和
     DynamicTensor Sum(std::vector<int>Dims = {}, bool KeepDim = false);
@@ -151,5 +151,10 @@ public:
     DynamicTensor MaskedFill(DynamicTensor Mask, float Value);
     DynamicTensor EleLog();
     static DynamicTensor CrossEntropy(DynamicTensor Input, DynamicTensor Target, std::string Reduction = "Mean", DynamicTensor Weight = DynamicTensor(), float LabelSmoothing =0);
+    DynamicTensor Sigmoid();
+    //高斯分布的积分，默认的是期望是0标准差是1的标准高斯分布，用泰勒展开3项
+    DynamicTensor GaussianCdf(float InputMean = 0, float InputStd =1, int Terms = 3);
+
+    /**不可导函数. */
 
 };
