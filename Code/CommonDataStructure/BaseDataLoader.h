@@ -82,7 +82,7 @@ void BaseDataloader<LoaderDataType>::SetBatchSize(int InputBatchSize, bool IsRes
     if(IsReset)
     {
         BatchIndex = 0;
-        BatchList = GenerateUniqueRandomNumbers(DataNum+1, 0, DataNum);
+        BatchList = GenerateUniqueRandomNumbers(DataNum, 0, DataNum-1);
     }
     BatchSize = InputBatchSize;
 }
