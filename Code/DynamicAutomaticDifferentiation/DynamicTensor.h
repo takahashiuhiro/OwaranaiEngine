@@ -142,6 +142,7 @@ public:
     DynamicTensor Tanh();
     static DynamicTensor Cat(std::vector<DynamicTensor>InputTensors, int Dim = 0);
     DynamicTensor GELU();
+    DynamicTensor ReLU();
     DynamicTensor Mean(std::vector<int>InputDims, bool KeepDim = false);
     // 方差
     DynamicTensor Var(std::vector<int>InputDims, bool KeepDim = false, float Correction = 1);

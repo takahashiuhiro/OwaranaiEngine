@@ -231,3 +231,10 @@ DynamicTensor DynamicTensor::GaussianCdf(float InputMean, float InputStd, int Te
 	DynamicTensor CDF = ErfApprox*(1./std::sqrt(M_PI)) + 0.5;
 	return CDF;
 }
+
+DynamicTensor DynamicTensor::ReLU()
+{
+	auto Self = DynamicTensor(Ops);
+	Tensor* SignTensor = Self.Ops->TensorPointer->GenerateSignTensor();
+	return Self*DynamicTensor(std::shared_ptr<Tensor>(SignTensor));
+}
