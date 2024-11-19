@@ -51,6 +51,7 @@ public:
     DynamicTensor Grad();
     DynamicTensor Copy();//复制一个空的只有张量的值.
     std::vector<size_t>& Shape();
+    void SetRequiresGrad(bool InputRequiresGrad);//使向量可导或者不可导
 
     /**Tensor内函数组装.*/
     //打印数据

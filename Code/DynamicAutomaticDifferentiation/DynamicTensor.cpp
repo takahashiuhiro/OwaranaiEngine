@@ -81,6 +81,11 @@ std::vector<size_t>& DynamicTensor::Shape()
 	return Ops->TensorPointer->shape;
 }
 
+void DynamicTensor::SetRequiresGrad(bool InputRequiresGrad)
+{
+	Ops->RequiresGrad = InputRequiresGrad;
+}
+
 void DynamicTensor::PrintData()
 {
 	Ops->TensorPointer->PrintData();
