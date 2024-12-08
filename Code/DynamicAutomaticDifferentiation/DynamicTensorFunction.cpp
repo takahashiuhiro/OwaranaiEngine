@@ -123,7 +123,7 @@ DynamicTensor DynamicTensor::Cat(std::vector<DynamicTensor>InputTensors, int Dim
 {
 	std::vector<Tensor*>TensorVer;
 	for (auto& It : InputTensors)TensorVer.push_back(It.Ops->TensorPointer.get());
-	auto GenRightMat = Tensor::GenerateCatTensor(TensorVer, Dim);
+	auto GenRightMat = Tensor::GenerateCatTensor(TensorVer, Dim);//性能问题的位置
 	DynamicTensor Res;
 	int TargetDim = 0;
 	for (size_t a = 0; a < InputTensors.size(); a++)TargetDim += InputTensors[a].Ops->TensorPointer->shape[Dim];
@@ -136,8 +136,8 @@ DynamicTensor DynamicTensor::Cat(std::vector<DynamicTensor>InputTensors, int Dim
 			if (b < Dim)FirstDim *= InputTensors[a].Ops->TensorPointer->shape[b];
 			else LastDim *= InputTensors[a].Ops->TensorPointer->shape[b];
 		}
-		if (a == 0)Res = InputTensors[a].View({ (int)FirstDim, (int)LastDim }) % DynamicTensor(std::shared_ptr<Tensor>(GenRightMat[a]));
-		else Res = Res + InputTensors[a].View({ (int)FirstDim, (int)LastDim }) % DynamicTensor(std::shared_ptr<Tensor>(GenRightMat[a]));
+		if (a == 0)Res = InputTensors[a].View({ (int)FirstDim, (int)LastDim }) % DynamicTensor(std::shared_ptr<Tensor>(GenRightMat[a]));//性能问题的位置
+		else Res = Res + InputTensors[a].View({ (int)FirstDim, (int)LastDim }) % DynamicTensor(std::shared_ptr<Tensor>(GenRightMat[a]));//性能问题的位置
 	}
 	std::vector<int> ReturnShape;
 	for (size_t a = 0; a < InputTensors[0].Ops->TensorPointer->shape.size(); a++)ReturnShape.push_back(InputTensors[0].Ops->TensorPointer->shape[a]);
