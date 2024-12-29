@@ -1141,8 +1141,9 @@ Tensor* Tensor::Pow(float Exponent)
 
 Tensor* Tensor::View(std::vector<size_t> OutputShape, int MinusOneIdx)
 {
-    Tensor* ReturnTensor = Copy();
+    Tensor* ReturnTensor = new Tensor();
     ReturnTensor->shape = OutputShape;
+    ReturnTensor->ShapeCount = ShapeCount;
     if(MinusOneIdx >= 0)
     {
         int SpcIdx = 1;
@@ -1155,6 +1156,7 @@ Tensor* Tensor::View(std::vector<size_t> OutputShape, int MinusOneIdx)
         }
         ReturnTensor->shape[MinusOneIdx] = ReturnTensor->ShapeCount/SpcIdx;
     }
+    ReturnTensor->DPMgr = DPMgr;
     return ReturnTensor;
 }
 
