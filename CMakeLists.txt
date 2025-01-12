@@ -4,6 +4,8 @@ project(${TARGET_NAME})
 set(CMAKE_CXX_FLAGS "-g -Wall -O2")
 set(CMAKE_CXX_STANDARD 17)
 
+set(BACKWARD "NONE" CACHE STRING "Set the mode of operation")
+
 cmake_minimum_required(VERSION 3.8)
 add_subdirectory(Code)
 add_subdirectory(Application)
