@@ -3,13 +3,16 @@
 
 int main() 
 {
-    Tensor* a = new Tensor({2,2}, 1, {1,2,3,4});
-    Tensor* b = new Tensor({2,2}, 1, {4,3,2,1});
+    bool isGPUDevice = 1;
+    Tensor* a = new Tensor({2,2}, isGPUDevice, {1,2,3,4});
+    Tensor* b = new Tensor({2,2}, isGPUDevice, {4,3,2,1});
     DynamicTensor dta(std::shared_ptr<Tensor>(a), 1);
     DynamicTensor dtb(std::shared_ptr<Tensor>(b), 1);
-    auto dtc = (dta%dtb).Sum();
-    print(dtc);
-    dtc.Backward();
-    print(dta.Grad());
-    print(dtb.Grad());
+    print(dta);
+    print(dtb);
+    //auto dtc = (dta%dtb).Sum();
+    //print(dtc);
+    //dtc.Backward();
+    //print(dta.Grad());
+    //print(dtb.Grad());
 }

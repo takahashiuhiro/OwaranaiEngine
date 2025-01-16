@@ -2,6 +2,7 @@
 #include <fstream>
 #include <random>
 #include <chrono>
+#include "GPUDeviceProcess.h"
 
 #ifdef CUDA_USEFUL
 #include "Cuda/TensorCoreCudaFun.h"
@@ -35,6 +36,9 @@ struct DevicePointerManager
 
     void InitDevicePointerManager(size_t InputDeviceNum, size_t ShapeCount)
     {
+        #ifdef OPENGL_USEFUL
+        Log::Assert(InputDeviceNum<=1, "opengl's devicenum must less than 2!");
+        #endif
         for(size_t a=0;a<MaxDeviceNum;a++)
         {
             DataPointers.push_back(nullptr);
@@ -53,6 +57,10 @@ struct DevicePointerManager
     /**当前的设备数.*/
     size_t DeviceNum = ImpossibleFrameMaxDeviceNum();
 
+    #ifdef OPENGL_USEFUL
+    GLuint OpenGLDataPointer;
+    #endif
+
     size_t FrameMaxDeviceNum()
     {
         return 5000;
@@ -65,6 +73,9 @@ struct DevicePointerManager
 
     float* GetDevicePointer()
     {
+        #ifdef OPENGL_USEFUL
+        Log::Assert(DeviceNum==0,"OpenGL has no DevicePointer");
+        #endif
         return DataPointers[DeviceNum];
     }
 
@@ -82,6 +93,9 @@ struct DevicePointerManager
             #ifdef CUDA_USEFUL
             cudaFreeInCPP(DataPointers[OldDeviceNum]);
             #endif
+            #ifdef OPENGL_USEFUL
+            glDeleteBuffers(1, &OpenGLDataPointer);
+            #endif
         }
     }
 
@@ -96,15 +110,22 @@ struct DevicePointerManager
             #ifdef CUDA_USEFUL
             if(OldDeviceNum !=ImpossibleFrameMaxDeviceNum())DataGPUToCPU(DataPointers[NewDeviceNum], DataPointers[OldDeviceNum], ShapeCount);
             #endif
+            #ifdef OPENGL_USEFUL
+            if(OldDeviceNum !=ImpossibleFrameMaxDeviceNum())GPUDeviceProcess::I().DataGPUToCPU(OpenGLDataPointer,DataPointers[NewDeviceNum],ShapeCount);
+            #endif
         }
         else
         {
-            bool CudaFlag = 0;
+            size_t GPUFlag = 0;
             #ifdef CUDA_USEFUL
-            CudaFlag = 1;
+            GPUFlag = 1;
             cudaMallocInCPP(&DataPointers[NewDeviceNum], ShapeCount, DeviceNumToCuda(NewDeviceNum));
             #endif
-            Log::Assert(CudaFlag, std::string("Use Cuda Branch But..."));
+            #ifdef OPENGL_USEFUL
+            GPUFlag = 2;
+            OpenGLDataPointer = GPUDeviceProcess::I().GetBuffer_OpenGL(ShapeCount);
+            #endif
+            Log::Assert(GPUFlag, std::string("Use GPU Branch But...Your -DBACKWARD=CPU..."));
             if(OldDeviceNum !=ImpossibleFrameMaxDeviceNum())
             {
                 #ifdef CUDA_USEFUL
@@ -115,6 +136,16 @@ struct DevicePointerManager
                 else
                 {
                     DataGPUToGPU(DataPointers[NewDeviceNum], DataPointers[OldDeviceNum], ShapeCount);
+                }
+                #endif
+                #ifdef OPENGL_USEFUL
+                if(!OldDeviceNum)
+                {
+                    GPUDeviceProcess::I().DataCPUToGPU(OpenGLDataPointer, DataPointers[OldDeviceNum], ShapeCount);
+                }
+                else
+                {
+                    Log::Assert(false, "OpenGL can not GPU TO GPU");
                 }
                 #endif
             }
