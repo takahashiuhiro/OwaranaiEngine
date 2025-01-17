@@ -17,6 +17,24 @@ private:
         Init_OpenGL();
         #endif
     }
+    ~GPUDeviceProcess()
+    {
+        #ifdef OPENGL_USEFUL
+        /**
+         * 删除编译过的程序
+         */
+        auto DeleteOpenGLPrograme = []()
+        {
+            for(auto&it:GPUDeviceProcess::I().GPUFunction_OpenGL)
+            {
+                glDeleteProgram(it);
+            }
+        };
+        DeleteOpenGLPrograme();
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        #endif
+    }
 
 public:
     GPUDeviceProcess(const GPUDeviceProcess&) = delete;
@@ -31,7 +49,7 @@ public:
     //#ifdef OPENGL_USEFUL
 
     GLFWwindow* window;
-    std::vector<GLuint>GPUFunction_OpenGL;
+    std::vector<GLuint>GPUFunction_OpenGL;//储存OpenGL函数的容器
     
     /**
      * 对于opengl的计算后端进行初始化
@@ -66,6 +84,9 @@ public:
         return ResBuffer;
     }
 
+    /**
+     * 数据从GPU传入CPU
+     */
     void DataGPUToCPU(GLuint InputBuffer, float*CPUDevicePointer, size_t ShapeCount)
     {
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, InputBuffer);
@@ -73,6 +94,9 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
+    /**
+     * 数据从CPU传入GPU
+     */
     void DataCPUToGPU(GLuint InputBuffer, float*CPUDevicePointer, size_t ShapeCount)
     {
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, InputBuffer);
@@ -80,11 +104,51 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
+    void CheckShaderCompilation(GLuint shader) 
+    {
+        GLint success;
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+        if (!success) {
+            char infoLog[512];
+            glGetShaderInfoLog(shader, 512, nullptr, infoLog);
+            std::cerr << "Shader compilation failed: " << infoLog << std::endl;
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    void CheckProgramLinking(GLuint program) 
+    {
+        GLint success;
+        glGetProgramiv(program, GL_LINK_STATUS, &success);
+        if (!success) {
+            char infoLog[512];
+            glGetProgramInfoLog(program, 512, nullptr, infoLog);
+            std::cerr << "Program linking failed: " << infoLog << std::endl;
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    /**
+     * 编译OpenGL所有的GPU程序
+     */
     void CompileAllGPUFunction()
     {
-        for(auto&it: GLSL::I().GLSLFun)
+        for(int FunName = 0;FunName < GLSL::I().GLSLFunNum;FunName++)
         {
-            
+            auto GLSLFunctionStr = GLSL::I().GetFunStr(FunName);
+            // 创建并编译计算着色器
+            GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
+            glShaderSource(computeShader, 1, &GLSLFunctionStr, nullptr);
+            glCompileShader(computeShader);
+            CheckShaderCompilation(computeShader);
+            // 创建程序并链接
+            GLuint program = glCreateProgram();
+            glAttachShader(program, computeShader);
+            glLinkProgram(program);
+            CheckProgramLinking(program);
+            // 删除着色器对象
+            glDeleteShader(computeShader);
+            GPUFunction_OpenGL.push_back(program);
         }
     }
 
