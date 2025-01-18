@@ -20,17 +20,20 @@ public:
     std::vector<std::string> GLSLFun;
     int GLSLFunNum = 0;
     char* GetFunStr(int FunNum){return GLSLFun[FunNum].data();}
+    void RegFun(int& InputRegFun, std::string InputFunContent)
+    {
+        InputRegFun = GLSLFunNum++;
+        GLSLFun.push_back(InputFunContent);
+    }
 
     int AddInCPP;
-
-
+    int AddScalarInCPP;
 
 
 void AddGLSLFun()
 {
 
-AddInCPP = GLSLFunNum++;
-GLSLFun.push_back(
+RegFun(AddInCPP,
 R"(
 #version 430
 layout(local_size_x = 256, local_size_y = 1) in;
@@ -58,6 +61,7 @@ void main() {
 }
 )");
 
+//RegFun(AddScalarInCPP);
 
 
 
