@@ -5,7 +5,7 @@
 class GLSL
 {
 private:
-    GLSL();
+    GLSL(){AddGLSLFun();}
 
 public:
     GLSL(const GLSL&) = delete;
@@ -19,26 +19,18 @@ public:
 
     std::vector<std::string> GLSLFun;
     int GLSLFunNum = 0;
-    char* GetFunStr(int FunNum);
-    void AddGLSLFun();
+    char* GetFunStr(int FunNum){return GLSLFun[FunNum].data();}
 
     int AddInCPP;
 
 
-};
 
-GLSL::GLSL(){AddGLSLFun();}
 
-char* GLSL::GetFunStr(int FunNum)
-{
-    return GLSLFun[FunNum].data();
-}
-
-void GLSL::AddGLSLFun()
+void AddGLSLFun()
 {
 
-GLSL::AddInCPP = GLSLFunNum++;
-GLSL::GLSLFun.push_back(
+AddInCPP = GLSLFunNum++;
+GLSLFun.push_back(
 R"(
 #version 430
 layout(local_size_x = 256, local_size_y = 1) in;
@@ -62,10 +54,11 @@ layout(std430, binding = 4) buffer bufferLowDimSize {
 void main() {
     uint Index = gl_GlobalInvocationID.x;
     if (Index < HighDimSize)Output[Index] = HighDimInput[Index] + LowDimInput[Index%LowDimSize];
+
 }
 )");
 
 
 
 
-}
+}};

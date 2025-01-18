@@ -136,6 +136,9 @@ void Tensor::FillArray(float Scalar)
         #ifdef CUDA_USEFUL
         FillArrayInCPP(DataPointer, Scalar, ShapeCount);
         #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::FillArray::todo");
+        #endif
     }
     else
     {
@@ -154,6 +157,9 @@ Tensor* Tensor::AddScalar(float Scalar)
         #ifdef CUDA_USEFUL
         AddScalarInCPP(Output->GetDevicePointer(), GetDevicePointer(), Scalar, ShapeCount);
         #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::AddScalar::todo");
+        #endif
     }
     else for(int a=0;a<ShapeCount;a++)Output->GetDevicePointer()[a] = GetDevicePointer()[a]+ Scalar;
     return Output;
@@ -167,6 +173,9 @@ Tensor* Tensor::MulScalar(float Scalar)
         #ifdef CUDA_USEFUL
         MulScalarInCPP(Output->GetDevicePointer(), GetDevicePointer(), Scalar, ShapeCount);
         #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::MulScalar::todo");
+        #endif
     }
     else for(int a=0;a<ShapeCount;a++)Output->GetDevicePointer()[a] = GetDevicePointer()[a] *Scalar;
     return Output;
@@ -179,6 +188,9 @@ Tensor* Tensor::AddArray(Tensor* Input)
     {
         #ifdef CUDA_USEFUL
         AddArrayInCPP(Output->GetDevicePointer(), GetDevicePointer(), Input->GetDevicePointer(), ShapeCount);
+        #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::AddArray::todo");
         #endif
     }
     else for(int a=0;a<ShapeCount;a++)Output->GetDevicePointer()[a] = GetDevicePointer()[a] + Input->GetDevicePointer()[a];
@@ -204,6 +216,9 @@ Tensor* Tensor::Add(Tensor* Input)
         #ifdef CUDA_USEFUL
         AddInCPP(Output->GetDevicePointer(), HighDimTensor->GetDevicePointer(), HighDimTensor->ShapeCount, LowDimTensor->GetDevicePointer(), LowDimTensor->ShapeCount);
         #endif
+        #ifdef OPENGL_USEFUL
+        GPUDeviceProcess::I().ProcessGLSLFun(GLSL::I().AddInCPP, Output->ShapeCount,{Output->GetDeviceBuffer(),HighDimTensor->GetDeviceBuffer(),VBuffer::CVBuffer(HighDimTensor->ShapeCount).OpenGLTMPBuffer,LowDimTensor->GetDeviceBuffer(),VBuffer::CVBuffer(LowDimTensor->ShapeCount).OpenGLTMPBuffer});
+        #endif 
     }
     else
     {
@@ -235,6 +250,9 @@ Tensor* Tensor::EleMul(Tensor* Input)
     {
         #ifdef CUDA_USEFUL
         EleMulInCPP(Output->GetDevicePointer(), HighDimTensor->GetDevicePointer(), HighDimTensor->ShapeCount, LowDimTensor->GetDevicePointer(), LowDimTensor->ShapeCount);
+        #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::EleMul::todo");
         #endif
     }
     else
@@ -302,6 +320,9 @@ Tensor* Tensor::Matmul(Tensor* Input)
                 #ifdef CUDA_USEFUL
                 Output->ToDevice(GetDeviceNum());
                 DotArrayInCPP(Output->GetDevicePointer(), GetDevicePointer(), Input->GetDevicePointer(), ShapeCount);
+                #endif
+                #ifdef OPENGL_USEFUL
+                Log::Assert(false, "OpenGL::Matmul::todo");
                 #endif
             }
             else for(int a=0;a<ShapeCount;a++)Output->GetDevicePointer()[0] += GetDevicePointer()[a]*Input->GetDevicePointer()[a];
@@ -448,6 +469,9 @@ Tensor* Tensor::T()
         #ifdef CUDA_USEFUL
         TInCPP(Output->GetDevicePointer(), GetDevicePointer(), InputFirstMatrixShape,ShapeCount);
         #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::T::todo");
+        #endif
     }
     else
     {
@@ -479,6 +503,9 @@ Tensor* Tensor::MaximumOrMinimum(size_t InputDim, bool IsMaximum)
     {
         #ifdef CUDA_USEFUL
         MaximumOrMinimumTensorDimInCPP(Output->GetDevicePointer(), GetDevicePointer(), ShapeArray.Shape,OutputShape.size(),InputDim, Output->ShapeCount, IsMaximum);
+        #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::MaximumOrMinimum::todo");
         #endif
     }
     else
@@ -589,6 +616,9 @@ Tensor* Tensor::SumTensorDim(size_t InputDim)
         #ifdef CUDA_USEFUL
         SumTensorDimInCPP(Output->GetDevicePointer(), GetDevicePointer(), ShapeArray.Shape,OutputShape.size(),InputDim, Output->ShapeCount);
         #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::SumTensorDim::todo");
+        #endif
     }
     else
     {
@@ -648,6 +678,9 @@ void Tensor::GaussianElimination()
         #ifdef CUDA_USEFUL
         GaussianEliminationInCPP(GetDevicePointer(), BatchSize, shape[shape.size()-2], shape[shape.size()-1]);
         #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::GaussianElimination::todo");
+        #endif
     }
     else
     {
@@ -685,6 +718,9 @@ Tensor* Tensor::TensorSplice(Tensor* InputTensor, int SpliceDim)
     {
         #ifdef CUDA_USEFUL
         TensorSpliceInCPP(ReturnTensor->GetDevicePointer() , GetDevicePointer(), InputTensor->GetDevicePointer(), ShapeArraySelf.Shape, ShapeArrayFirst.Shape, shape.size(), SpliceDim, ReturnTensor->ShapeCount);
+        #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::TensorSplice::todo");
         #endif
     }
     else
@@ -732,6 +768,9 @@ Tensor* Tensor::GetUnitTensor(std::vector<size_t>ReturnShape, size_t ReturnDevic
         #ifdef CUDA_USEFUL
         GetUnitTensorInCPP(ReturnTensor->GetDevicePointer(), ShapeArray.Shape, ReturnTensor->ShapeCount, ReturnTensor->shape.size());
         #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::GetUnitTensor::todo");
+        #endif
     }
     else
     {
@@ -775,6 +814,9 @@ Tensor* Tensor::GetTensorBy2ShapeVector(std::vector<size_t>StartShapeVector, std
     {
         #ifdef CUDA_USEFUL
         GetTensorBy2ShapeVectorInCPP(ReturnTensor->GetDevicePointer(), GetDevicePointer(), InputShape,OutputShape,StartShape, EndShape, ShapeLen);
+        #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::GetTensorBy2ShapeVector::todo");
         #endif
     }
     else
@@ -833,6 +875,9 @@ Tensor* Tensor::EleExp(float BaseNum)
         #ifdef CUDA_USEFUL
         EleExpInCPP(ReturnTensor->GetDevicePointer(), ReturnTensor->ShapeCount, BaseNum);
         #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::EleExp::todo");
+        #endif
     }
     else
     {
@@ -883,6 +928,9 @@ Tensor* Tensor::BroadCastTo(std::vector<size_t>BroadCastShape)
         #ifdef CUDA_USEFUL
         BroadCastToInCPP(ReturnTensor->GetDevicePointer(), GetDevicePointer(), OutputShapePointer, FixedShapePointer, ReturnTensor->shape.size(), ReturnTensor->ShapeCount);
         #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::BroadCastTo::todo");
+        #endif
     }
     else
     {
@@ -915,6 +963,9 @@ Tensor* Tensor::EleInverse()
     {
         #ifdef CUDA_USEFUL
         EleInverseInCPP(ReturnTensor->GetDevicePointer(), ShapeCount);
+        #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::EleInverse::todo");
         #endif
     }
     else
@@ -1023,6 +1074,9 @@ void Tensor::FillRandomValNormal(float MeanV, float VarianceV,unsigned Seed)
         #ifdef CUDA_USEFUL
         FillRandomValNormalInCPP(GetDevicePointer(), ShapeCount,MeanV, VarianceV, Seed);
         #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::FillRandomValNormal::todo");
+        #endif
     }
     else
     {
@@ -1048,6 +1102,9 @@ void Tensor::FillRandomValBernoulli(float P, unsigned Seed)
     {
         #ifdef CUDA_USEFUL
         FillRandomValBernoulliInCPP(GetDevicePointer(), ShapeCount,P, Seed);
+        #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::FillRandomValBernoulli::todo");
         #endif
     }
     else
@@ -1080,6 +1137,9 @@ void Tensor::FillRandomValUniform(float MinV, float MaxV, unsigned Seed)
         #ifdef CUDA_USEFUL
         FillRandomValUniformInCPP(GetDevicePointer(), ShapeCount,MinV,MaxV, Seed);
         #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::FillRandomValUniform::todo");
+        #endif
     }
     else
     {
@@ -1099,6 +1159,9 @@ Tensor* Tensor::GenerateSignTensor()
     {
         #ifdef CUDA_USEFUL
         GenerateSignTensorInCPP(ReturnTensor->GetDevicePointer(), ReturnTensor->ShapeCount);
+        #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::GenerateSignTensor::todo");
         #endif
     }
     else
@@ -1127,6 +1190,9 @@ Tensor* Tensor::Pow(float Exponent)
     {
         #ifdef CUDA_USEFUL
         PowInCPP(ReturnTensor->GetDevicePointer(), ReturnTensor->ShapeCount, Exponent);
+        #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::Pow::todo");
         #endif
     }
     else
@@ -1179,6 +1245,9 @@ Tensor* Tensor::CreateOnehotTensor(std::vector<size_t> InputShape, std::vector<s
         #ifdef CUDA_USEFUL
         FillOnehotDataInCPP(ReturnTensor->GetDevicePointer(), BaseShape, TokenLength, InputData.data());
         #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::CreateOnehotTensor::todo");
+        #endif
     }
     else
     {
@@ -1198,6 +1267,9 @@ Tensor* Tensor::Sin()
         #ifdef CUDA_USEFUL
         TrigonometricFunctionsInCPP(ReturnTensor->GetDevicePointer(), ShapeCount, 0);
         #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::Sin::todo");
+        #endif
     }
     else
     {
@@ -1215,6 +1287,9 @@ Tensor* Tensor::Cos()
     {
         #ifdef CUDA_USEFUL
         TrigonometricFunctionsInCPP(ReturnTensor->GetDevicePointer(), ShapeCount, 1);
+        #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::Cos::todo");
         #endif
     }
     else
@@ -1235,6 +1310,9 @@ Tensor* Tensor::ArithmeticSequence(std::vector<size_t> InputShape, float A1, flo
         #ifdef CUDA_USEFUL
         CudaDimVec InputShapeArray = ReturnTensor->TransformFromStdVector(InputShape, InputShape.size());
         ArithmeticSequenceInCPP(ReturnTensor->GetDevicePointer(), InputShapeArray.Shape, InputShape.size(), A1, Arithmetic);
+        #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::ArithmeticSequence::todo");
         #endif
     }
     else
@@ -1453,6 +1531,9 @@ Tensor* Tensor::GenerateTrilOnes(std::vector<size_t> InputShape, int Diagonal, s
         #ifdef CUDA_USEFUL
         GenerateTrilOnesInCPP(ReturnTensor->GetDevicePointer(), ReturnTensor->ShapeCount, ReturnTensor->shape[ShapeLen-2], ReturnTensor->shape[ShapeLen-1], Diagonal);
         #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::GenerateTrilOnes::todo");
+        #endif
     }
     else
     {
@@ -1493,6 +1574,9 @@ Tensor* Tensor::Transpose(int FirstDim, int SecondDim)
     {
         #ifdef CUDA_USEFUL
         TransposeInCPP(ReturnTensor->GetDevicePointer(), GetDevicePointer(), OutputShapePointer, shape.size(), FirstDim, SecondDim);
+        #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::Transpose::todo");
         #endif
     }
     else
@@ -1538,6 +1622,9 @@ Tensor* Tensor::EleLog()
     {
         #ifdef CUDA_USEFUL
         EleLogInCPP(ReturnTensor->GetDevicePointer(), ShapeCount);
+        #endif
+        #ifdef OPENGL_USEFUL
+        Log::Assert(false, "OpenGL::EleLog::todo");
         #endif
     }
     else

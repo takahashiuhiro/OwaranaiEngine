@@ -4,10 +4,74 @@
 #include "../CommonDataStructure/Log.h"
 #include "OpenGL/GLSL.h"
 
-//#ifdef OPENGL_USEFUL
+#define THREAD_NUM 256
+
+#ifdef OPENGL_USEFUL
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-//#endif
+#endif
+
+#ifdef OPENGL_USEFUL
+static GLuint GetBuffer_OpenGL_Inline(size_t ShapeCount, size_t TypeSize = sizeof(float))
+{
+    GLuint ResBuffer;
+    glGenBuffers(1, &ResBuffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ResBuffer);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, ShapeCount * TypeSize, nullptr, GL_STATIC_DRAW);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    return ResBuffer;
+}
+
+template<typename T>
+static void DataCPUToGPU_Inline(GLuint InputBuffer, T*CPUDevicePointer, size_t ShapeCount)
+{
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, InputBuffer);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, ShapeCount*sizeof(T), CPUDevicePointer, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+#endif
+
+struct VBuffer
+{
+    #ifdef OPENGL_USEFUL
+    GLuint OpenGLTMPBuffer;
+    #endif
+
+    VBuffer(){};
+
+    template<typename T>
+    static VBuffer CVBuffer(T InputData)
+    {
+        VBuffer Res;
+        Res.Init<T>(&InputData, 1);
+        return Res;
+    }
+
+    template<typename T>
+    static VBuffer CVBuffer(T* InputData ,size_t ShapeCount)
+    {
+        VBuffer Res;
+        Res.Init<T>(InputData, ShapeCount);
+        return Res;
+    }
+
+    template<typename T>
+    void Init(T* InputData ,size_t ShapeCount)
+    {
+        #ifdef OPENGL_USEFUL
+        OpenGLTMPBuffer = GetBuffer_OpenGL_Inline(ShapeCount);
+        DataCPUToGPU_Inline(OpenGLTMPBuffer, InputData, ShapeCount);
+        #endif
+    }
+
+    ~VBuffer()
+    {
+        #ifdef OPENGL_USEFUL
+        glDeleteBuffers(1, &OpenGLTMPBuffer);
+        #endif
+    }
+};
+
 
 class GPUDeviceProcess {
 private:
@@ -15,6 +79,7 @@ private:
     {
         #ifdef OPENGL_USEFUL
         Init_OpenGL();
+        CompileAllGPUFunction();
         #endif
     }
     ~GPUDeviceProcess()
@@ -46,7 +111,12 @@ public:
         return instance;
     }
 
-    //#ifdef OPENGL_USEFUL
+    std::pair<size_t, size_t>GetWorkItem(size_t InputThreadNum)
+    {
+        return std::make_pair((InputThreadNum + THREAD_NUM - 1) / THREAD_NUM, THREAD_NUM);
+    }
+
+    #ifdef OPENGL_USEFUL
 
     GLFWwindow* window;
     std::vector<GLuint>GPUFunction_OpenGL;//储存OpenGL函数的容器
@@ -76,12 +146,7 @@ public:
      */
     GLuint GetBuffer_OpenGL(size_t ShapeCount)
     {
-        GLuint ResBuffer;
-        glGenBuffers(1, &ResBuffer);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ResBuffer);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, ShapeCount * sizeof(float), nullptr, GL_STATIC_DRAW);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-        return ResBuffer;
+        return GetBuffer_OpenGL_Inline(ShapeCount);
     }
 
     /**
@@ -99,9 +164,7 @@ public:
      */
     void DataCPUToGPU(GLuint InputBuffer, float*CPUDevicePointer, size_t ShapeCount)
     {
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, InputBuffer);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, ShapeCount*sizeof(float), CPUDevicePointer, GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        DataCPUToGPU_Inline(InputBuffer, CPUDevicePointer, ShapeCount);
     }
 
     void CheckShaderCompilation(GLuint shader) 
@@ -152,5 +215,43 @@ public:
         }
     }
 
-    //#endif
+    void BindVariable(GLint InputBuffer, int BindIndex)
+    {
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, InputBuffer);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, BindIndex, InputBuffer);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    }
+
+    void BindVariableVec(std::vector<GLint>InputVariables)
+    {
+        for(int a=0;a<InputVariables.size();a++)
+        {
+            BindVariable(InputVariables[a],a);
+        }
+    }
+
+    void UnBindVariable(int BindNum)
+    {
+        for(int a=0;a<BindNum;a++)
+        {
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, a, 0);
+        }
+    }
+
+    GLint GetGPUFunction(int FuntionIndex)
+    {
+        return GPUFunction_OpenGL[FuntionIndex];
+    }
+
+
+    void ProcessGLSLFun(int GLSLFunName ,int WorkNum ,std::vector<GLint> FunctionParams)
+    {
+        BindVariableVec(FunctionParams);
+        glUseProgram(GetGPUFunction(GLSLFunName));
+        glDispatchCompute(GetWorkItem(WorkNum).first, 1, 1);
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        UnBindVariable(FunctionParams.size());
+    }
+
+    #endif
 };
