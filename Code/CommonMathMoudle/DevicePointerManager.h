@@ -10,7 +10,16 @@
 
 struct CudaDimVec
 {
-  size_t Shape[8];
+    int ShapeLen = 8;
+    size_t Shape[8];
+    std::vector<int>ShapeStd;
+    int* ToInt()
+    {
+        ShapeStd.clear();
+        ShapeStd.resize(ShapeLen);
+        for(int a=0;a<ShapeLen;a++)ShapeStd.push_back(Shape[a]);
+        return ShapeStd.data();
+    }
 };
 
 static size_t DeviceNumToCuda(size_t DeviceNum)

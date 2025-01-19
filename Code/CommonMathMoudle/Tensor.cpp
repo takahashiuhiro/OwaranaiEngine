@@ -128,23 +128,20 @@ void Tensor::PrintShape()
 
 void Tensor::FillArray(float Scalar)
 {
-
-    float* DataPointer = GetDevicePointer();
-
     if(GetDeviceNum())
     {
         #ifdef CUDA_USEFUL
-        FillArrayInCPP(DataPointer, Scalar, ShapeCount);
+        FillArrayInCPP(GetDevicePointer(), Scalar, ShapeCount);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::FillArray::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun(GLSL::I().FillArrayInCPP, ShapeCount, {GetDeviceBuffer(),VBuffer::CVBuffer(Scalar).OpenGLTMPBuffer, VBuffer::CVBuffer((int)ShapeCount).OpenGLTMPBuffer});
         #endif
     }
     else
     {
         for(int a=0;a<ShapeCount;a++)
         {
-            DataPointer[a] = Scalar;
+            GetDevicePointer()[a] = Scalar;
         }
     }
 }
@@ -158,7 +155,7 @@ Tensor* Tensor::AddScalar(float Scalar)
         AddScalarInCPP(Output->GetDevicePointer(), GetDevicePointer(), Scalar, ShapeCount);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::AddScalar::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun(GLSL::I().AddScalarInCPP, ShapeCount, {Output->GetDeviceBuffer(),GetDeviceBuffer(),VBuffer::CVBuffer(Scalar).OpenGLTMPBuffer, VBuffer::CVBuffer((int)ShapeCount).OpenGLTMPBuffer});
         #endif
     }
     else for(int a=0;a<ShapeCount;a++)Output->GetDevicePointer()[a] = GetDevicePointer()[a]+ Scalar;
@@ -174,7 +171,7 @@ Tensor* Tensor::MulScalar(float Scalar)
         MulScalarInCPP(Output->GetDevicePointer(), GetDevicePointer(), Scalar, ShapeCount);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::MulScalar::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun(GLSL::I().MulScalarInCPP, ShapeCount, {Output->GetDeviceBuffer(),GetDeviceBuffer(),VBuffer::CVBuffer(Scalar).OpenGLTMPBuffer, VBuffer::CVBuffer((int)ShapeCount).OpenGLTMPBuffer});
         #endif
     }
     else for(int a=0;a<ShapeCount;a++)Output->GetDevicePointer()[a] = GetDevicePointer()[a] *Scalar;
@@ -190,7 +187,7 @@ Tensor* Tensor::AddArray(Tensor* Input)
         AddArrayInCPP(Output->GetDevicePointer(), GetDevicePointer(), Input->GetDevicePointer(), ShapeCount);
         #endif
         #ifdef OPENGL_USEFUL
-        GPUDeviceProcess::I().ProcessGLSLFun(GLSL::I().AddArrayInCPP, ShapeCount, {Output->GetDeviceBuffer(),GetDeviceBuffer(),Input->GetDeviceBuffer(), VBuffer::CVBuffer(ShapeCount).OpenGLTMPBuffer});
+        GPUDeviceProcess::I().ProcessGLSLFun(GLSL::I().AddArrayInCPP, ShapeCount, {Output->GetDeviceBuffer(),GetDeviceBuffer(),Input->GetDeviceBuffer(), VBuffer::CVBuffer((int)ShapeCount).OpenGLTMPBuffer});
         #endif
     }
     else for(int a=0;a<ShapeCount;a++)Output->GetDevicePointer()[a] = GetDevicePointer()[a] + Input->GetDevicePointer()[a];
@@ -217,7 +214,7 @@ Tensor* Tensor::Add(Tensor* Input)
         AddInCPP(Output->GetDevicePointer(), HighDimTensor->GetDevicePointer(), HighDimTensor->ShapeCount, LowDimTensor->GetDevicePointer(), LowDimTensor->ShapeCount);
         #endif
         #ifdef OPENGL_USEFUL
-        GPUDeviceProcess::I().ProcessGLSLFun(GLSL::I().AddInCPP, Output->ShapeCount,{Output->GetDeviceBuffer(),HighDimTensor->GetDeviceBuffer(),VBuffer::CVBuffer(HighDimTensor->ShapeCount).OpenGLTMPBuffer,LowDimTensor->GetDeviceBuffer(),VBuffer::CVBuffer(LowDimTensor->ShapeCount).OpenGLTMPBuffer});
+        GPUDeviceProcess::I().ProcessGLSLFun(GLSL::I().AddInCPP, Output->ShapeCount,{Output->GetDeviceBuffer(),HighDimTensor->GetDeviceBuffer(),VBuffer::CVBuffer((int)(HighDimTensor->ShapeCount)).OpenGLTMPBuffer,LowDimTensor->GetDeviceBuffer(),VBuffer::CVBuffer((int)(LowDimTensor->ShapeCount)).OpenGLTMPBuffer});
         #endif 
     }
     else
@@ -252,7 +249,7 @@ Tensor* Tensor::EleMul(Tensor* Input)
         EleMulInCPP(Output->GetDevicePointer(), HighDimTensor->GetDevicePointer(), HighDimTensor->ShapeCount, LowDimTensor->GetDevicePointer(), LowDimTensor->ShapeCount);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::EleMul::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun(GLSL::I().EleMulInCPP, Output->ShapeCount,{Output->GetDeviceBuffer(),HighDimTensor->GetDeviceBuffer(),VBuffer::CVBuffer((int)(HighDimTensor->ShapeCount)).OpenGLTMPBuffer,LowDimTensor->GetDeviceBuffer(),VBuffer::CVBuffer((int)(LowDimTensor->ShapeCount)).OpenGLTMPBuffer});
         #endif
     }
     else
@@ -322,7 +319,7 @@ Tensor* Tensor::Matmul(Tensor* Input)
                 DotArrayInCPP(Output->GetDevicePointer(), GetDevicePointer(), Input->GetDevicePointer(), ShapeCount);
                 #endif
                 #ifdef OPENGL_USEFUL
-                Log::Assert(false, "OpenGL::Matmul::todo");
+                Log::Assert(false, "OpenGL::Matmul_1::todo");
                 #endif
             }
             else for(int a=0;a<ShapeCount;a++)Output->GetDevicePointer()[0] += GetDevicePointer()[a]*Input->GetDevicePointer()[a];
@@ -391,6 +388,29 @@ Tensor* Tensor::Matmul(Tensor* Input)
                     DeviceNumToCuda(GetDeviceNum())
                 );
                 #endif
+                //#ifdef OPENGL_USEFUL
+                int OutputMatrixShape_int[2] = {(int)(shape[shape.size()-2]), (int)(Input->shape[Input->shape.size()-1])};
+                int InputFirstMatrixShape_int[2] = {(int)(shape[shape.size()-2]), (int)(shape[shape.size()-1])};
+                int InputSecondMatrixShape_int[2] = {(int)(Input->shape[Input->shape.size()-2]), (int)(Input->shape[Input->shape.size()-1])};
+                GPUDeviceProcess::I().ProcessGLSLFun
+                (
+                    GLSL::I().MatmulInCPP, 
+                    Output->ShapeCount,
+                    {
+                        Output->GetDeviceBuffer(),
+                        VBuffer::CVBuffer(OutputShapeArray.ToInt(), OutputShapeArray.ShapeLen).OpenGLTMPBuffer,
+                        VBuffer::CVBuffer(OutputMatrixShape_int, 2).OpenGLTMPBuffer,
+                        GetDeviceBuffer(),
+                        VBuffer::CVBuffer(InputFirstArray.ToInt(), InputFirstArray.ShapeLen).OpenGLTMPBuffer,
+                        VBuffer::CVBuffer(InputFirstMatrixShape_int, 2).OpenGLTMPBuffer,
+                        Input->GetDeviceBuffer(),
+                        VBuffer::CVBuffer(InputSecondArray.ToInt(), InputSecondArray.ShapeLen).OpenGLTMPBuffer,
+                        VBuffer::CVBuffer(InputSecondMatrixShape_int, 2).OpenGLTMPBuffer,
+                        VBuffer::CVBuffer((int)(Output->shape.size()-2)).OpenGLTMPBuffer,
+                        VBuffer::CVBuffer((int)(Output->ShapeCount)).OpenGLTMPBuffer,
+                    }
+                );
+                //#endif
             }
             else
             {
