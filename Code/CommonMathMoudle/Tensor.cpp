@@ -298,7 +298,7 @@ CudaDimVec Tensor::TransformFromStdVector(std::vector<size_t> InputVector, size_
 {
     CudaDimVec ReturenV;
     size_t MinusRes = ShapeLen - InputVector.size();
-    memset(ReturenV.Shape,0,sizeof(CudaDimVec));
+    for(int a=0;a<8;a++)ReturenV.Shape[a]=0;
     for(int a=0;a<InputVector.size();a++)ReturenV.Shape[a+MinusRes] = InputVector[a];
     return ReturenV;
 }
@@ -388,7 +388,7 @@ Tensor* Tensor::Matmul(Tensor* Input)
                     DeviceNumToCuda(GetDeviceNum())
                 );
                 #endif
-                //#ifdef OPENGL_USEFUL
+                #ifdef OPENGL_USEFUL
                 int OutputMatrixShape_int[2] = {(int)(shape[shape.size()-2]), (int)(Input->shape[Input->shape.size()-1])};
                 int InputFirstMatrixShape_int[2] = {(int)(shape[shape.size()-2]), (int)(shape[shape.size()-1])};
                 int InputSecondMatrixShape_int[2] = {(int)(Input->shape[Input->shape.size()-2]), (int)(Input->shape[Input->shape.size()-1])};
@@ -410,7 +410,7 @@ Tensor* Tensor::Matmul(Tensor* Input)
                         VBuffer::CVBuffer((int)(Output->ShapeCount)).OpenGLTMPBuffer,
                     }
                 );
-                //#endif
+                #endif
             }
             else
             {
