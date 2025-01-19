@@ -26,18 +26,41 @@ public:
         GLSLFun.push_back(InputFunContent);
     }
 
+    int AddArrayInCPP;
+    int FillArrayInCPP;
     int AddInCPP;
     int AddScalarInCPP;
+    int EleMulInCPP;
+    int MulScalarInCPP;
 
 
 void AddGLSLFun()
 {
 
-RegFun(AddInCPP,
-R"(
+RegFun(AddArrayInCPP,R"(
 #version 430
 layout(local_size_x = 256, local_size_y = 1) in;
+layout(std430, binding = 0) buffer bufferOutput {
+    float Output[];
+};
+layout(std430, binding = 1) buffer bufferInputFirst {
+    float InputFirst[];
+};
+layout(std430, binding = 2) buffer bufferInputSecond {
+    float InputSecond[];
+};
+layout(std430, binding = 3) buffer bufferSize {
+    int Size;
+};
+void main() {
+    uint Index = gl_GlobalInvocationID.x;
+    if (Index < Size) Output[Index] = InputFirst[Index] + InputSecond[Index];
+}
+)");
 
+RegFun(AddInCPP,R"(
+#version 430
+layout(local_size_x = 256, local_size_y = 1) in;
 layout(std430, binding = 0) buffer bufferOutput {
     float Output[];
 };
@@ -53,15 +76,15 @@ layout(std430, binding = 3) buffer bufferLowDimInput {
 layout(std430, binding = 4) buffer bufferLowDimSize {
     int LowDimSize;
 };
-
 void main() {
     uint Index = gl_GlobalInvocationID.x;
     if (Index < HighDimSize)Output[Index] = HighDimInput[Index] + LowDimInput[Index%LowDimSize];
-
 }
 )");
 
-//RegFun(AddScalarInCPP);
+
+
+
 
 
 

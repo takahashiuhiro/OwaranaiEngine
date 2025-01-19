@@ -190,7 +190,7 @@ Tensor* Tensor::AddArray(Tensor* Input)
         AddArrayInCPP(Output->GetDevicePointer(), GetDevicePointer(), Input->GetDevicePointer(), ShapeCount);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::AddArray::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun(GLSL::I().AddArrayInCPP, ShapeCount, {Output->GetDeviceBuffer(),GetDeviceBuffer(),Input->GetDeviceBuffer(), VBuffer::CVBuffer(ShapeCount).OpenGLTMPBuffer});
         #endif
     }
     else for(int a=0;a<ShapeCount;a++)Output->GetDevicePointer()[a] = GetDevicePointer()[a] + Input->GetDevicePointer()[a];

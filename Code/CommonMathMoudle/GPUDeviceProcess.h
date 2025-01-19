@@ -28,6 +28,7 @@ static void DataCPUToGPU_Inline(GLuint InputBuffer, T*CPUDevicePointer, size_t S
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, InputBuffer);
     glBufferData(GL_SHADER_STORAGE_BUFFER, ShapeCount*sizeof(T), CPUDevicePointer, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 #endif
 
