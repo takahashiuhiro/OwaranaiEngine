@@ -709,7 +709,19 @@ Tensor* Tensor::SumTensorDim(size_t InputDim)
         SumTensorDimInCPP(Output->GetDevicePointer(), GetDevicePointer(), ShapeArray.Shape,OutputShape.size(),InputDim, Output->ShapeCount);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::SumTensorDim::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().SumTensorDimInCPP, 
+            Output->ShapeCount,
+            {
+                Output->GetDeviceBuffer(),
+                GetDeviceBuffer(),
+                VBuffer::CVBuffer(ShapeArray.ToInt(), ShapeArray.ShapeLen).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(OutputShape.size())).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(InputDim)).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(Output->ShapeCount)).OpenGLTMPBuffer
+            }
+        );
         #endif
     }
     else

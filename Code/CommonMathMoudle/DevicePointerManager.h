@@ -16,7 +16,6 @@ struct CudaDimVec
     int* ToInt()
     {
         ShapeStd.clear();
-        ShapeStd.resize(ShapeLen);
         for(int a=0;a<ShapeLen;a++)ShapeStd.push_back(Shape[a]);
         return ShapeStd.data();
     }

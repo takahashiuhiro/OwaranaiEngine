@@ -34,6 +34,7 @@ public:
     int MulScalarInCPP;
     int MatmulInCPP;
     int TInCPP;
+    int SumTensorDimInCPP;
 
 
 void AddGLSLFun()
@@ -287,12 +288,69 @@ void main()
     uint Index = gl_GlobalInvocationID.x;
     if(Index < ShapeCount)
     {
-      int MatrixShapeCount = MatrixShape[0]*MatrixShape[1];
-      int InputMatIndex = int(Index)%MatrixShapeCount;
-      int BaseCount = int(Index) - InputMatIndex;
-      int InputMatIndexFirst = InputMatIndex/MatrixShape[1];
-      int InputMatIndexSecond = InputMatIndex%MatrixShape[1];
-      Output[BaseCount + InputMatIndexSecond*MatrixShape[0] + InputMatIndexFirst] = Input[Index];
+        int MatrixShapeCount = MatrixShape[0]*MatrixShape[1];
+        int InputMatIndex = int(Index)%MatrixShapeCount;
+        int BaseCount = int(Index) - InputMatIndex;
+        int InputMatIndexFirst = InputMatIndex/MatrixShape[1];
+        int InputMatIndexSecond = InputMatIndex%MatrixShape[1];
+        Output[BaseCount + InputMatIndexSecond*MatrixShape[0] + InputMatIndexFirst] = Input[Index];
+    }
+}
+)");
+
+RegFun(SumTensorDimInCPP,R"(
+#version 430
+layout(local_size_x = 256, local_size_y = 1) in;
+layout(std430, binding = 0) buffer bufferOutputData {
+    float OutputData[];
+};
+layout(std430, binding = 1) buffer bufferInputData {
+    float InputData[];
+};
+layout(std430, binding = 2) buffer bufferInputShape {
+    int InputShape[];
+};
+layout(std430, binding = 3) buffer bufferInputShapeLen {
+    int InputShapeLen;
+};
+layout(std430, binding = 4) buffer bufferInputDim {
+    int InputDim;
+};
+layout(std430, binding = 5) buffer bufferOutputShapeCount {
+    int OutputShapeCount;
+};
+void main() 
+{
+    uint Index = gl_GlobalInvocationID.x;
+    if(Index < OutputShapeCount)
+    {
+        int OutputIndex[8];
+        int OutputSizeTMP = int(Index);
+        for(int a=InputShapeLen-1;a>=0;a--)
+        {
+            if(a != InputDim) 
+            {
+                OutputIndex[a] = OutputSizeTMP%InputShape[a];
+                OutputSizeTMP /= InputShape[a];
+            }
+            else
+            {
+                OutputIndex[a] = 0;
+            }
+        }
+        OutputData[Index] = 0;
+        for(int a =0;a<InputShape[InputDim];a++)
+        {
+            int InputDimIndex = 0;
+            int InputSizeTMP = 1;
+            for(int b = InputShapeLen - 1;b>=0;b--)
+            {
+                if(b!=InputDim)InputDimIndex += InputSizeTMP*OutputIndex[b];
+                else InputDimIndex += InputSizeTMP*a;
+                InputSizeTMP*=InputShape[b];
+            }
+            OutputData[Index] += InputData[InputDimIndex];
+        }
     }
 }
 )");
