@@ -3,12 +3,13 @@
 
 int main() 
 {
-    bool isGPUDevice = 1;
+    bool isGPUDevice = 0;
     Tensor* a = new Tensor({3,2}, isGPUDevice, {1.08,2,3,4,8,9});
     Tensor* b = new Tensor({2,4}, isGPUDevice, {4,3,2,1,-1,-15000,88.1,55.9});
     //a->SumTensorDim(1)->PrintData();
-    b->T()->Matmul(a->T()->T()->T()->T()->T())->T()->T()->T()->T()->T()->T()->PrintData();
-    b->T()->Matmul(a->T()->T()->T()->T()->T())->T()->T()->T()->T()->T()->T()->Sum({0})->PrintData();
+    //b->T()->Matmul(a->T()->T()->T()->T()->T())->T()->T()->T()->T()->T()->T()->PrintData();
+    //b->T()->Matmul(a->T()->T()->T()->T()->T())->T()->T()->T()->T()->T()->T()->Sum({0})->PrintData();
+    a->T()->T()->T()->T()->Maximum({0})->PrintData();
     //a->PrintData();
     //a->T()->T()->T()->T()->T()->T()->T()->T()->T()->T()->T()->T()->PrintData();
 

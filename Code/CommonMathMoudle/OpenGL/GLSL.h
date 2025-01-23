@@ -35,6 +35,7 @@ public:
     int MatmulInCPP;
     int TInCPP;
     int SumTensorDimInCPP;
+    int MaximumOrMinimumTensorDimInCPP;
 
 
 void AddGLSLFun()
@@ -350,6 +351,80 @@ void main()
                 InputSizeTMP*=InputShape[b];
             }
             OutputData[Index] += InputData[InputDimIndex];
+        }
+    }
+}
+)");
+
+RegFun(MaximumOrMinimumTensorDimInCPP,R"(
+#version 430
+layout(local_size_x = 256, local_size_y = 1) in;
+layout(std430, binding = 0) buffer bufferOutputData {
+    float OutputData[];
+};
+layout(std430, binding = 1) buffer bufferInputData {
+    float InputData[];
+};
+layout(std430, binding = 2) buffer bufferInputShape {
+    int InputShape[];
+};
+layout(std430, binding = 3) buffer bufferInputShapeLen {
+    int InputShapeLen;
+};
+layout(std430, binding = 4) buffer bufferInputDim {
+    int InputDim;
+};
+layout(std430, binding = 5) buffer bufferOutputShapeCount {
+    int OutputShapeCount;
+};
+layout(std430, binding = 6) buffer bufferIsMaximum {
+    int IsMaximum;
+};
+void main() 
+{
+    uint Index = gl_GlobalInvocationID.x;
+    if(Index < OutputShapeCount)
+    {
+        if(bool(IsMaximum))
+        {
+            OutputData[Index] = -1e9+7;
+        }
+        else
+        {
+            OutputData[Index] = 1e9+7;
+        }
+        int OutputIndex[8];
+        int OutputSizeTMP = int(Index);
+        for(int a=InputShapeLen-1;a>=0;a--)
+        {
+            if(a != InputDim) 
+            {
+                OutputIndex[a] = OutputSizeTMP%InputShape[a];
+                OutputSizeTMP /= InputShape[a];
+            }
+            else
+            {
+                OutputIndex[a] = 0;
+            }
+        }
+        for(int a =0;a<InputShape[InputDim];a++)
+        {
+            int InputDimIndex = 0;
+            int InputSizeTMP = 1;
+            for(int b = InputShapeLen - 1;b>=0;b--)
+            {
+                if(b!=InputDim)InputDimIndex += InputSizeTMP*OutputIndex[b];
+                else InputDimIndex += InputSizeTMP*a;
+                InputSizeTMP*=InputShape[b];
+            }
+            if(bool(IsMaximum))
+            {
+                OutputData[Index] = max(OutputData[Index], InputData[InputDimIndex]);
+            }
+            else
+            {
+                OutputData[Index] = min(OutputData[Index], InputData[InputDimIndex]);
+            }
         }
     }
 }

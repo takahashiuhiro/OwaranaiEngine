@@ -596,8 +596,22 @@ Tensor* Tensor::MaximumOrMinimum(size_t InputDim, bool IsMaximum)
         #ifdef CUDA_USEFUL
         MaximumOrMinimumTensorDimInCPP(Output->GetDevicePointer(), GetDevicePointer(), ShapeArray.Shape,OutputShape.size(),InputDim, Output->ShapeCount, IsMaximum);
         #endif
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().MaximumOrMinimumTensorDimInCPP, 
+            Output->ShapeCount,
+            {
+                Output->GetDeviceBuffer(),
+                GetDeviceBuffer(),
+                VBuffer::CVBuffer(ShapeArray.ToInt(), ShapeArray.ShapeLen).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(OutputShape.size())).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(InputDim)).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(Output->ShapeCount)).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(IsMaximum)).OpenGLTMPBuffer,
+            }
+        );
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::MaximumOrMinimum::todo");
+        //Log::Assert(false, "OpenGL::MaximumOrMinimum::todo");
         #endif
     }
     else
