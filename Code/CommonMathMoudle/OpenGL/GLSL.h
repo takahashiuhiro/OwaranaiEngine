@@ -36,6 +36,7 @@ public:
     int TInCPP;
     int SumTensorDimInCPP;
     int MaximumOrMinimumTensorDimInCPP;
+    int TensorSpliceInCPP;
 
 
 void AddGLSLFun()
@@ -426,6 +427,59 @@ void main()
                 OutputData[Index] = min(OutputData[Index], InputData[InputDimIndex]);
             }
         }
+    }
+}
+)");
+
+RegFun(TensorSpliceInCPP,R"(
+#version 430
+layout(local_size_x = 256, local_size_y = 1) in;
+layout(std430, binding = 0) buffer bufferOutputData {
+    float OutputData[];
+};
+layout(std430, binding = 1) buffer bufferInputDataFirst {
+    float InputDataFirst[];
+};
+layout(std430, binding = 2) buffer bufferInputDataSecond {
+    float InputDataSecond[];
+};
+layout(std430, binding = 3) buffer bufferShapeCount {
+    int InputShapeFirst[];
+};
+layout(std430, binding = 4) buffer bufferInputShapeSecond {
+    int InputShapeSecond[];
+};
+layout(std430, binding = 5) buffer bufferInputShapeLen {
+    int InputShapeLen;
+};
+layout(std430, binding = 6) buffer bufferInputDim {
+    int InputDim;
+};
+layout(std430, binding = 7) buffer bufferOutputShapeCount {
+    int OutputShapeCount;
+};
+void main() 
+{
+    uint Index = gl_GlobalInvocationID.x;
+    if(Index >= OutputShapeCount)return;
+    int RightShapeCount = 1;
+    //算出指定维度右边的单元大小
+    for(int a=InputDim + 1;a<InputShapeLen;a++)
+    {
+        RightShapeCount*= InputShapeFirst[a];
+    }
+    //算出指定维度的大小
+    int InputDimCount = InputShapeFirst[InputDim] + InputShapeSecond[InputDim];
+    int LeftDimCount = int(Index)/RightShapeCount;
+    int NowDimCount = LeftDimCount%InputDimCount;
+    int StrictLeftDimCount = LeftDimCount/InputDimCount;
+    if(NowDimCount < InputShapeFirst[InputDim])
+    {
+        OutputData[Index] = InputDataFirst[Index - StrictLeftDimCount*InputShapeSecond[InputDim]*RightShapeCount];
+    }
+    else
+    {
+        OutputData[Index] = InputDataSecond[Index - (StrictLeftDimCount+1)*InputShapeFirst[InputDim]*RightShapeCount];
     }
 }
 )");

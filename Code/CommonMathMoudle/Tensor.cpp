@@ -596,6 +596,7 @@ Tensor* Tensor::MaximumOrMinimum(size_t InputDim, bool IsMaximum)
         #ifdef CUDA_USEFUL
         MaximumOrMinimumTensorDimInCPP(Output->GetDevicePointer(), GetDevicePointer(), ShapeArray.Shape,OutputShape.size(),InputDim, Output->ShapeCount, IsMaximum);
         #endif
+        #ifdef OPENGL_USEFUL
         GPUDeviceProcess::I().ProcessGLSLFun
         (
             GLSL::I().MaximumOrMinimumTensorDimInCPP, 
@@ -610,8 +611,6 @@ Tensor* Tensor::MaximumOrMinimum(size_t InputDim, bool IsMaximum)
                 VBuffer::CVBuffer((int)(IsMaximum)).OpenGLTMPBuffer,
             }
         );
-        #ifdef OPENGL_USEFUL
-        //Log::Assert(false, "OpenGL::MaximumOrMinimum::todo");
         #endif
     }
     else
@@ -838,7 +837,21 @@ Tensor* Tensor::TensorSplice(Tensor* InputTensor, int SpliceDim)
         TensorSpliceInCPP(ReturnTensor->GetDevicePointer() , GetDevicePointer(), InputTensor->GetDevicePointer(), ShapeArraySelf.Shape, ShapeArrayFirst.Shape, shape.size(), SpliceDim, ReturnTensor->ShapeCount);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::TensorSplice::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().TensorSpliceInCPP, 
+            ReturnTensor->ShapeCount,
+            {
+                ReturnTensor->GetDeviceBuffer(),
+                GetDeviceBuffer(),
+                InputTensor->GetDeviceBuffer(),
+                VBuffer::CVBuffer(ShapeArraySelf.ToInt(), ShapeArraySelf.ShapeLen).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(ShapeArrayFirst.ToInt(), ShapeArrayFirst.ShapeLen).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(shape.size())).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(SpliceDim)).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(ReturnTensor->ShapeCount)).OpenGLTMPBuffer,
+            }
+        );
         #endif
     }
     else
