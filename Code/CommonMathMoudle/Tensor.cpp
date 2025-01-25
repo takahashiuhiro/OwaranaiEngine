@@ -900,7 +900,17 @@ Tensor* Tensor::GetUnitTensor(std::vector<size_t>ReturnShape, size_t ReturnDevic
         GetUnitTensorInCPP(ReturnTensor->GetDevicePointer(), ShapeArray.Shape, ReturnTensor->ShapeCount, ReturnTensor->shape.size());
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::GetUnitTensor::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().GetUnitTensorInCPP, 
+            ReturnTensor->ShapeCount,
+            {
+                ReturnTensor->GetDeviceBuffer(),
+                VBuffer::CVBuffer(ShapeArray.ToInt(), ShapeArray.ShapeLen).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(ReturnTensor->ShapeCount)).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(ReturnTensor->shape.size())).OpenGLTMPBuffer, 
+            }
+        );
         #endif
     }
     else

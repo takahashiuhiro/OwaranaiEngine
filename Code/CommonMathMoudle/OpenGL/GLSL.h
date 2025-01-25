@@ -37,6 +37,7 @@ public:
     int SumTensorDimInCPP;
     int MaximumOrMinimumTensorDimInCPP;
     int TensorSpliceInCPP;
+    int GetUnitTensorInCPP;
 
 
 void AddGLSLFun()
@@ -480,6 +481,34 @@ void main()
     else
     {
         OutputData[Index] = InputDataSecond[Index - (StrictLeftDimCount+1)*InputShapeFirst[InputDim]*RightShapeCount];
+    }
+}
+)");
+
+RegFun(GetUnitTensorInCPP,R"(
+#version 430
+layout(local_size_x = 256, local_size_y = 1) in;
+layout(std430, binding = 0) buffer bufferOutputData {
+    float OutputData[];
+};
+layout(std430, binding = 1) buffer bufferInputShape {
+    int InputShape[];
+};
+layout(std430, binding = 2) buffer bufferOutputShapeCount {
+    int OutputShapeCount;
+};
+layout(std430, binding = 3) buffer bufferInputShapeLen {
+    int InputShapeLen;
+};
+void main() 
+{
+    uint Index = gl_GlobalInvocationID.x;
+    if(Index >= OutputShapeCount)return;
+    int MatrixShapeCount = InputShape[InputShapeLen - 2]*InputShape[InputShapeLen - 1];
+    int MatrixIndex = int(Index)%MatrixShapeCount;
+    if(MatrixIndex%InputShape[InputShapeLen - 2] == MatrixIndex/InputShape[InputShapeLen - 2])
+    {
+      OutputData[Index] = 1;
     }
 }
 )");
