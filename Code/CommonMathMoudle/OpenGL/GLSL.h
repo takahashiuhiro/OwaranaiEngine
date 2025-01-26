@@ -39,6 +39,7 @@ public:
     int TensorSpliceInCPP;
     int GetUnitTensorInCPP;
     int EleExpInCPP;
+    int EleInverseInCPP;
 
 
 void AddGLSLFun()
@@ -531,6 +532,23 @@ void main()
     uint Index = gl_GlobalInvocationID.x;
     if(Index >= OutputShape)return;
     OutputData[Index] = pow(BaseNum, OutputData[Index]);
+}
+)");
+
+RegFun(EleInverseInCPP,R"(
+#version 430
+layout(local_size_x = 256, local_size_y = 1) in;
+layout(std430, binding = 0) buffer bufferOutputData {
+    float OutputData[];
+};
+layout(std430, binding = 1) buffer bufferOutputShape {
+    int OutputShape;
+};
+void main() 
+{
+    uint Index = gl_GlobalInvocationID.x;
+    if(Index >= OutputShape)return;
+    OutputData[Index] = 1./OutputData[Index];
 }
 )");
 

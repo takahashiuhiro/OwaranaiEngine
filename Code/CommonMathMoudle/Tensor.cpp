@@ -1115,7 +1115,15 @@ Tensor* Tensor::EleInverse()
         EleInverseInCPP(ReturnTensor->GetDevicePointer(), ShapeCount);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::EleInverse::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().EleInverseInCPP, 
+            ShapeCount,
+            {
+                ReturnTensor->GetDeviceBuffer(),
+                VBuffer::CVBuffer((int)(ShapeCount)).OpenGLTMPBuffer,
+            }
+        );
         #endif
     }
     else
