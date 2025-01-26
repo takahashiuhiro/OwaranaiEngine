@@ -1079,7 +1079,19 @@ Tensor* Tensor::BroadCastTo(std::vector<size_t>BroadCastShape)
         BroadCastToInCPP(ReturnTensor->GetDevicePointer(), GetDevicePointer(), OutputShapePointer, FixedShapePointer, ReturnTensor->shape.size(), ReturnTensor->ShapeCount);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::BroadCastTo::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().BroadCastToInCPP, 
+            ReturnTensor->ShapeCount,
+            {
+                ReturnTensor->GetDeviceBuffer(),
+                GetDeviceBuffer(),
+                VBuffer::CVBuffer(OutputShapeArray.ToInt(), OutputShapeArray.ShapeLen).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(FixedShapeArray.ToInt(), FixedShapeArray.ShapeLen).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(ReturnTensor->shape.size())).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(ReturnTensor->ShapeCount)).OpenGLTMPBuffer,
+            }
+        );
         #endif
     }
     else

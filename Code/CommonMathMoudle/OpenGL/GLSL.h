@@ -40,7 +40,7 @@ public:
     int GetUnitTensorInCPP;
     int EleExpInCPP;
     int EleInverseInCPP;
-
+    int BroadCastToInCPP;
 
 void AddGLSLFun()
 {
@@ -549,6 +549,49 @@ void main()
     uint Index = gl_GlobalInvocationID.x;
     if(Index >= OutputShape)return;
     OutputData[Index] = 1./OutputData[Index];
+}
+)");
+
+RegFun(BroadCastToInCPP,R"(
+#version 430
+layout(local_size_x = 256, local_size_y = 1) in;
+layout(std430, binding = 0) buffer bufferOutputData {
+    float OutputData[];
+};
+layout(std430, binding = 1) buffer bufferInputData {
+    float InputData[];
+};
+layout(std430, binding = 2) buffer bufferOutputShape {
+    int OutputShape[];
+};
+layout(std430, binding = 3) buffer bufferInputShape {
+    int InputShape[];
+};
+layout(std430, binding = 4) buffer bufferShapeLen {
+    int ShapeLen;
+};
+layout(std430, binding = 5) buffer bufferOutputShapeCount {
+    int OutputShapeCount;
+};
+void main() 
+{
+    uint Index = gl_GlobalInvocationID.x;
+    if(Index >= OutputShapeCount)return;
+    int ShapeIndex[10];
+    int NowIndex = int(Index);
+    for(int a = ShapeLen - 1 ;a >= 0;a--)
+    {
+        ShapeIndex[a] = NowIndex%OutputShape[a];
+        NowIndex = int(NowIndex/OutputShape[a]);
+        if(OutputShape[a] > InputShape[a])ShapeIndex[a] = 0;
+    }
+    int FixedInputIndex = 0;
+    for(int a = 0;a<ShapeLen;a++)
+    {
+        FixedInputIndex *= InputShape[a];
+        FixedInputIndex += ShapeIndex[a];
+    }
+    OutputData[Index] = InputData[FixedInputIndex];
 }
 )");
 
