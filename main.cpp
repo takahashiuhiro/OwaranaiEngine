@@ -13,7 +13,7 @@ int main()
     //a->PrintData();
     //a->T()->T()->T()->T()->T()->T()->T()->T()->T()->T()->T()->T()->PrintData();
 
-    Tensor::GetUnitTensor({3,3},isGPUDevice)->PrintData();
+    a->EleExp(3.2)->PrintData();
 
     //DynamicTensor dta(std::shared_ptr<Tensor>(a), 1);
     //DynamicTensor dtb(std::shared_ptr<Tensor>(b), 1);

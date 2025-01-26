@@ -1017,7 +1017,16 @@ Tensor* Tensor::EleExp(float BaseNum)
         EleExpInCPP(ReturnTensor->GetDevicePointer(), ReturnTensor->ShapeCount, BaseNum);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::EleExp::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().EleExpInCPP, 
+            ReturnTensor->ShapeCount,
+            {
+                ReturnTensor->GetDeviceBuffer(),
+                VBuffer::CVBuffer((int)(ReturnTensor->ShapeCount)).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(BaseNum).OpenGLTMPBuffer, 
+            }
+        );
         #endif
     }
     else

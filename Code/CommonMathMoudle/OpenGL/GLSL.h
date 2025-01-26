@@ -38,6 +38,7 @@ public:
     int MaximumOrMinimumTensorDimInCPP;
     int TensorSpliceInCPP;
     int GetUnitTensorInCPP;
+    int EleExpInCPP;
 
 
 void AddGLSLFun()
@@ -510,6 +511,26 @@ void main()
     {
       OutputData[Index] = 1;
     }
+}
+)");
+
+RegFun(EleExpInCPP,R"(
+#version 430
+layout(local_size_x = 256, local_size_y = 1) in;
+layout(std430, binding = 0) buffer bufferOutputData {
+    float OutputData[];
+};
+layout(std430, binding = 1) buffer bufferOutputShape {
+    int OutputShape;
+};
+layout(std430, binding = 2) buffer bufferBaseNum {
+    float BaseNum;
+};
+void main() 
+{
+    uint Index = gl_GlobalInvocationID.x;
+    if(Index >= OutputShape)return;
+    OutputData[Index] = pow(BaseNum, OutputData[Index]);
 }
 )");
 
