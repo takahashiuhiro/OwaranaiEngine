@@ -1245,7 +1245,18 @@ void Tensor::FillRandomValNormal(float MeanV, float VarianceV,unsigned Seed)
         FillRandomValNormalInCPP(GetDevicePointer(), ShapeCount,MeanV, VarianceV, Seed);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::FillRandomValNormal::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().FillRandomValNormalInCPP, 
+            ShapeCount,
+            {
+                GetDeviceBuffer(),
+                VBuffer::CVBuffer((int)(ShapeCount)).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(MeanV).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(VarianceV).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(Seed).OpenGLTMPBuffer,
+            }
+        );
         #endif
     }
     else
