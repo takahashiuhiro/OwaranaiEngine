@@ -1382,7 +1382,16 @@ Tensor* Tensor::Pow(float Exponent)
         PowInCPP(ReturnTensor->GetDevicePointer(), ReturnTensor->ShapeCount, Exponent);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::Pow::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().PowInCPP, 
+            ReturnTensor->ShapeCount,
+            {
+                ReturnTensor->GetDeviceBuffer(),
+                VBuffer::CVBuffer((int)(ReturnTensor->ShapeCount)).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(Exponent).OpenGLTMPBuffer,
+            }
+        );
         #endif
     }
     else

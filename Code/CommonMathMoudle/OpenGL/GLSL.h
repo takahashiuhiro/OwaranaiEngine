@@ -43,6 +43,7 @@ public:
     int BroadCastToInCPP;
     int FillRandomValNormalInCPP;
     int GenerateSignTensorInCPP;
+    int PowInCPP;
 
 void AddGLSLFun()
 {
@@ -646,10 +647,10 @@ layout(local_size_x = 256, local_size_y = 1) in;
 layout(std430, binding = 0) buffer bufferOutputData {
     float OutputData[];
 };
-layout(std430, binding = 1) buffer bufferInputData {
+layout(std430, binding = 1) buffer bufferOutputShapeCount {
     int OutputShapeCount;
 };
-layout(std430, binding = 2) buffer bufferOutputShape {
+layout(std430, binding = 2) buffer bufferSwitchValue {
     float SwitchValue;
 };
 void main() 
@@ -658,6 +659,26 @@ void main()
     if(Index >= OutputShapeCount)return;
     if(OutputData[Index] > SwitchValue)OutputData[Index] = 1.;
     else OutputData[Index] = 0.;
+}
+)");
+
+RegFun(PowInCPP,R"(
+#version 430
+layout(local_size_x = 256, local_size_y = 1) in;
+layout(std430, binding = 0) buffer bufferOutputData {
+    float OutputData[];
+};
+layout(std430, binding = 1) buffer bufferOutputShapeCount {
+    int OutputShapeCount;
+};
+layout(std430, binding = 2) buffer bufferExponent {
+    float Exponent;
+};
+void main() 
+{
+    uint Index = gl_GlobalInvocationID.x;
+    if(Index >= OutputShapeCount)return;
+    OutputData[Index] = pow(OutputData[Index], Exponent);
 }
 )");
 
