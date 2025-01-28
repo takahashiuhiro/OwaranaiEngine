@@ -14,11 +14,11 @@ int main()
     //a->T()->T()->T()->T()->T()->T()->T()->T()->T()->T()->T()->T()->PrintData();
 
     //a->EleInverse()->PrintData();
-
+    b->GenerateSignTensor()->PrintData();
     //DynamicTensor dta(std::shared_ptr<Tensor>(a), 1);
-    DynamicTensor dtb(std::shared_ptr<Tensor>(b), 1);
-    dtb.FillRandomValNormal(0,1);
-    print(dtb);
+    //DynamicTensor dtb(std::shared_ptr<Tensor>(b), 1);
+    //dtb.FillRandomValNormal(0,10);
+    //print(dtb);
     //a->Add(b)->PrintData();
     //b->PrintData();
     //a->FillArray(50);

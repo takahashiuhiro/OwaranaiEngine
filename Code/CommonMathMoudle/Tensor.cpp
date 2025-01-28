@@ -1342,7 +1342,16 @@ Tensor* Tensor::GenerateSignTensor()
         GenerateSignTensorInCPP(ReturnTensor->GetDevicePointer(), ReturnTensor->ShapeCount);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::GenerateSignTensor::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().GenerateSignTensorInCPP, 
+            ReturnTensor->ShapeCount,
+            {
+                ReturnTensor->GetDeviceBuffer(),
+                VBuffer::CVBuffer((int)(ReturnTensor->ShapeCount)).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((float)0).OpenGLTMPBuffer,
+            }
+        );
         #endif
     }
     else

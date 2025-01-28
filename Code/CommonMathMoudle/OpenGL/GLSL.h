@@ -42,6 +42,7 @@ public:
     int EleInverseInCPP;
     int BroadCastToInCPP;
     int FillRandomValNormalInCPP;
+    int GenerateSignTensorInCPP;
 
 void AddGLSLFun()
 {
@@ -602,16 +603,16 @@ layout(local_size_x = 256, local_size_y = 1) in;
 layout(std430, binding = 0) buffer bufferOutputData {
     float OutputData[];
 };
-layout(std430, binding = 1) buffer bufferInputData {
+layout(std430, binding = 1) buffer bufferOutputShapeCount {
     int  OutputShapeCount;
 };
-layout(std430, binding = 2) buffer bufferOutputShape {
+layout(std430, binding = 2) buffer bufferMeanV {
     float MeanV;
 };
-layout(std430, binding = 3) buffer bufferInputShape {
+layout(std430, binding = 3) buffer bufferVarianceV {
     float VarianceV;  
 };
-layout(std430, binding = 4) buffer bufferShapeLen {
+layout(std430, binding = 4) buffer bufferSeed {
     uint Seed;
 };
 float rand(inout uint seed)
@@ -619,22 +620,16 @@ float rand(inout uint seed)
     seed ^= 2747636419u;
     seed *= 2654435769u;
     seed ^= (seed >> 16u);
-    // 将整型映射到 [0,1)
     return float(seed & 0xFFFFFFFFu) / 4294967295.0;
 }
 // Box-Muller 生成正态随机数
 float generateGaussian(uint baseSeed, float mean, float param)
 {
     uint threadID = gl_GlobalInvocationID.x;
-    // 保证不同线程使用不同 seed
     uint seed = baseSeed ^ threadID;
-    // 取两个 [0,1) 随机数
     float u1 = rand(seed);
     float u2 = rand(seed);
-    // Box-Muller 核心公式
     float z0 = sqrt(-2.0 * log(u1)) * cos(6.28318530718 * u2);
-    // 将 z0 调整为你想要的分布
-    // param 可以是你事先准备好的 σ (标准差)；也可以是任何你想用来乘以 z0 的散度参数。
     return z0 * param + mean;
 }
 void main()
@@ -642,6 +637,27 @@ void main()
     uint idx = gl_GlobalInvocationID.x;
     if (idx >= uint(OutputShapeCount))return;
     OutputData[idx] = generateGaussian(Seed, MeanV, VarianceV);
+}
+)");
+
+RegFun(GenerateSignTensorInCPP,R"(
+#version 430
+layout(local_size_x = 256, local_size_y = 1) in;
+layout(std430, binding = 0) buffer bufferOutputData {
+    float OutputData[];
+};
+layout(std430, binding = 1) buffer bufferInputData {
+    int OutputShapeCount;
+};
+layout(std430, binding = 2) buffer bufferOutputShape {
+    float SwitchValue;
+};
+void main() 
+{
+    uint Index = gl_GlobalInvocationID.x;
+    if(Index >= OutputShapeCount)return;
+    if(OutputData[Index] > SwitchValue)OutputData[Index] = 1.;
+    else OutputData[Index] = 0.;
 }
 )");
 
