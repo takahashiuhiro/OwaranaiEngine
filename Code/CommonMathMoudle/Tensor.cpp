@@ -1285,7 +1285,17 @@ void Tensor::FillRandomValBernoulli(float P, unsigned Seed)
         FillRandomValBernoulliInCPP(GetDevicePointer(), ShapeCount,P, Seed);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::FillRandomValBernoulli::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().FillRandomValBernoulliInCPP, 
+            ShapeCount,
+            {
+                GetDeviceBuffer(),
+                VBuffer::CVBuffer((int)(ShapeCount)).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(P).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(Seed).OpenGLTMPBuffer,
+            }
+        );
         #endif
     }
     else
@@ -1319,7 +1329,18 @@ void Tensor::FillRandomValUniform(float MinV, float MaxV, unsigned Seed)
         FillRandomValUniformInCPP(GetDevicePointer(), ShapeCount,MinV,MaxV, Seed);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::FillRandomValUniform::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().FillRandomValUniformInCPP, 
+            ShapeCount,
+            {
+                GetDeviceBuffer(),
+                VBuffer::CVBuffer((int)(ShapeCount)).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(MinV).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(MaxV).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(Seed).OpenGLTMPBuffer,
+            }
+        );
         #endif
     }
     else

@@ -5,7 +5,11 @@
 class GLSL
 {
 private:
-    GLSL(){AddGLSLFun();}
+    GLSL()
+    {
+        AddGLSLFun();
+        AddGLSLComFun();
+    }
 
 public:
     GLSL(const GLSL&) = delete;
@@ -26,6 +30,14 @@ public:
         GLSLFun.push_back(InputFunContent);
     }
 
+
+    /**
+     * 拼装函数
+     */
+    int FillRandomValBernoulliInCPP;
+    /**
+     * 原型函数
+     */
     int AddArrayInCPP;
     int FillArrayInCPP;
     int AddInCPP;
@@ -44,6 +56,12 @@ public:
     int FillRandomValNormalInCPP;
     int GenerateSignTensorInCPP;
     int PowInCPP;
+    int FillRandomValUniformInCPP;
+
+void AddGLSLComFun()
+{
+    FillRandomValBernoulliInCPP = -1;
+}
 
 void AddGLSLFun()
 {
@@ -679,6 +697,41 @@ void main()
     uint Index = gl_GlobalInvocationID.x;
     if(Index >= OutputShapeCount)return;
     OutputData[Index] = pow(OutputData[Index], Exponent);
+}
+)");
+
+RegFun(FillRandomValUniformInCPP,R"(
+#version 430
+layout(local_size_x = 256, local_size_y = 1) in;
+layout(std430, binding = 0) buffer bufferOutputData {
+    float OutputData[];
+};
+layout(std430, binding = 1) buffer bufferOutputShapeCount {
+    int  OutputShapeCount;
+};
+layout(std430, binding = 2) buffer bufferMeanV {
+    float MinV;
+};
+layout(std430, binding = 3) buffer bufferVarianceV {
+    float MaxV;  
+};
+layout(std430, binding = 4) buffer bufferSeed {
+    uint Seed;
+};
+float rand(inout uint seed)
+{
+    seed ^= gl_GlobalInvocationID.x;
+    seed ^= 2747636419u;
+    seed *= 2654435769u;
+    seed ^= (seed >> 16u);
+    return float(seed & 0xFFFFFFFFu) / 4294967295.0;
+}
+void main()
+{
+    uint idx = gl_GlobalInvocationID.x;
+    if (idx >= uint(OutputShapeCount))return;
+    float Zero2OneRes = rand(Seed);
+    OutputData[idx] = MinV + (MaxV-MinV)*Zero2OneRes;
 }
 )");
 

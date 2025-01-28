@@ -3,7 +3,7 @@
 
 int main() 
 {
-    bool isGPUDevice = 0;
+    bool isGPUDevice = 1;
     Tensor* a = new Tensor({1,2,1}, isGPUDevice, {1.08,2});
     Tensor* b = new Tensor({1,12}, isGPUDevice, {4,3,2,1,-1,-15000,88.1,55.9,7788,123,654,477});
     //a->SumTensorDim(1)->PrintData();
@@ -14,8 +14,11 @@ int main()
     //a->T()->T()->T()->T()->T()->T()->T()->T()->T()->T()->T()->T()->PrintData();
     //a->EleInverse()->PrintData();
     //b->GenerateSignTensor()->PrintData();
-    DynamicTensor dta(std::shared_ptr<Tensor>(a), 1);
-    print(dta.Pow(3.2));
+    //DynamicTensor dta(std::shared_ptr<Tensor>(a), 1);
+    DynamicTensor e = DynamicTensor({5,5},0,isGPUDevice);
+    e.FillRandBernoulli(0.2);
+    print(e);
+    //print(dta.Pow(3.2));
     //DynamicTensor dtb(std::shared_ptr<Tensor>(b), 1);
     //dtb.FillRandomValNormal(0,10);
     //print(dtb);

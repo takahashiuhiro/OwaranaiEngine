@@ -9,6 +9,7 @@
 #ifdef OPENGL_USEFUL
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include "OpenGL/GLSLFunComb.h"
 #endif
 
 #ifdef OPENGL_USEFUL
@@ -247,6 +248,11 @@ public:
 
     void ProcessGLSLFun(int GLSLFunName ,int WorkNum ,std::vector<GLint> FunctionParams)
     {
+        if(GLSLFunName < 0)
+        {
+            GPUFunCombFun<GPUDeviceProcess, GLSL, GLint, VBuffer>(GLSLFunName, WorkNum, FunctionParams);
+            return;
+        }
         BindVariableVec(FunctionParams);
         glUseProgram(GetGPUFunction(GLSLFunName));
         glDispatchCompute(GetWorkItem(WorkNum).first, 1, 1);
