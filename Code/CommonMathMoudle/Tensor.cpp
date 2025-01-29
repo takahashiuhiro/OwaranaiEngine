@@ -1466,7 +1466,19 @@ Tensor* Tensor::CreateOnehotTensor(std::vector<size_t> InputShape, std::vector<s
         FillOnehotDataInCPP(ReturnTensor->GetDevicePointer(), BaseShape, TokenLength, InputData.data());
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::CreateOnehotTensor::todo");
+        std::vector<int>InputDataUint;
+        for(auto& it:InputData)InputDataUint.push_back(it);
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().FillOnehotDataInCPP, 
+            BaseShape,
+            {
+                ReturnTensor->GetDeviceBuffer(),
+                VBuffer::CVBuffer((int)(BaseShape)).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(TokenLength)).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(InputDataUint.data(), InputDataUint.size()).OpenGLTMPBuffer,
+            }
+        );
         #endif
     }
     else

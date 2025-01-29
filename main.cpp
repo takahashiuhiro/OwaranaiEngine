@@ -15,9 +15,8 @@ int main()
     //a->EleInverse()->PrintData();
     //b->GenerateSignTensor()->PrintData();
     //DynamicTensor dta(std::shared_ptr<Tensor>(a), 1);
-    DynamicTensor e = DynamicTensor({5,5},0,isGPUDevice);
-    e.FillRandBernoulli(0.2);
-    print(e);
+    auto ff = DynamicTensor::CreateOnehotTensor({1,9}, {1,2,3,5,4,2,0,0,2}, 7, 0, isGPUDevice);
+    print(ff);
     //print(dta.Pow(3.2));
     //DynamicTensor dtb(std::shared_ptr<Tensor>(b), 1);
     //dtb.FillRandomValNormal(0,10);
