@@ -1557,12 +1557,23 @@ Tensor* Tensor::ArithmeticSequence(std::vector<size_t> InputShape, float A1, flo
     Tensor* ReturnTensor = new Tensor(InputShape, InputDeviceNum);
     if(ReturnTensor->GetDeviceNum())
     {
-        #ifdef CUDA_USEFUL
         CudaDimVec InputShapeArray = ReturnTensor->TransformFromStdVector(InputShape, InputShape.size());
+        #ifdef CUDA_USEFUL
         ArithmeticSequenceInCPP(ReturnTensor->GetDevicePointer(), InputShapeArray.Shape, InputShape.size(), A1, Arithmetic);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::ArithmeticSequence::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().ArithmeticSequenceInCPP, 
+            ReturnTensor->ShapeCount,
+            {
+                ReturnTensor->GetDeviceBuffer(),
+                VBuffer::CVBuffer(InputShapeArray.ToInt(), InputShapeArray.ShapeLen).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(InputShape.size())).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(A1).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(Arithmetic).OpenGLTMPBuffer,
+            }
+        );
         #endif
     }
     else

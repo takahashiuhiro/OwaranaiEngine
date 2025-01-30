@@ -3,9 +3,11 @@
 
 int main() 
 {
-    bool isGPUDevice = 0;
+    bool isGPUDevice = 1;
     Tensor* a = new Tensor({1,2,1}, isGPUDevice, {1.08,2});
     Tensor* b = new Tensor({1,12}, isGPUDevice, {4,3,2,1,-1,-15000,88.1,55.9,7788,123,654,477});
+
+    print(DynamicTensor::Arange(5,106,5,0,isGPUDevice));
     //a->SumTensorDim(1)->PrintData();
     //b->T()->Matmul(a->T()->T()->T()->T()->T())->T()->T()->T()->T()->T()->T()->PrintData();
     //b->T()->Matmul(a->T()->T()->T()->T()->T())->T()->T()->T()->T()->T()->T()->Sum({0})->PrintData();
@@ -14,8 +16,8 @@ int main()
     //a->T()->T()->T()->T()->T()->T()->T()->T()->T()->T()->T()->T()->PrintData();
     //a->EleInverse()->PrintData();
     //b->GenerateSignTensor()->PrintData();
-    DynamicTensor dta(std::shared_ptr<Tensor>(a), 1);
-    b->Sin()->PrintData();
+    //DynamicTensor dta(std::shared_ptr<Tensor>(a), 1);
+    //Sb->Sin()->PrintData();
     //auto ff = DynamicTensor::CreateOnehotTensor({1,9}, {1,2,3,5,4,2,0,0,2}, 7, 0, isGPUDevice);
     //print(ff);
     //print(dta.Pow(3.2));

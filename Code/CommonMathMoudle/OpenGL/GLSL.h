@@ -59,6 +59,7 @@ public:
     int FillRandomValUniformInCPP;
     int FillOnehotDataInCPP;
     int TrigonometricFunctionsInCPP;
+    int ArithmeticSequenceInCPP;
 
 void AddGLSLComFun()
 {
@@ -778,6 +779,35 @@ void main()
     if(Index >= OutputShapeCount)return;
     if(FunType == 0)OutputData[Index] = sin(OutputData[Index]);
     if(FunType == 1)OutputData[Index] = cos(OutputData[Index]);
+}
+)");
+
+RegFun(ArithmeticSequenceInCPP,R"(
+#version 430
+layout(local_size_x = 256, local_size_y = 1) in;
+layout(std430, binding = 0) buffer bufferOutputData {
+    float OutputData[];
+};
+layout(std430, binding = 1) buffer bufferOutputShape {
+    int OutputShape[];
+};
+layout(std430, binding = 2) buffer bufferOutputShapeSize {
+    int OutputShapeSize;
+};
+layout(std430, binding = 3) buffer bufferA1 {
+    float A1;
+};
+layout(std430, binding = 4) buffer bufferArithmetic {
+    float Arithmetic;
+};
+void main() 
+{
+    uint Index = gl_GlobalInvocationID.x;
+    int OutputShapeCount = 1;
+    for(int a=0;a<OutputShapeSize;a++)OutputShapeCount *= OutputShape[a];
+    if(Index >= OutputShapeCount)return;
+    int CurIndex = int(Index)%OutputShape[OutputShapeSize-1];
+    OutputData[Index] = CurIndex*Arithmetic + A1;
 }
 )");
 
