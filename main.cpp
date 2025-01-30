@@ -19,7 +19,8 @@ int main()
     //a->EleInverse()->PrintData();
     //b->GenerateSignTensor()->PrintData();
     DynamicTensor dta(std::shared_ptr<Tensor>(b), 1);
-    print(dta.Tril());
+    print(dta);
+    print(dta.Transpose(0,1));
     //Sb->Sin()->PrintData();
     //auto ff = DynamicTensor::CreateOnehotTensor({1,9}, {1,2,3,5,4,2,0,0,2}, 7, 0, isGPUDevice);
     //print(ff);

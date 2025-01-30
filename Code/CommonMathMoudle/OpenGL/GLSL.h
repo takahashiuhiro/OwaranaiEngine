@@ -61,6 +61,7 @@ public:
     int TrigonometricFunctionsInCPP;
     int ArithmeticSequenceInCPP;
     int GenerateTrilOnesInCPP;
+    int TransposeInCPP;
 
 void AddGLSLComFun()
 {
@@ -839,6 +840,59 @@ void main()
     int ThisCol = TrueIndex%Col;
     if(ThisCol <= ThisRow + Diagonal)OutputData[Index] = 1;
     else OutputData[Index] = 0;
+}
+)");
+
+RegFun(TransposeInCPP,R"(
+#version 430
+layout(local_size_x = 256, local_size_y = 1) in;
+layout(std430, binding = 0) buffer bufferOutputData {
+    float OutputData[];
+};
+layout(std430, binding = 1) buffer bufferInputData {
+    float InputData[];
+};
+layout(std430, binding = 2) buffer bufferOutputShape {
+    int OutputShape[];
+};
+layout(std430, binding = 3) buffer bufferOutputShapeSize {
+    int OutputShapeSize;
+};
+layout(std430, binding = 4) buffer bufferFirstDim {
+    int FirstDim;
+};
+layout(std430, binding = 5) buffer bufferSecondDim {
+    int SecondDim;
+};
+void main() 
+{
+    uint Index = gl_GlobalInvocationID.x;
+    int OutputShapeCount = 1;
+    int LeftDim = min(FirstDim, SecondDim);//最左边的维度
+    int RightDim = max(FirstDim, SecondDim);//最右边的维度
+    int MidRightElement = 1;//所有的要变换的维度的元素个数
+    int RightElement = 1;//比要变换的右边的维度还小的
+    int MidElement = 1;//中间的维度
+    for(int a=0;a<OutputShapeSize;a++)
+    {
+        OutputShapeCount*=OutputShape[a];
+        if(a < LeftDim)continue;
+        MidRightElement*=OutputShape[a];
+        if(a > RightDim)RightElement*=OutputShape[a];
+        if(a < RightDim&&a > LeftDim)MidElement*=OutputShape[a];
+    }
+    if(Index >= OutputShapeCount)return;
+    //交换维度得到输入的shape
+    int NowIndex = int(Index)%MidRightElement;
+    int UseIndex = NowIndex/RightElement;//右边都是行向量
+    int ReduIndex = NowIndex%RightElement;
+    int ADim = UseIndex/(MidElement*OutputShape[RightDim]);
+    int BDim = (UseIndex%(MidElement*OutputShape[RightDim]))/OutputShape[RightDim];
+    int CDim = UseIndex%OutputShape[RightDim];
+    int InputUseIndex = CDim*(MidElement*OutputShape[LeftDim]) + BDim*OutputShape[LeftDim] + ADim;
+    int InputNowIndex = InputUseIndex*RightElement + ReduIndex;
+    int InputIndex = InputNowIndex+(int(Index/MidRightElement))*MidRightElement;
+    OutputData[Index] = InputData[InputIndex];
 }
 )");
 

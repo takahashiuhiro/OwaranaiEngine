@@ -1848,7 +1848,19 @@ Tensor* Tensor::Transpose(int FirstDim, int SecondDim)
         TransposeInCPP(ReturnTensor->GetDevicePointer(), GetDevicePointer(), OutputShapePointer, shape.size(), FirstDim, SecondDim);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::Transpose::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().TransposeInCPP, 
+            ReturnTensor->ShapeCount,
+            {
+                ReturnTensor->GetDeviceBuffer(),
+                GetDeviceBuffer(),
+                VBuffer::CVBuffer(OutputShapeArray.ToInt(),OutputShapeArray.ShapeLen).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(shape.size())).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(FirstDim)).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(SecondDim)).OpenGLTMPBuffer,
+            }
+        );
         #endif
     }
     else
