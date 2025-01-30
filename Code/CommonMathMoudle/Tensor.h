@@ -42,6 +42,10 @@ public:
     /**获取张量数据指针.*/
     float* GetDevicePointer(){return DPMgr->GetDevicePointer();}
     /**print data of this tensor*/
+    #ifdef OPENGL_USEFUL
+    GLuint GetDeviceBuffer(){return DPMgr->OpenGLDataPointer;}
+    #endif
+
     void PrintData();
     /**打印维度.*/
     void PrintShape();
