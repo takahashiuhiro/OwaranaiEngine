@@ -1500,7 +1500,16 @@ Tensor* Tensor::Sin()
         TrigonometricFunctionsInCPP(ReturnTensor->GetDevicePointer(), ShapeCount, 0);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::Sin::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().TrigonometricFunctionsInCPP, 
+            ShapeCount,
+            {
+                ReturnTensor->GetDeviceBuffer(),
+                VBuffer::CVBuffer((int)(ShapeCount)).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(0)).OpenGLTMPBuffer,
+            }
+        );
         #endif
     }
     else
@@ -1521,7 +1530,16 @@ Tensor* Tensor::Cos()
         TrigonometricFunctionsInCPP(ReturnTensor->GetDevicePointer(), ShapeCount, 1);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::Cos::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().TrigonometricFunctionsInCPP, 
+            ShapeCount,
+            {
+                ReturnTensor->GetDeviceBuffer(),
+                VBuffer::CVBuffer((int)(ShapeCount)).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(1)).OpenGLTMPBuffer,
+            }
+        );
         #endif
     }
     else
