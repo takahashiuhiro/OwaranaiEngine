@@ -3,12 +3,14 @@
 
 int main() 
 {
-    bool isGPUDevice = 0;
+    bool isGPUDevice = 1;
     Tensor* a = new Tensor({1,2,1}, isGPUDevice, {1.08,2});
     Tensor* b = new Tensor({3,4}, isGPUDevice, {4,3,2,1,-1,-15000,88.1,55.9,7788,123,654,477});
 
     //print(DynamicTensor::)
-
+    ////DynamicTensor dtc = DynamicTensor({2,2},{1,2,3.,4}, 0,isGPUDevice);
+    ////(dtc);
+    //print(dtc.Transpose(0,1));
     //print(DynamicTensor::Arange(5,106,5,0,isGPUDevice));
     //a->SumTensorDim(1)->PrintData();
     //b->T()->Matmul(a->T()->T()->T()->T()->T())->T()->T()->T()->T()->T()->T()->PrintData();

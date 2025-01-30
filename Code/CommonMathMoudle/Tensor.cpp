@@ -1875,13 +1875,15 @@ Tensor* Tensor::Transpose(int FirstDim, int SecondDim)
         size_t* OutputShape = OutputShapePointer;
         auto OutputData = ReturnTensor->GetDevicePointer();
         auto InputData = GetDevicePointer();
+        std::vector<float>TP;//暂时逻辑,还不清楚为什么不复制出来就有问题
         for(size_t a=0;a<OutputShapeSize;a++)
         {
-          if(a < LeftDim)continue;
-          MidRightElement*=OutputShape[a];
-          if(a > RightDim)RightElement*=OutputShape[a];
-          if(a < RightDim&&a > LeftDim)MidElement*=OutputShape[a];
+            if(a < LeftDim)continue;
+            MidRightElement*=OutputShape[a];
+            if(a > RightDim)RightElement*=OutputShape[a];
+            if(a < RightDim&&a > LeftDim)MidElement*=OutputShape[a];
         }
+        for(size_t a=0;a<OutputShapeCount;a++)TP.push_back(InputData[a]);
         for(int Index = 0;Index < OutputShapeCount;Index++)
         {
             int NowIndex = Index%MidRightElement;
@@ -1893,7 +1895,7 @@ Tensor* Tensor::Transpose(int FirstDim, int SecondDim)
             int InputUseIndex = CDim*(MidElement*OutputShape[LeftDim]) + BDim*OutputShape[LeftDim] + ADim;
             int InputNowIndex = InputUseIndex*RightElement + ReduIndex;
             int InputIndex = InputNowIndex+(int(Index/MidRightElement))*MidRightElement;
-            OutputData[Index] = InputData[InputIndex];
+            OutputData[Index] = TP[InputIndex];//InputData[InputIndex];
         }
     }
     return ReturnTensor;
