@@ -1793,7 +1793,18 @@ Tensor* Tensor::GenerateTrilOnes(std::vector<size_t> InputShape, int Diagonal, s
         GenerateTrilOnesInCPP(ReturnTensor->GetDevicePointer(), ReturnTensor->ShapeCount, ReturnTensor->shape[ShapeLen-2], ReturnTensor->shape[ShapeLen-1], Diagonal);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::GenerateTrilOnes::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().GenerateTrilOnesInCPP, 
+            ReturnTensor->ShapeCount,
+            {
+                ReturnTensor->GetDeviceBuffer(),
+                VBuffer::CVBuffer((int)(ReturnTensor->ShapeCount)).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(ReturnTensor->shape[ShapeLen-2])).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(ReturnTensor->shape[ShapeLen-1])).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(Diagonal)).OpenGLTMPBuffer,
+            }
+        );
         #endif
     }
     else
