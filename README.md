@@ -55,4 +55,3 @@ ctrl+F5编译运行
 ## 项目备忘录 
 1. hyperelement的splay还没写
 2. DynamicTensor::Cat有严重的复杂度的性能问题，要重新实现，现在的问题在于cat的时候会将高维矩阵压平，但是亚平后可能会产生一个元素数*元素数级别的大稀疏矩阵，内存放不下。
-3. Tensor::Transpose 的cpu版本有个奇怪的bug,搞不懂, 如果没有TP复制就会出错, 他的opengl版看似没问题, cuda版还得测试
