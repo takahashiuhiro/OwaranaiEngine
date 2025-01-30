@@ -62,6 +62,7 @@ public:
     int ArithmeticSequenceInCPP;
     int GenerateTrilOnesInCPP;
     int TransposeInCPP;
+    int EleLogInCPP;
 
 void AddGLSLComFun()
 {
@@ -893,6 +894,23 @@ void main()
     int InputNowIndex = InputUseIndex*RightElement + ReduIndex;
     int InputIndex = InputNowIndex+(int(Index/MidRightElement))*MidRightElement;
     OutputData[Index] = InputData[InputIndex];
+}
+)");
+
+RegFun(EleLogInCPP,R"(
+#version 430
+layout(local_size_x = 256, local_size_y = 1) in;
+layout(std430, binding = 0) buffer bufferOutputData {
+    float OutputData[];
+};
+layout(std430, binding = 1) buffer bufferOutputShapeSize {
+    int OutputShapeSize;
+};
+void main() 
+{
+    uint Index = gl_GlobalInvocationID.x;
+    if(Index >= OutputShapeSize)return;
+    OutputData[Index] = log(OutputData[Index]);
 }
 )");
 

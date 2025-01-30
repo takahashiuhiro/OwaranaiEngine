@@ -1906,7 +1906,15 @@ Tensor* Tensor::EleLog()
         EleLogInCPP(ReturnTensor->GetDevicePointer(), ShapeCount);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::EleLog::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().EleLogInCPP, 
+            ShapeCount,
+            {
+                ReturnTensor->GetDeviceBuffer(),
+                VBuffer::CVBuffer((int)(ShapeCount)).OpenGLTMPBuffer,
+            }
+        );
         #endif
     }
     else
