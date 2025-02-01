@@ -957,7 +957,21 @@ Tensor* Tensor::GetTensorBy2ShapeVector(std::vector<size_t>StartShapeVector, std
         GetTensorBy2ShapeVectorInCPP(ReturnTensor->GetDevicePointer(), GetDevicePointer(), InputShape,OutputShape,StartShape, EndShape, ShapeLen);
         #endif
         #ifdef OPENGL_USEFUL
-        Log::Assert(false, "OpenGL::GetTensorBy2ShapeVector::todo");
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().GetTensorBy2ShapeVectorInCPP, 
+            ReturnTensor->ShapeCount,
+            {
+                ReturnTensor->GetDeviceBuffer(),
+                GetDeviceBuffer(),
+                VBuffer::CVBuffer(InputShapeArray.ToInt(), InputShapeArray.ShapeLen).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(OutputShapeArray.ToInt(), OutputShapeArray.ShapeLen).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(StartShapeArray.ToInt(), StartShapeArray.ShapeLen).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(EndShapeArray.ToInt(), EndShapeArray.ShapeLen).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(ShapeLen)).OpenGLTMPBuffer, 
+                VBuffer::CVBuffer((int)(ReturnTensor->ShapeCount)).OpenGLTMPBuffer,
+            }
+        );
         #endif
     }
     else

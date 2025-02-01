@@ -7,6 +7,10 @@ int main()
     Tensor* a = new Tensor({1,2,1}, isGPUDevice, {1.08,2});
     Tensor* b = new Tensor({3,4}, isGPUDevice, {4,3,2,1,-1,-15000,88.1,55.9,7788,123,654,477});
 
+    b->PrintData();
+
+    b->GetTensorBy2ShapeVector({1,0}, {2,3})->PrintData();
+
     //print(DynamicTensor::)
 
     //print(DynamicTensor::Arange(5,106,5,0,isGPUDevice));
@@ -18,8 +22,8 @@ int main()
     //a->T()->T()->T()->T()->T()->T()->T()->T()->T()->T()->T()->T()->PrintData();
     //a->EleInverse()->PrintData();
     //b->GenerateSignTensor()->PrintData();
-    DynamicTensor dta(std::shared_ptr<Tensor>(b), 1);
-    print(dta.EleLog());
+    //DynamicTensor dta(std::shared_ptr<Tensor>(b), 1);
+    //print(dta.EleLog());
     //print(dta.Transpose(0,1));
     //Sb->Sin()->PrintData();
     //auto ff = DynamicTensor::CreateOnehotTensor({1,9}, {1,2,3,5,4,2,0,0,2}, 7, 0, isGPUDevice);

@@ -63,6 +63,7 @@ public:
     int GenerateTrilOnesInCPP;
     int TransposeInCPP;
     int EleLogInCPP;
+    int GetTensorBy2ShapeVectorInCPP;
 
 void AddGLSLComFun()
 {
@@ -911,6 +912,53 @@ void main()
     uint Index = gl_GlobalInvocationID.x;
     if(Index >= OutputShapeSize)return;
     OutputData[Index] = log(OutputData[Index]);
+}
+)");
+
+RegFun(GetTensorBy2ShapeVectorInCPP,R"(
+#version 430
+layout(local_size_x = 256, local_size_y = 1) in;
+layout(std430, binding = 0) buffer bufferOutputData {
+    float OutputData[];
+};
+layout(std430, binding = 1) buffer bufferInputData {
+    float InputData[];
+};
+layout(std430, binding = 2) buffer bufferInputShape {
+    int InputShape[];
+};
+layout(std430, binding = 3) buffer bufferOutputShape {
+    int OutputShape[];
+};
+layout(std430, binding = 4) buffer bufferStartShape {
+    int StartShape[];
+};
+layout(std430, binding = 5) buffer bufferEndShape {
+    int EndShape[];
+};
+layout(std430, binding = 6) buffer bufferShapeLen {
+    int ShapeLen;
+};
+layout(std430, binding = 7) buffer bufferOutputShapeCount {
+    int OutputShapeCount;
+};
+void main() 
+{
+    uint Index = gl_GlobalInvocationID.x;
+    if(Index >= OutputShapeCount)return;
+    int OutputShapeIndex[10];
+    int PreCount = int(Index);
+    int InputIndex = 0;
+    int InputIndexNowDim = 1;
+    for(int a= ShapeLen -1;a>=0;a--)
+    {
+        OutputShapeIndex[a] =PreCount%OutputShape[a];
+        OutputShapeIndex[a] += StartShape[a];
+        InputIndex += OutputShapeIndex[a]*InputIndexNowDim;
+        InputIndexNowDim*= InputShape[a];
+        PreCount/=OutputShape[a];
+    }
+    OutputData[Index] = InputData[InputIndex];
 }
 )");
 
