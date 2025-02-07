@@ -3,7 +3,7 @@
 
 int main() 
 {
-    bool isGPUDevice = 1;
+    bool isGPUDevice = 0;
     Tensor* a = new Tensor({1,2,1}, isGPUDevice, {1.08,2});
     Tensor* b = new Tensor({2,3,4}, isGPUDevice);
     b->FillArray(99999);
@@ -12,9 +12,9 @@ int main()
     //b->GetTensorBy2ShapeVector({1,0}, {2,3})->PrintData();
 
     b->PrintData();
-    Tensor* c = new Tensor({2,2,3}, isGPUDevice);
+    Tensor* c = new Tensor({1,3,3}, isGPUDevice);
     c->FillArray(54);
-    c->SendTensorBy2ShapeVector({0,1,1},b);
+    c->SendTensorBy2ShapeVector({0,0,1},b);
     b->PrintData();
 
     //print(DynamicTensor::)

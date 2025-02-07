@@ -482,13 +482,46 @@ __global__ void EleLogKernel(float* OutputData, size_t OutputShapeSize)
   OutputData[Index] = log(OutputData[Index]);
 }
 
+__global__ void SendTensorBy2ShapeVectorKernel(float* OutputData, float* InputData, int InputShapeCount, int* InputShapePointer, int* StartShapePointer, int* OutputShapePointer, int ShapeLen)
+{
+  size_t Index = blockIdx.x * blockDim.x + threadIdx.x;
+  if(Index >= InputShapeCount)return;
+  int InputShapeIndex[10];
+  int PreIndex = int(Index);
+  for(int a=ShapeLen-1;a>=0;a--)
+  {
+      int ThisShapeIndex = a;
+      InputShapeIndex[ThisShapeIndex] = PreIndex%InputShapePointer[ThisShapeIndex];
+      PreIndex = PreIndex/InputShapePointer[ThisShapeIndex];
+  }
+  int OutputShapeIndex[10];
+  for(int a=ShapeLen-1;a>=0;a--)OutputShapeIndex[a] = InputShapeIndex[a] + StartShapePointer[a];
+  int OutputIndex = 0;
+  for(int a=0;a<ShapeLen;a++)
+  {
+      OutputIndex *= OutputShapePointer[a];
+      OutputIndex += OutputShapeIndex[a];
+  }
+  OutputData[OutputIndex] = InputData[Index];
+}
+
 void SendTensorBy2ShapeVectorInCPP(float* OutputData, float* InputData, int InputShapeCount, int* InputShapePointer, int* StartShapePointer, int* OutputShapePointer, int ShapeLen)
 {
-  //todo
+  //todo meiceshi!
   CudaPair CudaPairInput = GetCudaPair(InputShapeCount);
-  size_t *OutputShapeCuda;
-  cudaMalloc((void**)&OutputShapeCuda, OutputShapeSize*sizeof(size_t));
-  cudaMemcpy(OutputShapeCuda,OutputShape,sizeof(size_t)*OutputShapeSize,cudaMemcpyHostToDevice);
+  int *InputShapePointerCuda;
+  cudaMalloc((void**)&InputShapePointerCuda, ShapeLen*sizeof(int));
+  cudaMemcpy(InputShapePointerCuda,InputShapePointer,ShapeLen*sizeof(int),cudaMemcpyHostToDevice);
+  int *StartShapePointerCuda;
+  cudaMalloc((void**)&StartShapePointerCuda, ShapeLen*sizeof(int));
+  cudaMemcpy(StartShapePointerCuda,StartShapePointer,ShapeLen*sizeof(int),cudaMemcpyHostToDevice);
+  int *OutputShapePointerCuda;
+  cudaMalloc((void**)&OutputShapePointerCuda, ShapeLen*sizeof(int));
+  cudaMemcpy(OutputShapePointerCuda,OutputShapePointer,ShapeLen*sizeof(int),cudaMemcpyHostToDevice);
+  SendTensorBy2ShapeVectorKernel<<<CudaPairInput.block, CudaPairInput.grid>>>(OutputData, InputData, InputShapeCount, InputShapePointerCuda, StartShapePointerCuda, OutputShapePointerCuda, ShapeLen);
+  cudaFree(InputShapePointerCuda);
+  cudaFree(StartShapePointerCuda);
+  cudaFree(OutputShapePointerCuda);
 }
 
 void EleLogInCPP(float* OutputData, size_t OutputShapeSize)

@@ -1009,7 +1009,7 @@ void Tensor::SendTensorBy2ShapeVector(std::vector<size_t>StartShape, Tensor* Inp
     if(GetDeviceNum())
     {
         #ifdef CUDA_USEFUL
-        Log::Assert(false, "Cuda::SendTensorBy2ShapeVector::todo");
+        SendTensorBy2ShapeVectorInCPP(InputTensor->GetDevicePointer(),GetDevicePointer(),ShapeCount,InputShapeArray.ToInt(),StartShapeArray.ToInt(),OutputShapeArray.ToInt(),ShapeLen);
         #endif
         #ifdef OPENGL_USEFUL
         GPUDeviceProcess::I().ProcessGLSLFun
