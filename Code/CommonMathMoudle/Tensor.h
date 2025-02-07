@@ -93,6 +93,8 @@ public:
     static Tensor* GetUnitTensor(std::vector<size_t>ReturnShape, size_t ReturnDeviceNum);
     /**在矩阵中通过两个输入维度扣出新的矩阵.*/
     Tensor* GetTensorBy2ShapeVector(std::vector<size_t>StartShape, std::vector<size_t>EndShape);
+    /**在矩阵中通过两个输入维度把当前矩阵送到新矩阵里 */
+    void SendTensorBy2ShapeVector(std::vector<size_t>StartShape, Tensor* InputTensor);
     /**矩阵求逆.*/
     Tensor* Inverse();
     /**元素上的逆.*/

@@ -3,13 +3,19 @@
 
 int main() 
 {
-    bool isGPUDevice = 0;
+    bool isGPUDevice = 1;
     Tensor* a = new Tensor({1,2,1}, isGPUDevice, {1.08,2});
-    Tensor* b = new Tensor({3,4}, isGPUDevice, {4,3,2,1,-1,-15000,88.1,55.9,7788,123,654,477});
+    Tensor* b = new Tensor({2,3,4}, isGPUDevice);
+    b->FillArray(99999);
+    //b->PrintData();
+
+    //b->GetTensorBy2ShapeVector({1,0}, {2,3})->PrintData();
 
     b->PrintData();
-
-    b->GetTensorBy2ShapeVector({1,0}, {2,3})->PrintData();
+    Tensor* c = new Tensor({2,2,3}, isGPUDevice);
+    c->FillArray(54);
+    c->SendTensorBy2ShapeVector({0,1,1},b);
+    b->PrintData();
 
     //print(DynamicTensor::)
 

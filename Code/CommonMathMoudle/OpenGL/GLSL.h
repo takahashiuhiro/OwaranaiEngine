@@ -64,6 +64,7 @@ public:
     int TransposeInCPP;
     int EleLogInCPP;
     int GetTensorBy2ShapeVectorInCPP;
+    int SendTensorBy2ShapeVectorInCPP;
 
 void AddGLSLComFun()
 {
@@ -959,6 +960,54 @@ void main()
         PreCount/=OutputShape[a];
     }
     OutputData[Index] = InputData[InputIndex];
+}
+)");
+
+RegFun(SendTensorBy2ShapeVectorInCPP,R"(
+#version 430
+layout(local_size_x = 256, local_size_y = 1) in;
+layout(std430, binding = 0) buffer bufferOutputData {
+    float OutputData[];
+};
+layout(std430, binding = 1) buffer bufferInputData {
+    float InputData[];
+};
+layout(std430, binding = 2) buffer bufferInputShapeCount {
+    int InputShapeCount;
+};
+layout(std430, binding = 3) buffer bufferInputShapePointer {
+    int InputShapePointer[];
+};
+layout(std430, binding = 4) buffer bufferStartShapePointer {
+    int StartShapePointer[];
+};
+layout(std430, binding = 5) buffer bufferOutputShapePointer {
+    int OutputShapePointer[];
+};
+layout(std430, binding = 6) buffer bufferShapeLen {
+    int ShapeLen;
+};
+void main() 
+{
+    uint Index = gl_GlobalInvocationID.x;
+    if(Index >= InputShapeCount)return;
+    int InputShapeIndex[10];
+    int PreIndex = int(Index);
+    for(int a=ShapeLen-1;a>=0;a--)
+    {
+        int ThisShapeIndex = a;
+        InputShapeIndex[ThisShapeIndex] = PreIndex%InputShapePointer[ThisShapeIndex];
+        PreIndex = PreIndex/InputShapePointer[ThisShapeIndex];
+    }
+    int OutputShapeIndex[10];
+    for(int a=ShapeLen-1;a>=0;a--)OutputShapeIndex[a] = InputShapeIndex[a] + StartShapePointer[a];
+    int OutputIndex = 0;
+    for(int a=0;a<ShapeLen;a++)
+    {
+        OutputIndex *= OutputShapePointer[a];
+        OutputIndex += OutputShapeIndex[a];
+    }
+    OutputData[OutputIndex] = InputData[Index];
 }
 )");
 

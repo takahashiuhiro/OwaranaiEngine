@@ -482,6 +482,15 @@ __global__ void EleLogKernel(float* OutputData, size_t OutputShapeSize)
   OutputData[Index] = log(OutputData[Index]);
 }
 
+void SendTensorBy2ShapeVectorInCPP(float* OutputData, float* InputData, int InputShapeCount, int* InputShapePointer, int* StartShapePointer, int* OutputShapePointer, int ShapeLen)
+{
+  //todo
+  CudaPair CudaPairInput = GetCudaPair(InputShapeCount);
+  size_t *OutputShapeCuda;
+  cudaMalloc((void**)&OutputShapeCuda, OutputShapeSize*sizeof(size_t));
+  cudaMemcpy(OutputShapeCuda,OutputShape,sizeof(size_t)*OutputShapeSize,cudaMemcpyHostToDevice);
+}
+
 void EleLogInCPP(float* OutputData, size_t OutputShapeSize)
 {
   CudaPair CudaPairInput = GetCudaPair(OutputShapeSize);

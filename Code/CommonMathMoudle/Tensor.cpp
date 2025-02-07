@@ -998,6 +998,67 @@ Tensor* Tensor::GetTensorBy2ShapeVector(std::vector<size_t>StartShapeVector, std
     return ReturnTensor;
 }
 
+void Tensor::SendTensorBy2ShapeVector(std::vector<size_t>StartShape, Tensor* InputTensor)
+{
+    //还是不太对的状态
+    Log::Assert(InputTensor->shape.size()==shape.size(), "Dim Not Match.");
+    CudaDimVec StartShapeArray = TransformFromStdVector(StartShape, StartShape.size());
+    CudaDimVec InputShapeArray = TransformFromStdVector(shape, shape.size());
+    CudaDimVec OutputShapeArray = TransformFromStdVector(InputTensor->shape, InputTensor->shape.size());
+    int ShapeLen = InputTensor->shape.size();
+    if(GetDeviceNum())
+    {
+        #ifdef CUDA_USEFUL
+        Log::Assert(false, "Cuda::SendTensorBy2ShapeVector::todo");
+        #endif
+        #ifdef OPENGL_USEFUL
+        GPUDeviceProcess::I().ProcessGLSLFun
+        (
+            GLSL::I().SendTensorBy2ShapeVectorInCPP, 
+            ShapeCount,
+            {
+                InputTensor->GetDeviceBuffer(),
+                GetDeviceBuffer(),
+                VBuffer::CVBuffer((int)(ShapeCount)).OpenGLTMPBuffer, 
+                VBuffer::CVBuffer(InputShapeArray.ToInt(), InputShapeArray.ShapeLen).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(StartShapeArray.ToInt(), StartShapeArray.ShapeLen).OpenGLTMPBuffer,
+                VBuffer::CVBuffer(OutputShapeArray.ToInt(), OutputShapeArray.ShapeLen).OpenGLTMPBuffer,
+                VBuffer::CVBuffer((int)(ShapeLen)).OpenGLTMPBuffer, 
+            }
+        );
+        #endif
+    }
+    else
+    {
+        float* OutputData = InputTensor->GetDevicePointer();
+        float* InputData = GetDevicePointer();
+        int InputShapeCount = ShapeCount;
+        int* InputShapePointer = InputShapeArray.ToInt();
+        int* StartShapePointer = StartShapeArray.ToInt();
+        int* OutputShapePointer = OutputShapeArray.ToInt();
+        for(int Index = 0;Index < InputShapeCount;Index++)
+        {
+            int InputShapeIndex[10];
+            int PreIndex = int(Index);
+            for(int a=ShapeLen-1;a>=0;a--)
+            {
+                int ThisShapeIndex = a;
+                InputShapeIndex[ThisShapeIndex] = PreIndex%InputShapePointer[ThisShapeIndex];
+                PreIndex = PreIndex/InputShapePointer[ThisShapeIndex];
+            }
+            int OutputShapeIndex[10];
+            for(int a=ShapeLen-1;a>=0;a--)OutputShapeIndex[a] = InputShapeIndex[a] + StartShapePointer[a];
+            int OutputIndex = 0;
+            for(int a=0;a<ShapeLen;a++)
+            {
+                OutputIndex *= OutputShapePointer[a];
+                OutputIndex += OutputShapeIndex[a];
+            }
+            OutputData[OutputIndex] = InputData[Index];
+        }
+    }
+}
+
 Tensor* Tensor::Inverse()
 {
     Tensor* ReturnUnit = GetUnitTensor(shape, GetDeviceNum());

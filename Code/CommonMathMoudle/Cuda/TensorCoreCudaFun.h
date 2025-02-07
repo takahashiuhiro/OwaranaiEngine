@@ -49,3 +49,4 @@ extern "C" void ArithmeticSequenceInCPP(float* OutputData, size_t* OutputShape, 
 extern "C" void GenerateTrilOnesInCPP(float* OutputData, size_t OutputShapeCount, size_t Row, size_t Col, int Diagonal);
 extern "C" void TransposeInCPP(float* OutputData, float* InputData, size_t* OutputShape, size_t OutputShapeSize, int FirstDim, int SecondDim);
 extern "C" void EleLogInCPP(float* OutputData, size_t OutputShapeSize);
+extern "C" void SendTensorBy2ShapeVectorInCPP(float* OutputData, float* InputData, int InputShapeCount, int* InputShapePointer, int* StartShapePointer, int* OutputShapePointer, int ShapeLen);
