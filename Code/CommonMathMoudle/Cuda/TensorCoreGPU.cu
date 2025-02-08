@@ -507,7 +507,6 @@ __global__ void SendTensorBy2ShapeVectorKernel(float* OutputData, float* InputDa
 
 void SendTensorBy2ShapeVectorInCPP(float* OutputData, float* InputData, int InputShapeCount, int* InputShapePointer, int* StartShapePointer, int* OutputShapePointer, int ShapeLen)
 {
-  //todo meiceshi!
   CudaPair CudaPairInput = GetCudaPair(InputShapeCount);
   int *InputShapePointerCuda;
   cudaMalloc((void**)&InputShapePointerCuda, ShapeLen*sizeof(int));
