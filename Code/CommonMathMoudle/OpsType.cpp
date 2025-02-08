@@ -15,3 +15,4 @@ const size_t OpsType::EleExp = 11;//指数函数
 const size_t OpsType::View = 12;//改变张量shape
 const size_t OpsType::Transpose = 13;//交换shape
 const size_t OpsType::EleLog = 14;//对元素取log
+const size_t OpsType::SubSend = 15;//对元素取log

@@ -13,6 +13,7 @@ void DynamicTensor::OpsSetInMap()
 	BackwardOps[OpsType::EleExp] = DynamicStdOps_Backward_Eleexp;
 	BackwardOps[OpsType::Transpose] = DynamicStdOps_Backward_Transpose;
 	BackwardOps[OpsType::EleLog] = DynamicStdOps_Backward_EleLog;
+	BackwardOps[OpsType::SubSend] = DynamicStdOps_Backward_SubSend;
 }
 
 
@@ -280,4 +281,24 @@ void DynamicTensor::DynamicStdOps_Backward_EleLog(std::map<DynamicOps*, std::map
 	if (!CurOps->InputOpsList[0]->RequiresGrad)return;
 	DynamicTensor Res = DynamicTensor(CurOps->GradOps)*DynamicTensor(CurOps->InputOpsList[0]).Pow(-1);
 	BackwardOpsMap[CurOps->InputOpsList[0].get()][CurOps.get()] = Res.Ops;
+}
+
+DynamicTensor DynamicTensor::DynamicStdOps_Forward_SubSend(std::vector<DynamicTensor>InputList, he InputParams, bool RequiresGrad)
+{
+	std::vector<size_t>TargetShape;
+	InputParams["TargetShape"].v(TargetShape);
+	auto ResTensorContent = new Tensor(TargetShape, InputList[0].Ops->TensorPointer->GetDeviceNum());
+	ResTensorContent->FillArray(0);
+	for(int a=0;a<InputList.size();a++)
+	{
+		std::vector<size_t>InputStartShape;
+		InputParams["InputStartShape"][a].v(InputStartShape);
+		InputList[0].Ops->TensorPointer->SendTensorBy2ShapeVector(InputStartShape, ResTensorContent);
+	}
+	return SetComputationalHistory(ResTensorContent, InputList, InputParams, OpsType::EleLog, RequiresGrad); 
+}
+void DynamicTensor::DynamicStdOps_Backward_SubSend(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps)
+{
+	if (!CurOps->InputOpsList[0]->RequiresGrad)return;
+	Log::Assert(false, "DynamicStdOps_Backward_SubSend::todo");
 }
