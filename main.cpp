@@ -1,21 +1,42 @@
 #include "Code/OEDynamic.h"
 #include "Application/GPTX/GPTX.h"
 
+//python 语言大师第2课
 int main() 
 {
-    bool isGPUDevice = 0;
-    Tensor* a = new Tensor({1,2,1}, isGPUDevice, {1.08,2});
-    Tensor* b = new Tensor({2,3,4}, isGPUDevice);
-    b->FillArray(99999);
-    //b->PrintData();
+    
+    bool isGPUDevice = 1;
+    DynamicTensor c = DynamicTensor({4,2},{100,200,300,400,500,600,700,800.},1,isGPUDevice);
+    DynamicTensor d = DynamicTensor({3,4},{1,2,3,4,5,6,7,8,9,10,11,12.},1,isGPUDevice);
+    //c.Fill(5);
+    //d.Fill(9);
+    he param = he::NewDict();
+    std::vector<int>tg = {8,8};
+    param["TargetShape"] = he::NewList(tg);
+    param["InputStartShape"] = he::NewList(2);
+    param["SubInputShapeS"] = he::NewList(2);
+    param["SubInputShapeE"] = he::NewList(2);
+    tg = {1,1};
+    param["InputStartShape"][0] = he::NewList(tg);
+    tg = {0,0};
+    param["SubInputShapeS"][0] = he::NewList(tg);
+    tg = {3,1};
+    param["SubInputShapeE"][0] = he::NewList(tg);
+    tg = {3,3};
+    param["InputStartShape"][1] = he::NewList(tg);
+    tg = {1,0};
+    param["SubInputShapeS"][1] = he::NewList(tg);
+    tg = {2,3};
+    param["SubInputShapeE"][1] = he::NewList(tg);
 
-    //b->GetTensorBy2ShapeVector({1,0}, {2,3})->PrintData();
+    auto ggg = DynamicTensor::DynamicStdOps_Forward_SubSend({c,d},param,1);
+    auto pp = ggg.Sum();
+    pp.Backward();
+    print(ggg);
+    print("");
 
-    b->PrintData();
-    Tensor* c = new Tensor({1,3,3}, isGPUDevice);
-    c->FillArray(54);
-    c->SendTensorBy2ShapeVector({0,0,1},b);
-    b->PrintData();
+    print(c.Grad());
+
 
     //print(DynamicTensor::)
 

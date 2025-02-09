@@ -293,12 +293,41 @@ DynamicTensor DynamicTensor::DynamicStdOps_Forward_SubSend(std::vector<DynamicTe
 	{
 		std::vector<size_t>InputStartShape;
 		InputParams["InputStartShape"][a].v(InputStartShape);
-		InputList[0].Ops->TensorPointer->SendTensorBy2ShapeVector(InputStartShape, ResTensorContent);
+		std::vector<size_t>SubInputShapeS;
+		InputParams["SubInputShapeS"][a].v(SubInputShapeS);
+		std::vector<size_t>SubInputShapeE;
+		InputParams["SubInputShapeE"][a].v(SubInputShapeE);
+		auto SubInputTensor = InputList[a].Ops->TensorPointer->GetTensorBy2ShapeVector(SubInputShapeS, SubInputShapeE);
+		SubInputTensor->SendTensorBy2ShapeVector(InputStartShape, ResTensorContent);
+		delete SubInputTensor;
 	}
-	return SetComputationalHistory(ResTensorContent, InputList, InputParams, OpsType::EleLog, RequiresGrad); 
+	return SetComputationalHistory(ResTensorContent, InputList, InputParams, OpsType::SubSend, RequiresGrad); 
 }
 void DynamicTensor::DynamicStdOps_Backward_SubSend(std::map<DynamicOps*, std::map<DynamicOps*, std::shared_ptr<DynamicOps>>>& BackwardOpsMap, std::shared_ptr<DynamicOps>CurOps)
 {
-	if (!CurOps->InputOpsList[0]->RequiresGrad)return;
-	Log::Assert(false, "DynamicStdOps_Backward_SubSend::todo");
+	std::vector<int>ShapeVec;
+	auto& P = CurOps->Params;
+	for(int a=0;a<CurOps->InputOpsList.size();a++)
+	{
+		auto& ThisInput = CurOps->InputOpsList[a];
+		if (!ThisInput->RequiresGrad)continue;
+		he InputTensorParams = he::NewDict();
+		InputTensorParams["InputStartShape"] = he::NewList(1);
+    	InputTensorParams["SubInputShapeS"] = he::NewList(1);
+    	InputTensorParams["SubInputShapeE"] = he::NewList(1);
+		ShapeVec.clear();
+		for(auto&it:ThisInput->TensorPointer->shape)ShapeVec.push_back(it);
+		InputTensorParams["TargetShape"] = he::NewList(ShapeVec);
+		P["InputStartShape"][a].v(ShapeVec);
+		InputTensorParams["SubInputShapeS"][0] = he::NewList(ShapeVec);
+		P["SubInputShapeS"][a].v(ShapeVec);
+		InputTensorParams["InputStartShape"][0] = he::NewList(ShapeVec);
+		InputTensorParams["SubInputShapeE"][0] = he::NewList();
+		for(int b=0;b < ThisInput->TensorPointer->shape.size();b++)
+		{
+			InputTensorParams["SubInputShapeE"][0].append((P["SubInputShapeE"][a][b]-P["SubInputShapeS"][a][b]).i() + P["InputStartShape"][a][b].i());
+		}
+		DynamicTensor Res = DynamicStdOps_Forward_SubSend({DynamicTensor(CurOps->GradOps)}, InputTensorParams, true);
+		BackwardOpsMap[ThisInput.get()][CurOps.get()] = Res.Ops;
+	}
 }

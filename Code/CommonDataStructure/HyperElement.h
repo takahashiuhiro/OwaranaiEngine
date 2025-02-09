@@ -75,6 +75,7 @@ struct he
     void v(std::vector<T>&Res)
     {
         Log::Assert(ElementType==heType::LIST, "only he can  convert to std::vector");
+        Res.clear();
         for (he a = 0; a < size(); a = a+1)
         {
             if ((*this)[a].ElementType == heType::INT)Res.push_back((*this)[a].i());

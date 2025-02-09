@@ -41,6 +41,7 @@ float he::f()
 void he::v(std::vector<std::string>& Res)
 {
     Log::Assert(ElementType == heType::LIST, "only he can  convert to std::vector");
+    Res.clear();
     for (he a = 0; a < size(); a = a + 1)
     {
         if ((*this)[a].ElementType == heType::STRING)Res.push_back((*this)[a].s());
