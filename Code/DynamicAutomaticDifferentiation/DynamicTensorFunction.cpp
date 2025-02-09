@@ -121,28 +121,33 @@ DynamicTensor DynamicTensor::Tanh()
 
 DynamicTensor DynamicTensor::Cat(std::vector<DynamicTensor>InputTensors, int Dim)
 {
-	std::vector<Tensor*>TensorVer;
-	for (auto& It : InputTensors)TensorVer.push_back(It.Ops->TensorPointer.get());
-	auto GenRightMat = Tensor::GenerateCatTensor(TensorVer, Dim);//性能问题的位置
-	DynamicTensor Res;
-	int TargetDim = 0;
-	for (size_t a = 0; a < InputTensors.size(); a++)TargetDim += InputTensors[a].Ops->TensorPointer->shape[Dim];
-	for (size_t a = 0; a < InputTensors.size(); a++)
+	int InputNum = InputTensors.size();
+	std::vector<int> ReturnShape,StartShape,EndShape;
+	for (size_t a = 0; a < InputTensors[0].Shape().size(); a++)
 	{
-		size_t FirstDim = 1;
-		size_t LastDim = 1;
-		for (size_t b = 0; b < InputTensors[a].Ops->TensorPointer->shape.size(); b++)
-		{
-			if (b < Dim)FirstDim *= InputTensors[a].Ops->TensorPointer->shape[b];
-			else LastDim *= InputTensors[a].Ops->TensorPointer->shape[b];
-		}
-		if (a == 0)Res = InputTensors[a].View({ (int)FirstDim, (int)LastDim }) % DynamicTensor(std::shared_ptr<Tensor>(GenRightMat[a]));//性能问题的位置
-		else Res = Res + InputTensors[a].View({ (int)FirstDim, (int)LastDim }) % DynamicTensor(std::shared_ptr<Tensor>(GenRightMat[a]));//性能问题的位置
+		ReturnShape.push_back(InputTensors[a].Shape()[a]);
+		StartShape.push_back(0);
+		EndShape.push_back(InputTensors[a].Shape()[a] - 1);
 	}
-	std::vector<int> ReturnShape;
-	for (size_t a = 0; a < InputTensors[0].Ops->TensorPointer->shape.size(); a++)ReturnShape.push_back(InputTensors[0].Ops->TensorPointer->shape[a]);
+	he SubSendParams = he::NewDict();
+	int TargetDim = 0;
+	SubSendParams["InputStartShape"] = he::NewList(InputNum);
+    SubSendParams["SubInputShapeS"] = he::NewList(InputNum);
+    SubSendParams["SubInputShapeE"] = he::NewList(InputNum);
+	for (int a = 0; a < InputTensors.size(); a++)
+	{
+		auto ThisStartShape = StartShape;
+		ThisStartShape[Dim] = TargetDim;
+		SubSendParams["InputStartShape"][a] = he::NewList(ThisStartShape);
+		SubSendParams["SubInputShapeS"][a] = he::NewList(StartShape);
+		auto ThisEndShape = EndShape;
+		ThisEndShape[Dim] = InputTensors[a].Shape()[Dim]-1;
+		SubSendParams["SubInputShapeE"][a] = he::NewList(ThisEndShape);
+		TargetDim += InputTensors[a].Shape()[Dim];
+	}
 	ReturnShape[Dim] = TargetDim;
-	return Res.View(ReturnShape);
+	SubSendParams["TargetShape"] = he::NewList(ReturnShape);
+	return DynamicStdOps_Forward_SubSend(InputTensors, SubSendParams, true);
 }
 
 DynamicTensor DynamicTensor::GELU()

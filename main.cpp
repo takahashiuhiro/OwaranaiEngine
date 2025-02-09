@@ -1,41 +1,18 @@
 #include "Code/OEDynamic.h"
 #include "Application/GPTX/GPTX.h"
 
-//python 语言大师第2课
+
 int main() 
 {
     
     bool isGPUDevice = 1;
-    DynamicTensor c = DynamicTensor({4,2},{100,200,300,400,500,600,700,800.},1,isGPUDevice);
-    DynamicTensor d = DynamicTensor({3,4},{1,2,3,4,5,6,7,8,9,10,11,12.},1,isGPUDevice);
-    //c.Fill(5);
-    //d.Fill(9);
-    he param = he::NewDict();
-    std::vector<int>tg = {8,8};
-    param["TargetShape"] = he::NewList(tg);
-    param["InputStartShape"] = he::NewList(2);
-    param["SubInputShapeS"] = he::NewList(2);
-    param["SubInputShapeE"] = he::NewList(2);
-    tg = {1,1};
-    param["InputStartShape"][0] = he::NewList(tg);
-    tg = {0,0};
-    param["SubInputShapeS"][0] = he::NewList(tg);
-    tg = {3,1};
-    param["SubInputShapeE"][0] = he::NewList(tg);
-    tg = {3,3};
-    param["InputStartShape"][1] = he::NewList(tg);
-    tg = {1,0};
-    param["SubInputShapeS"][1] = he::NewList(tg);
-    tg = {2,3};
-    param["SubInputShapeE"][1] = he::NewList(tg);
+    DynamicTensor c = DynamicTensor({30,8},1,isGPUDevice);
+    DynamicTensor d = DynamicTensor({30,4},1,isGPUDevice);
+    c.Fill(1);
+    d.Fill(5);
 
-    auto ggg = DynamicTensor::DynamicStdOps_Forward_SubSend({c,d},param,1);
-    auto pp = ggg.Sum();
-    pp.Backward();
-    print(ggg);
-    print("");
+    print(DynamicTensor::Cat({c,d},1));
 
-    print(c.Grad());
 
 
     //print(DynamicTensor::)
