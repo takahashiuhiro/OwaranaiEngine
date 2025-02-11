@@ -66,7 +66,7 @@ struct DevicePointerManager
     size_t DeviceNum = ImpossibleFrameMaxDeviceNum();
 
     #ifdef OPENGL_USEFUL
-    GLuint OpenGLDataPointer;
+    GLuint OpenGLDataPointer = 0;
     #endif
 
     size_t FrameMaxDeviceNum()
@@ -91,7 +91,12 @@ struct DevicePointerManager
     {
         //释放对应设备的内存
         if(OldDeviceNum == ImpossibleFrameMaxDeviceNum())return;
+        #ifdef CUDA_USEFUL
         if(!DataPointers[OldDeviceNum])return;
+        #endif
+        #ifdef OPENGL_USEFUL
+        if(!OpenGLDataPointer)return;
+        #endif
         if(!OldDeviceNum)
         {
             free(DataPointers[OldDeviceNum]);
@@ -103,6 +108,7 @@ struct DevicePointerManager
             #endif
             #ifdef OPENGL_USEFUL
             glDeleteBuffers(1, &OpenGLDataPointer);
+            OpenGLDataPointer = 0;
             #endif
         }
     }

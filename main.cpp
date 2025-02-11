@@ -6,12 +6,11 @@ int main()
 {
     
     bool isGPUDevice = 1;
-    DynamicTensor c = DynamicTensor({30,8},1,isGPUDevice);
-    DynamicTensor d = DynamicTensor({30,4},1,isGPUDevice);
-    c.Fill(1);
-    d.Fill(5);
-
-    print(DynamicTensor::Cat({c,d},1));
+    int n;
+    Tensor* g = new Tensor({900000000},isGPUDevice);
+    std::cin>>n;
+    delete g;
+    std::cin>>n;
 
 
 
