@@ -140,6 +140,15 @@ DynamicTensor DynamicTensor::Arange(float Start, float End, float Step, bool Req
 	return Res;
 }
 
+DynamicTensor DynamicTensor::CreateUnitTensor(std::vector<int>ReturnShape, bool RequiresGrad, size_t DeviceNum)
+{
+    Tensor* TensorContent;
+    std::vector<size_t>ReturnShapeInt;
+    for(auto&it:ReturnShape)ReturnShapeInt.push_back(it);
+    TensorContent = Tensor::GetUnitTensor(ReturnShapeInt, DeviceNum);
+    return DynamicTensor(std::shared_ptr<Tensor>(TensorContent), RequiresGrad);
+}
+
 DynamicTensor DynamicTensor::SetComputationalHistory(Tensor* ResTensor, std::vector<DynamicTensor>InputList, he InputPrams, size_t InputOpsType, bool RequiresGrad)
 {
 	bool MaxRequiresGrad = 0,MaxIsEval = 0;

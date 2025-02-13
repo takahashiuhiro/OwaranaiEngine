@@ -72,6 +72,7 @@ public:
     int Numel();
     //创建一个新的等差数列张量
     static DynamicTensor Arange(float Start, float End, float Step = 1, bool RequiresGrad = false, size_t DeviceNum = 0);
+    static DynamicTensor CreateUnitTensor(std::vector<int>ReturnShape, bool RequiresGrad = false, size_t DeviceNum = 0);
 
 
     /**计算图逻辑.*/

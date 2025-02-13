@@ -6,11 +6,8 @@ int main()
 {
     
     bool isGPUDevice = 1;
-    int n;
-    Tensor* g = new Tensor({900000000},isGPUDevice);
-    std::cin>>n;
-    delete g;
-    std::cin>>n;
+
+    print(DynamicTensor::CreateUnitTensor({2,2},0, isGPUDevice));
 
 
 
