@@ -1957,6 +1957,9 @@ Tensor* Tensor::Transpose(int FirstDim, int SecondDim)
         }
         for(int Index = 0;Index < OutputShapeCount;Index++)
         {
+            if (RightElement == 0) std::cerr << "Error: RightElement is zero!" << std::endl;
+            if (OutputShape[RightDim] == 0) std::cerr << "Error: OutputShape[RightDim] is zero!" << std::endl;
+            if (MidElement == 0) std::cerr << "Error: MidElement is zero!" << std::endl;
             int NowIndex = Index%MidRightElement;
             int UseIndex = NowIndex/RightElement;//右边都是行向量
             int ReduIndex = NowIndex%RightElement;

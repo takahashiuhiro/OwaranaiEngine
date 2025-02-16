@@ -81,6 +81,14 @@ std::vector<size_t>& DynamicTensor::Shape()
 	return Ops->TensorPointer->shape;
 }
 
+std::vector<int> DynamicTensor::ShapeInt()
+{
+	Log::Assert(Ops != nullptr, "this ops of dynamictensor is nullptr, so you can't read its shape..");
+	std::vector<int>Res;
+	for(auto&it:Ops->TensorPointer->shape)Res.push_back(it);
+	return Res;
+}
+
 void DynamicTensor::SetRequiresGrad(bool InputRequiresGrad)
 {
 	Ops->RequiresGrad = InputRequiresGrad;
@@ -395,7 +403,7 @@ DynamicTensor DynamicTensor::operator%(DynamicTensor Other)
 DynamicTensor DynamicTensor::operator*(DynamicTensor Other)
 {
 	if (Other.Ops.get() != Ops.get())return ViewAndBC(*this, Other, DynamicStdOps_Forward_Elemul, false);
-	else return DynamicStdOps_Forward_Add({ *this, DynamicStdOps_Forward_Elemul({Other},he(),true) }, he(), true);
+	else return DynamicStdOps_Forward_Elemul({ *this, DynamicStdOps_Forward_Add({Other},he(),true) }, he(), true);
 }
 DynamicTensor DynamicTensor::operator*(float Other)
 {
