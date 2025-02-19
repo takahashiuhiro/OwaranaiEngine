@@ -24,7 +24,7 @@ https://github.com/karpathy/nanoGPT/tree/master
 
 ## 关于项目文档  
 
-https://github.com/takahashiuhiro/OwaranaiEngine/blob/main/doc.md 
+https://github.com/takahashiuhiro/OwaranaiEngine/blob/main/doc.md (年久失修)
 
 ## 关于本项目的配置  
 
