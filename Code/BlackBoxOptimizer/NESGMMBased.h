@@ -20,8 +20,8 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
         SampleNum = this->Params.DictGet("SampleNum", 30).i();
         CosmosNum = this->Params.DictGet("CosmosNum", 30).i();
         Beta = this->Params.DictGet("Beta", 0.3).f();
-        LearingRate_Mean = this->Params.DictGet("LearingRate_Mean", 0.05).f();
-        LearingRate_Var = this->Params.DictGet("LearingRate_Var", 0.01).f();
+        LearingRate_Mean = this->Params.DictGet("LearingRate_Mean", 0.1).f();
+        LearingRate_Var = this->Params.DictGet("LearingRate_Var", 0.1).f();
         Gamma = this->Params.DictGet("Gamma", 1.).f();
     }
 
@@ -52,7 +52,7 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
             return DynamicTensor::Cat(SampleSet);
         };
 
-        for(int a = 0;a < 50;a++)
+        for(int a = 0;a < 250;a++)
         {
             DynamicTensor SampleRes = GetSampleRes();
             //print(SampleRes);
@@ -68,7 +68,7 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
                     PSingle.push_back(SampleRes.GetProbabilityDensityFromGaussian(MeanSet[a], VarSet[a]).View({1, -1}));
                 }
                 DynamicTensor MergeAllPSingle = DynamicTensor::Cat(PSingle).Transpose(0, 1)*(1./CosmosNum); // 行: 样本， 列: 高斯
-                DynamicTensor MergeResSum = MergeAllPSingle.Sum({1}, true).Pow(-1.);
+                DynamicTensor MergeResSum = (MergeAllPSingle.Sum({1}, true) + 1e-7).Pow(-1.);
                 return MergeAllPSingle*MergeResSum;
             };
             DynamicTensor R = GetR();
@@ -115,47 +115,27 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
 
             auto GetFRepel = [&MergeMean, &MergeVar, this]()
             {
-                /* ① 带宽 h²：用平均方差并乘 Gamma */
-                DynamicTensor h2   = MergeVar.Mean({});          // scalar
-                DynamicTensor invh = (h2 + 1e-12).Pow(-1);       // 1/h²
-
-                /* ② Δμ_{kl} */
-                DynamicTensor mu_k = MergeMean.View({-1,1,DimNum});
-                DynamicTensor mu_l = MergeMean.View({1,-1,DimNum});
-                DynamicTensor dmu  = mu_k - mu_l;                // (K,K,D)
-
-                /* ③ 高斯核 */
-                DynamicTensor dist2  = dmu.Pow(2).Sum({2}, true);        // (K,K,1)
-                DynamicTensor kernel = (dist2 * (-0.5) * invh).Eleexp(M_E); // (K,K,1) 0-1
-
-                /* ④ 斥力向量 */
-                DynamicTensor repel = (kernel * dmu * invh).Sum({1});    // (K,D)
-                return repel * (1./CosmosNum);                        // 均匀平均
+                auto GetH = [&MergeVar, this]()
+                {
+                    DynamicTensor HRes = MergeVar.Sum({},true);
+                    double HResNum = Gamma/CosmosNum;
+                    return HRes.View({1,1,-1})*HResNum;
+                };
+                DynamicTensor H = GetH();
+                DynamicTensor DualMergeMean_1 = MergeMean.View({-1,1,DimNum});
+                DynamicTensor DualMergeMean_2 = MergeMean.View({1,-1,DimNum});
+                DynamicTensor DualMergeMean = DualMergeMean_1 - DualMergeMean_2;
+                DynamicTensor Dis = DualMergeMean.Pow(2.).Sum({2}, true);
+                DynamicTensor NormDis = H.Pow(-1)*(-0.5);
+                DynamicTensor CosmosKernel = (Dis*NormDis).Eleexp(M_E);
+                DynamicTensor DuelDis = CosmosKernel*DualMergeMean;
+                DynamicTensor Res = DuelDis.Sum({1})*(1./CosmosNum);
+                return Res.Sum({0});
             };
-
-            //auto GetFRepel = [&MergeMean, &MergeVar, this]()
-            //{
-            //    auto GetH = [&MergeVar, this]()
-            //    {
-            //        DynamicTensor HRes = MergeVar.Sum({},true);
-            //        double HResNum = Gamma/CosmosNum;
-            //        return HRes.View({1,1,-1})*HResNum;
-            //    };
-            //    DynamicTensor H = GetH();
-            //    DynamicTensor DualMergeMean_1 = MergeMean.View({-1,1,DimNum});
-            //    DynamicTensor DualMergeMean_2 = MergeMean.View({1,-1,DimNum});
-            //    DynamicTensor DualMergeMean = DualMergeMean_1 - DualMergeMean_2;
-            //    DynamicTensor Dis = DualMergeMean.Pow(2.).Sum({2}, true);
-            //    DynamicTensor NormDis = H.Pow(-1)*(-0.5);
-            //    DynamicTensor CosmosKernel = (Dis*NormDis).Eleexp(M_E);
-            //    DynamicTensor DuelDis = CosmosKernel*DualMergeMean;
-            //    DynamicTensor Res = DuelDis.Sum({1})*(1./CosmosNum);
-            //    return Res.Sum({0});
-            //};
 
             auto GetMeanUpdateDelta = [&JMean, &GetFRepel, &a, this]()
             {
-                double FRepelDeacy = 0.08;
+                double FRepelDeacy = 0.02;
                 DynamicTensor FRepel = GetFRepel();
                 DynamicTensor FRepel_Deacy = FRepel * std::max(1-a*FRepelDeacy, 0.) * Gamma;
                 DynamicTensor Res = JMean - FRepel_Deacy;
@@ -166,14 +146,9 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
 
             auto GetVarLogUpdateDelta = [&MergeVar, &JVar, this]()
             {
-                DynamicTensor ProtoRes = MergeVar *JVar* LearingRate_Var;
-                DynamicTensor ProtoCopy = ProtoRes.Copy();
-                ProtoCopy.Fill(3.);
-                DynamicTensor ClipRes = (ProtoRes - ProtoCopy).ReLU();
-                print(ProtoRes);
-                print(ProtoCopy);
-                print(ClipRes);
-                return ProtoRes - ClipRes;
+                //这块反正很奇怪，还没搞懂，现在问题是不清楚这里要不要乘以-1和MergeVar，-1我觉得是不应该乘的，但是MergeVar我觉得也不太应该，现在感觉很不对
+                DynamicTensor ProtoRes =  MergeVar* JVar* LearingRate_Var*(-1);
+                return ProtoRes;
             };
 
             DynamicTensor MergeVarLogUpdateDelta = GetVarLogUpdateDelta();

@@ -160,7 +160,14 @@ DynamicTensor DynamicTensor::GELU()
 DynamicTensor DynamicTensor::Mean(std::vector<int>InputDims, bool KeepDim)
 {
 	float MeanPartial = 1;
-	for (size_t a = 0; a < InputDims.size(); a++)MeanPartial *= Ops->TensorPointer->shape[InputDims[a]];
+	if(InputDims.empty())
+	{
+		for (size_t a = 0; a < Shape().size(); a++)MeanPartial *= Shape()[a];
+	}
+	else
+	{
+		for (size_t a = 0; a < InputDims.size(); a++)MeanPartial *= Shape()[InputDims[a]];
+	}
 	return Sum(InputDims, KeepDim)*(1./ MeanPartial);
 }
 
