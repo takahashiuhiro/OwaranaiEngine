@@ -49,9 +49,13 @@ public:
 
     /**公共函数.*/
     DynamicTensor Grad();
-    DynamicTensor Copy();//复制一个空的只有张量的值.
+    /**复制一个空的只有张量的值. */
+    DynamicTensor Copy();
     std::vector<size_t>& Shape();
     std::vector<int> ShapeInt();
+    /**返回整个张量的元素个数 */
+    int ShapeCount();
+
     void SetRequiresGrad(bool InputRequiresGrad);//使向量可导或者不可导
 
     /**Tensor内函数组装.*/
@@ -164,4 +168,19 @@ public:
 
     /**不可导函数. */
 
+    /**
+     * 从多元高斯分布中采样
+     */
+    static DynamicTensor SampleFromMulGaussian(DynamicTensor MeanVector, DynamicTensor CovarianceMatrix, std::vector<int>OutputShape, bool RequiresGrad = 0 ,size_t DeviceNum = 0, int Seed = -1);
+    /**
+     * 给出一个绝对值的tensor
+     */
+    DynamicTensor Abs();
+    /**
+     * 当前tensor在高斯分布里求概率密度
+     * @param MeanVector 均值向量
+     * @param CovarianceMatrix 协方差矩阵
+     * @param IsDiagonal 协方差矩阵是否是对角向量(如果是对角阵为了内存只会输入一个向量)
+     */
+    DynamicTensor GetProbabilityDensityFromGaussian(DynamicTensor MeanVector, DynamicTensor CovarianceMatrix, bool IsDiagonal = true);
 };

@@ -181,6 +181,12 @@ struct he
     bool In(he InputKey);//外部查询是否存在该key
     bool In(std::string InputKey);
     bool In(int InputKey);
+    template<typename KeyType, typename ValueType>
+    he DictGet(KeyType InputKey, ValueType InputValue)
+    {
+        if(In(InputKey))return (*this)[InputKey];
+        return he(InputValue);
+    }
     int SplayInsert(he InputKey, he InputValue);//在splay上插入一对k-v,返回内存块
     void SplayPrintForDebugArray();//debug用
     void SplayPrintForDebugTree();

@@ -125,9 +125,10 @@ DynamicTensor DynamicTensor::Cat(std::vector<DynamicTensor>InputTensors, int Dim
 	std::vector<int> ReturnShape,StartShape,EndShape;
 	for (size_t a = 0; a < InputTensors[0].Shape().size(); a++)
 	{
-		ReturnShape.push_back(InputTensors[a].Shape()[a]);
+		// 这里的修改，我们认为InputTensors中除了Dim所在的维度其他shape都是相等的
+		ReturnShape.push_back(InputTensors[0].Shape()[a]);
 		StartShape.push_back(0);
-		EndShape.push_back(InputTensors[a].Shape()[a] - 1);
+		EndShape.push_back(InputTensors[0].Shape()[a] - 1);
 	}
 	he SubSendParams = he::NewDict();
 	int TargetDim = 0;

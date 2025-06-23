@@ -24,7 +24,8 @@ https://github.com/karpathy/nanoGPT/tree/master
 
 ## 关于项目文档  
 
-https://github.com/takahashiuhiro/OwaranaiEngine/blob/main/doc.md (年久失修)
+https://deepwiki.com/takahashiuhiro/OwaranaiEngine？   
+在这里感恩deepwiki
 
 ## 关于本项目的配置  
 
@@ -32,13 +33,11 @@ https://github.com/takahashiuhiro/OwaranaiEngine/blob/main/doc.md (年久失修)
 (选装)Cuda Version:11.8  
 (选装)Cuda Drive Version:522.25  
 
-只要装了g++就能跑起来, 检测不到cuda会编译C++版
-
 ## 关于项目运行方法  
 1. wsl/ubuntu:  
 git clone https://github.com/takahashiuhiro/OwaranaiEngine.git  
 cd build  
-cmake ../  
+cmake -DBACKWARD=CUDA ../    BACKWARD是选择CUDA或者OPENGL为计算后端的选项  
 make  
 ./OwaranaiEngineMain  
 
@@ -53,4 +52,6 @@ git clone https://github.com/takahashiuhiro/OwaranaiEngine.git
 ctrl+F5编译运行  
 
 ## 项目备忘录 
-1. hyperelement的splay还没写
+1. hyperelement的splay还没写 
+2. 多元高斯分布的cuda版没写 
+3. SVD分解没写  

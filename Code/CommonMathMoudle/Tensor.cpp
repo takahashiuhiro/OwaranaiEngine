@@ -2004,3 +2004,44 @@ Tensor* Tensor::EleLog()
     }
     return ReturnTensor;
 }
+
+Tensor* Tensor::GenMulGaussianDistribution(Tensor* MeanVector, Tensor* CovarianceMatrix, std::vector<size_t>OutputShape, int DeviceNum)
+{
+    unsigned Seed = std::chrono::system_clock::now().time_since_epoch().count();
+    return GenMulGaussianDistribution(MeanVector, CovarianceMatrix, OutputShape, Seed, DeviceNum);
+}
+
+Tensor* Tensor::GenMulGaussianDistribution(Tensor* MeanVector, Tensor* CovarianceMatrix, std::vector<size_t>OutputShape, unsigned Seed, int DeviceNum)
+{
+    auto CheckIsIndepend = [&MeanVector, &CovarianceMatrix]()
+    {
+        Log::Assert(CovarianceMatrix->shape.size() == 1 || CovarianceMatrix->shape.size() == 2, "CovarianceMatrix is NOT a Vector Or Matrix.");
+        Log::Assert(MeanVector->shape[0]==CovarianceMatrix->shape[0], "Mean's dim != Var's dim");
+        Log::Assert(MeanVector->shape.size()==1, "Mean's dim != 1");
+        if(CovarianceMatrix->shape.size() == 1)return true;
+        return false;
+    };
+
+    if(CheckIsIndepend()) return GenIndependentGaussian(MeanVector, CovarianceMatrix, OutputShape, Seed, DeviceNum);
+    else Log::Assert(false, "GenMulGaussianDistribution::Todo");
+}
+
+Tensor* Tensor::GenIndependentGaussian(Tensor* MeanVector, Tensor* CovarianceVector, std::vector<size_t>OutputShape, unsigned Seed, int DeviceNum)
+{
+    size_t Dim = MeanVector->shape[0];
+    OutputShape.push_back(Dim);
+    Tensor* ReturnTensor = new Tensor(OutputShape, DeviceNum);
+
+    if(ReturnTensor->GetDeviceNum())
+    {
+        Log::Assert(false, "GenIndependentGaussian::todo");
+    }
+    else
+    {
+        std::vector<std::normal_distribution<double>> NormVec;
+        for(size_t a =0; a<Dim;a++)NormVec.emplace_back(MeanVector->GetDevicePointer()[a], CovarianceVector->GetDevicePointer()[a]);
+        std::default_random_engine Gen(Seed);
+        for(size_t idx = 0;idx < ReturnTensor->ShapeCount;idx++)ReturnTensor->GetDevicePointer()[idx] = NormVec[idx%Dim](Gen);
+    }
+    return ReturnTensor;
+}

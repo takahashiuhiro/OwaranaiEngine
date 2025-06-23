@@ -11,6 +11,7 @@ elseif(CGTYPE STREQUAL "DYNAMIC")
 else()
     message(FATAL_ERROR "An error occurred: undefined mode of computational graph!")
 endif()
+add_subdirectory(BlackBoxOptimizer)
 
 add_library(OwaranaiEngine STATIC Code.cpp)
 
@@ -23,3 +24,4 @@ elseif(CGTYPE STREQUAL "DYNAMIC")
 else()
     message(FATAL_ERROR "An error occurred: undefined mode of computational graph!")
 endif()
+target_link_libraries (OwaranaiEngine BlackBoxOptimizer)

@@ -83,10 +83,15 @@ std::vector<size_t>& DynamicTensor::Shape()
 
 std::vector<int> DynamicTensor::ShapeInt()
 {
-	Log::Assert(Ops != nullptr, "this ops of dynamictensor is nullptr, so you can't read its shape..");
+	Log::Assert(Ops != nullptr, "this ops of dynamictensor is nullptr, so you can't read its shapeint..");
 	std::vector<int>Res;
 	for(auto&it:Ops->TensorPointer->shape)Res.push_back(it);
 	return Res;
+}
+
+int DynamicTensor::ShapeCount()
+{
+	return Ops->TensorPointer->ShapeCount;
 }
 
 void DynamicTensor::SetRequiresGrad(bool InputRequiresGrad)
