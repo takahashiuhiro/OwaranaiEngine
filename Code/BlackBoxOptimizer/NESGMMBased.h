@@ -21,7 +21,7 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
         CosmosNum = this->Params.DictGet("CosmosNum", 30).i();
         Beta = this->Params.DictGet("Beta", 0.3).f();
         LearingRate_Mean = this->Params.DictGet("LearingRate_Mean", 0.1).f();
-        LearingRate_Var = this->Params.DictGet("LearingRate_Var", 0.1).f();
+        LearingRate_Var = this->Params.DictGet("LearingRate_Var", 0.02).f();
         Gamma = this->Params.DictGet("Gamma", 1.).f();
     }
 
@@ -52,7 +52,7 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
             return DynamicTensor::Cat(SampleSet);
         };
 
-        for(int a = 0;a < 250;a++)
+        for(int a = 0;a < 2500;a++)
         {
             DynamicTensor SampleRes = GetSampleRes();
             //print(SampleRes);
@@ -130,7 +130,7 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
                 DynamicTensor CosmosKernel = (Dis*NormDis).Eleexp(M_E);
                 DynamicTensor DuelDis = CosmosKernel*DualMergeMean;
                 DynamicTensor Res = DuelDis.Sum({1})*(1./CosmosNum);
-                return Res.Sum({0});
+                return Res;
             };
 
             auto GetMeanUpdateDelta = [&JMean, &GetFRepel, &a, this]()
@@ -147,7 +147,7 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
             auto GetVarLogUpdateDelta = [&MergeVar, &JVar, this]()
             {
                 //这块反正很奇怪，还没搞懂，现在问题是不清楚这里要不要乘以-1和MergeVar，-1我觉得是不应该乘的，但是MergeVar我觉得也不太应该，现在感觉很不对
-                DynamicTensor ProtoRes =  MergeVar* JVar* LearingRate_Var*(-1);
+                DynamicTensor ProtoRes =  MergeVar* JVar* LearingRate_Var;
                 return ProtoRes;
             };
 
