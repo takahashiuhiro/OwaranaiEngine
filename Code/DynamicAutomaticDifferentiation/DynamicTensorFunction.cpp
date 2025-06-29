@@ -251,3 +251,10 @@ DynamicTensor DynamicTensor::ReLU()
 	Tensor* SignTensor = Self.Ops->TensorPointer->GenerateSignTensor();
 	return Self*DynamicTensor(std::shared_ptr<Tensor>(SignTensor));
 }
+
+DynamicTensor DynamicTensor::Abs()
+{
+    DynamicTensor MinusSelf = (DynamicTensor(Ops)*(-1)).ReLU();
+    DynamicTensor Self = DynamicTensor(Ops).ReLU();
+    return MinusSelf + Self;
+}

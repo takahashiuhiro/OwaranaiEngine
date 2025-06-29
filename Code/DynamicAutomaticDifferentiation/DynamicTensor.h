@@ -165,22 +165,12 @@ public:
     DynamicTensor Sigmoid();
     //高斯分布的积分，默认的是期望是0标准差是1的标准高斯分布，用泰勒展开3项
     DynamicTensor GaussianCdf(float InputMean = 0, float InputStd =1, int Terms = 3);
-
-    /**不可导函数. */
-
-    /**
-     * 从多元高斯分布中采样
-     */
-    static DynamicTensor SampleFromMulGaussian(DynamicTensor MeanVector, DynamicTensor CovarianceMatrix, std::vector<int>OutputShape, bool RequiresGrad = 0 ,size_t DeviceNum = 0, int Seed = -1);
     /**
      * 给出一个绝对值的tensor
      */
     DynamicTensor Abs();
-    /**
-     * 当前tensor在高斯分布里求概率密度
-     * @param MeanVector 均值向量
-     * @param CovarianceMatrix 协方差矩阵
-     * @param IsDiagonal 协方差矩阵是否是对角向量(如果是对角阵为了内存只会输入一个向量)
-     */
-    DynamicTensor GetProbabilityDensityFromGaussian(DynamicTensor MeanVector, DynamicTensor CovarianceMatrix, bool IsDiagonal = true);
+
+    /**不可导函数. */
+
+
 };

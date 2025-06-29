@@ -24,9 +24,9 @@ int main()
 {
     NESGMMBased<yxx> solver;
     he params = he::NewDict();
-    params["DimNum"] = 1;
-    params["CosmosNum"] = 5;
-    params["SampleNum"] = 30;
+    params["DimNum"] = 10;
+    params["CosmosNum"] = 10;
+    params["SampleNum"] = 10;
     solver.Init(params);
     solver.Solve();
 

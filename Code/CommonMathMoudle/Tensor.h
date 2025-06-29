@@ -162,21 +162,5 @@ public:
     Tensor* Transpose(int FirstDim, int SecondDim);
     /**对所有元素取log. */
     Tensor* EleLog();
-    /**
-     * 生成多元高斯分布
-     * Params
-     * @param MeanVector 均值向量
-     * @param CovarianceMatrix 协方差矩阵，如果输入一个向量，那就是对角阵
-     * @param OutputShape 输出的shape，每个元素是一个高斯分布向量
-     */
-    static Tensor* GenMulGaussianDistribution(Tensor* MeanVector, Tensor* CovarianceMatrix, std::vector<size_t>OutputShape, int DeviceNum = 0);
-    static Tensor* GenMulGaussianDistribution(Tensor* MeanVector, Tensor* CovarianceMatrix, std::vector<size_t>OutputShape, unsigned Seed, int DeviceNum);
-    /**
-     * 生成协方差矩阵是对角阵的高斯分布
-     * Params
-     * @param MeanVector 均值向量
-     * @param CovarianceVector 协方差向量
-     * @param OutputShape 输出的shape，每个元素是一个高斯分布向量
-     */
-    static Tensor* GenIndependentGaussian(Tensor* MeanVector, Tensor* CovarianceVector, std::vector<size_t>OutputShape, unsigned Seed, int DeviceNum);
+
 };
