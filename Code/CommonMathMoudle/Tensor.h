@@ -30,7 +30,7 @@ public:
     ~Tensor(){};
 
     /**数据管理.*/
-    std::shared_ptr<DevicePointerManager> DPMgr = nullptr;
+    std::shared_ptr<DevicePointerManager<float>> DPMgr = nullptr;
     /**shape of the tensor*/
     std::vector<size_t>shape;
     /**all data num*/

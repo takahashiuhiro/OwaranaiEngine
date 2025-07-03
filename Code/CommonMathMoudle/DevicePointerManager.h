@@ -27,6 +27,7 @@ static size_t DeviceNumToCuda(size_t DeviceNum)
     return DeviceNum-1;
 }
 
+template<typename ElementType = float>
 struct DevicePointerManager
 {
 
@@ -59,7 +60,7 @@ struct DevicePointerManager
         FreeOldDevice(this->DeviceNum);
     }
 
-    std::vector<float*>DataPointers;
+    std::vector<ElementType*>DataPointers;
     /**最大的设备数.*/
     size_t MaxDeviceNum = 1;
     /**当前的设备数.*/
@@ -79,7 +80,7 @@ struct DevicePointerManager
         return FrameMaxDeviceNum()+1;
     }
 
-    float* GetDevicePointer()
+    ElementType* GetDevicePointer()
     {
         #ifdef OPENGL_USEFUL
         Log::Assert(DeviceNum==0,"OpenGL has no DevicePointer");
@@ -120,7 +121,7 @@ struct DevicePointerManager
         if(NewDeviceNum == OldDeviceNum)return;
         if(!NewDeviceNum)
         {
-            DataPointers[NewDeviceNum] = (float*)malloc(sizeof(float)*ShapeCount);
+            DataPointers[NewDeviceNum] = (ElementType*)malloc(sizeof(ElementType)*ShapeCount);
             #ifdef CUDA_USEFUL
             if(OldDeviceNum !=ImpossibleFrameMaxDeviceNum())DataGPUToCPU(DataPointers[NewDeviceNum], DataPointers[OldDeviceNum], ShapeCount);
             #endif

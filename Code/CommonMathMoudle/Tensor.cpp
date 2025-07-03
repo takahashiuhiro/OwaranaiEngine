@@ -73,7 +73,7 @@ void Tensor::InitTensor(std::vector<size_t>shape, size_t DeviceNum)
     this->shape = shape;
     ShapeCount = 1;
     for(int a=0;a<shape.size();a++)ShapeCount*=shape[a];
-    DPMgr = std::make_shared<DevicePointerManager>(DeviceNum, ShapeCount);
+    DPMgr = std::make_shared<DevicePointerManager<float>>(DeviceNum, ShapeCount);
 }
 
 std::vector<size_t> Tensor::GetDim(size_t DataIndex)
