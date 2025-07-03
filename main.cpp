@@ -22,16 +22,15 @@ struct yxx
 
 int main() 
 {
-    NESGMMBased<yxx> solver;
-    he params = he::NewDict();
-    params["DimNum"] = 10;
-    params["CosmosNum"] = 10;
-    params["SampleNum"] = 10;
-    solver.Init(params);
-    solver.Solve();
+    //NESGMMBased<yxx> solver;
+    //he params = he::NewDict();
+    //params["DimNum"] = 10;
+    //params["CosmosNum"] = 10;
+    //params["SampleNum"] = 10;
+    //solver.Init(params);
+    //solver.Solve();
 
-    //std::vector<DynamicTensor>hj;
-    //DynamicTensor a = DynamicTensor({1,1}, {-0.5},0,0);
-    //hj.push_back(a);
-    //hj.back().Abs();
+    std::vector<DynamicTensor>hj;
+    DynamicTensor a = DynamicTensor({1,2}, {1.,2},0,1);
+    print(a%a.Transpose(0,1));
 }

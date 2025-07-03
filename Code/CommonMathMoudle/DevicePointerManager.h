@@ -5,7 +5,7 @@
 #include "GPUDeviceProcess.h"
 
 #ifdef CUDA_USEFUL
-#include "Cuda/TensorCoreCudaFun.h"
+#include "Cuda/TensorCoreCudaHead.cuh"
 #endif
 
 struct CudaDimVec

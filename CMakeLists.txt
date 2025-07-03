@@ -5,7 +5,6 @@ set(CMAKE_CXX_FLAGS "-g -Wall -O2")
 set(CMAKE_CXX_STANDARD 17)
 
 set(BACKWARD "NONE" CACHE STRING "Set the mode of operation")
-set(CGTYPE "DYNAMIC" CACHE STRING "Set the mode of computational graph")
 
 cmake_minimum_required(VERSION 3.8)
 add_subdirectory(Code)

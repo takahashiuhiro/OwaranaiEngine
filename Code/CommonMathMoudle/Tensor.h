@@ -143,17 +143,9 @@ public:
     Tensor* Cos();
     /**生成等差数列.*/
     static Tensor* ArithmeticSequence(std::vector<size_t> InputShape, float A1, float Arithmetic, size_t DeviceNum = 0);
-    /**生成位置编码.*/
-    static Tensor* PositionalEncoding(int DModel, int MaxLen, size_t DeviceNum = 0);
     /**生成沿着split后的分割矩阵.*/
     std::vector<Tensor*> GenerateSplitTensor(int SplitSize, int Dim=0);
     std::vector<Tensor*> GenerateSplitTensor(std::vector<int> SplitSections, int Dim=0);
-    /**生成沿着指定dim进行split后的矩阵vec.*/
-    std::vector<Tensor*> TensorSplit(int SplitSize, int Dim = 0);
-    std::vector<Tensor*> TensorSplit(std::vector<int> SplitSections, int Dim = 0);
-    /**生成沿着cat后的合成矩阵.*/
-    static std::vector<Tensor*> GenerateCatTensor(std::vector<Tensor*>InputTensors, int Dim = 0);
-    static Tensor* TensorCat(std::vector<Tensor*>InputTensors, int Dim = 0);
     /**生成下三角的全1矩阵. */
     static Tensor* GenerateTrilOnes(std::vector<size_t> InputShape, int Diagonal = 0, size_t DeviceNum = 0);
     /**把矩阵变为下三角矩阵. */
