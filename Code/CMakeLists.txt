@@ -7,9 +7,12 @@ add_subdirectory(CommonDataStructure)
 add_subdirectory(DynamicAutomaticDifferentiation)
 add_subdirectory(BlackBoxOptimizer)
 
-add_library(OwaranaiEngine STATIC Code.cpp)
+add_library(OwaranaiEngine INTERFACE)
 
-target_link_libraries (OwaranaiEngine CommonMathMoudle)
-target_link_libraries (OwaranaiEngine CommonDataStructure)
-target_link_libraries (OwaranaiEngine DynamicAutomaticDifferentiation)
-target_link_libraries (OwaranaiEngine BlackBoxOptimizer)
+target_link_libraries(OwaranaiEngine
+    INTERFACE
+        CommonMathMoudle
+        CommonDataStructure
+        DynamicAutomaticDifferentiation
+        BlackBoxOptimizer
+)
