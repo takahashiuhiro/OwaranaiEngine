@@ -1915,3 +1915,15 @@ Tensor* Tensor::Cholesky()
     }
     return ReturnTensor;
 }
+
+Tensor* Tensor::SampleMultivariateStandardGaussian(int Dim, std::vector<size_t> InputVec, int Seed, size_t DeviceNum)
+{
+    InputVec.push_back(Dim);
+    Tensor* Res = new Tensor(InputVec, DeviceNum);
+    if(Seed == -1)
+    {
+        Seed = std::chrono::system_clock::now().time_since_epoch().count();
+    }
+    Res->FillRandomValNormal(0, 1, Seed);
+    return Res;
+}

@@ -171,6 +171,7 @@ public:
     DynamicTensor Abs();
 
     /**不可导函数，包含能导但暂时用不到就没写的. */
+    /**方阵分解为下三角矩阵 */
     DynamicTensor Cholesky(); //能导
-
+    static DynamicTensor SampleFromStdGaussian(int Dim, std::vector<int> InputVec, int Seed = -1,int DeviceNum = 0);
 };

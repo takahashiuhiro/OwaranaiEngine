@@ -156,4 +156,8 @@ public:
     Tensor* EleLog();
     /**进行Cholesky分解 */
     Tensor* Cholesky();
+
+    /**多维高斯分布 */
+    /**标准多维高斯分布采样 */
+    static Tensor* SampleMultivariateStandardGaussian(int Dim, std::vector<size_t> InputVec, int Seed = -1,size_t DeviceNum = 0);
 };
