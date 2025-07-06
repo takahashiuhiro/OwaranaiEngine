@@ -154,5 +154,6 @@ public:
     Tensor* Transpose(int FirstDim, int SecondDim);
     /**对所有元素取log. */
     Tensor* EleLog();
-
+    /**进行Cholesky分解 */
+    Tensor* Cholesky();
 };

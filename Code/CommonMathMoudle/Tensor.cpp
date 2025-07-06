@@ -1860,3 +1860,58 @@ Tensor* Tensor::EleLog()
     }
     return ReturnTensor;
 }
+
+Tensor* Tensor::Cholesky()
+{
+    // 已经通过类型检查
+    Tensor* ReturnTensor = CopyNewEmptyTensor();
+    if(ReturnTensor->GetDeviceNum())
+    {
+        Log::Assert(false, "Tensor::Cholesky::GPU::todo");
+        #ifdef CUDA_USEFUL
+        #endif
+        #ifdef OPENGL_USEFUL
+        #endif
+    }
+    else
+    {
+        ReturnTensor->FillArray(0);
+        int OutputShapeCount = ReturnTensor->ShapeCount;
+        int ShapeLen = ReturnTensor->shape.size();
+        int Row = ReturnTensor->shape[ShapeLen-2];
+        int Col = ReturnTensor->shape[ShapeLen-1];
+        int Mat = OutputShapeCount/Row/Col;
+        auto* InputTensor = GetDevicePointer();
+        auto* OutputTensor = ReturnTensor->GetDevicePointer();
+        using EleType = std::decay_t<decltype(*InputTensor)>;
+        for(int ThisMat = 0; ThisMat < Mat;ThisMat++)
+        {
+            auto GetIndex = [&ThisMat, &Row, &Col](int InputRow, int InputCol)
+            {
+                return ThisMat*(Row*Col)+InputRow*Col+InputCol;
+            };
+            for(int j=0; j<Row;j++)
+            {
+                EleType SumPowV = 0;
+                for(int k=0;k<j;k++)
+                {
+                    SumPowV = SumPowV + OutputTensor[GetIndex(j,k)]*OutputTensor[GetIndex(j,k)];
+                }
+                EleType SumVPowMinus = InputTensor[GetIndex(j,j)] - SumPowV;
+                OutputTensor[GetIndex(j,j)] = std::sqrt(std::max(SumVPowMinus, EleType(0)));
+
+                for(int i=j+1;i<Row;i++)
+                {
+                    EleType SumProdV = 0;
+                    for(int k=0;k<j;k++)
+                    {
+                        SumProdV = SumProdV + OutputTensor[GetIndex(i,k)]*OutputTensor[GetIndex(j,k)];
+                    }
+                    EleType SumProdVMinus = InputTensor[GetIndex(i,j)] - SumProdV;
+                    OutputTensor[GetIndex(i,j)] = SumProdVMinus/(OutputTensor[GetIndex(j,j)] + 1e-7);
+                }
+            }
+        }
+    }
+    return ReturnTensor;
+}
