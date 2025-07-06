@@ -170,7 +170,7 @@ public:
      */
     DynamicTensor Abs();
 
-    /**不可导函数. */
-
+    /**不可导函数，包含能导但暂时用不到就没写的. */
+    DynamicTensor Cholesky(); //能导
 
 };

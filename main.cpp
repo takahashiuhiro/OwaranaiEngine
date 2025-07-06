@@ -38,10 +38,11 @@ int main()
     std::vector<DynamicTensor>hj;
     DynamicTensor a = DynamicTensor({2,4,4}, ff,0,0);
 
-    auto gg = a.Ops->TensorPointer->Cholesky();
-    gg->PrintData();
+    auto gg = a.Cholesky();
+    print(gg);
     print("--");
-    auto ggt = gg->Transpose(1,2);
-    gg->Matmul(ggt)->PrintData();
+    auto ggt = gg.Transpose(1,2);
+    print(gg%ggt);
+    print("--");
     print(a);
 }
