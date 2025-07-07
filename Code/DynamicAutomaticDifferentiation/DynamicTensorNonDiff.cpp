@@ -11,8 +11,20 @@ DynamicTensor DynamicTensor::SampleFromStdGaussian(int Dim, std::vector<int> Inp
 {
     std::vector<size_t> ShapeVec;
     for(auto&it:InputVec)ShapeVec.push_back(it);
+    if(Seed == -1)Seed = std::chrono::system_clock::now().time_since_epoch().count();
     auto ContentRes = Tensor::SampleMultivariateStandardGaussian(Dim, ShapeVec, Seed, DeviceNum);
     using ContentType = std::remove_pointer_t<std::decay_t<decltype(ContentRes)>>;
     auto ContentPtr = std::shared_ptr<ContentType>(ContentRes);
     return DynamicTensor(ContentPtr);
+}
+
+DynamicTensor DynamicTensor::SampleFromOtherGaussian(int Dim, std::vector<int> InputVec, DynamicTensor Mean, DynamicTensor Var, int Seed,int DeviceNum)
+{
+    if(Seed == -1)Seed = std::chrono::system_clock::now().time_since_epoch().count();
+    DynamicTensor STDSamples = DynamicTensor::SampleFromStdGaussian(Dim, InputVec, Seed, DeviceNum);
+    DynamicTensor CholeskyRes = Var.Cholesky();
+    InputVec.push_back(Dim);
+    auto OutputVec = InputVec;
+    InputVec.push_back(1);
+    return Mean + (CholeskyRes%STDSamples.View(InputVec)).View(OutputVec);
 }

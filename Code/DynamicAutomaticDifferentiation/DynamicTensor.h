@@ -173,5 +173,22 @@ public:
     /**不可导函数，包含能导但暂时用不到就没写的. */
     /**方阵分解为下三角矩阵 */
     DynamicTensor Cholesky(); //能导
+    /**
+     * 从标准高斯分布采样
+     * @param Dim 高斯的维度
+     * @param InputVec 输出的形状，不包含高斯本身
+     * @param Seed 随机种子
+     * @param DeviceNum 设备号
+     */
     static DynamicTensor SampleFromStdGaussian(int Dim, std::vector<int> InputVec, int Seed = -1,int DeviceNum = 0);
+    /**
+     * 从非标准高斯分布采样
+     * @param Dim 高斯的维度
+     * @param InputVec 输出的形状，不包含高斯本身
+     * @param Mean 均值
+     * @param Var 协方差矩阵
+     * @param Seed 随机种子
+     * @param DeviceNum 设备号
+     */
+    static DynamicTensor SampleFromOtherGaussian(int Dim, std::vector<int> InputVec, DynamicTensor Mean, DynamicTensor Var, int Seed = -1,int DeviceNum = 0);
 };
