@@ -32,11 +32,33 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
         LearingRate_Var = this->Params.DictGet("LearingRate_Var", 0.02).f();
     }
 
-    
+    /**
+     * 初始化目标分布，一般来说都应该给出warm start，如果没给的话就从标准正态分布开始了，这种情况跑得慢是一定的
+     */
+    void DistributionInit()
+    {
+        if(IsWarmStart)return;
+        TargetDistribution.Mean = DynamicTensor({CosmosNum, DimNum}, false, this->DeviceNum);
+        TargetDistribution.Mean.Fill(0);
+        TargetDistribution.Var = DynamicTensor::CreateUnitTensor({CosmosNum, DimNum, DimNum}, false, this->DeviceNum);
+    }
+
+    /**
+     * 对目标分布进行采样
+     */
+    DynamicTensor SampleFromTargetDistribution()
+    {
+        DynamicTensor NewSample = DynamicTensor::SampleFromOtherGaussian(DimNum, {SampleNum}, TargetDistribution.Mean, TargetDistribution.Var, -1, this->DeviceNum);
+        return NewSample;
+    }
 
     virtual DynamicTensor Solve()
     {        
-        
+        DistributionInit();
+        DynamicTensor NewSample = SampleFromTargetDistribution();
+        print(NewSample);
+
+        return DynamicTensor(); //暂时返回
     }
     
 };
