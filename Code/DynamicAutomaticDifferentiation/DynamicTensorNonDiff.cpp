@@ -18,13 +18,13 @@ DynamicTensor DynamicTensor::SampleFromStdGaussian(int Dim, std::vector<int> Inp
     return DynamicTensor(ContentPtr);
 }
 
-DynamicTensor DynamicTensor::SampleFromOtherGaussian(int Dim, std::vector<int> InputVec, DynamicTensor Mean, DynamicTensor Var, int Seed,int DeviceNum)
+DynamicTensor DynamicTensor::SampleFromOtherGaussian(int Dim, std::vector<int> InputVec, DynamicTensor Mean, DynamicTensor Var,DynamicTensor VarL, int Seed,int DeviceNum)
 {
     if(Seed == -1)Seed = std::chrono::system_clock::now().time_since_epoch().count();
     DynamicTensor STDSamples = DynamicTensor::SampleFromStdGaussian(Dim, InputVec, Seed, DeviceNum);
-    DynamicTensor CholeskyRes = Var.Cholesky();
+    if(VarL.Ops == nullptr)VarL= Var.Cholesky();
     InputVec.push_back(Dim);
     auto OutputVec = InputVec;
     InputVec.push_back(1);
-    return Mean + (CholeskyRes%STDSamples.View(InputVec)).View(OutputVec);
+    return Mean + (VarL%STDSamples.View(InputVec)).View(OutputVec);
 }

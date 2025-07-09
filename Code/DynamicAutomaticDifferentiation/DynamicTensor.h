@@ -190,5 +190,5 @@ public:
      * @param Seed 随机种子
      * @param DeviceNum 设备号
      */
-    static DynamicTensor SampleFromOtherGaussian(int Dim, std::vector<int> InputVec, DynamicTensor Mean, DynamicTensor Var, int Seed = -1,int DeviceNum = 0);
+    static DynamicTensor SampleFromOtherGaussian(int Dim, std::vector<int> InputVec, DynamicTensor Mean, DynamicTensor Var, DynamicTensor VarL = DynamicTensor(), int Seed = -1,int DeviceNum = 0);
 };

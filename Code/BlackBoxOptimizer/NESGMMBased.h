@@ -3,9 +3,17 @@
 
 struct GMM
 {
-    DynamicTensor Mean;
-    DynamicTensor Var;
-    DynamicTensor PartialRate;
+    DynamicTensor Mean;// 均值
+    DynamicTensor Var, VarL; // 协方差，协方差的LU分解
+    DynamicTensor PartialRate;// 不同高斯的系数
+
+    void Init(DynamicTensor InputMean, DynamicTensor InputVar, DynamicTensor InputPartialRate)
+    {
+        Mean = InputMean;
+        Var = InputVar;
+        PartialRate = InputPartialRate;
+        VarL = Var.Cholesky();
+    }
 };
 
 
@@ -38,9 +46,12 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
     void DistributionInit()
     {
         if(IsWarmStart)return;
-        TargetDistribution.Mean = DynamicTensor({CosmosNum, DimNum}, false, this->DeviceNum);
-        TargetDistribution.Mean.Fill(0);
-        TargetDistribution.Var = DynamicTensor::CreateUnitTensor({CosmosNum, DimNum, DimNum}, false, this->DeviceNum);
+        DynamicTensor Mean = DynamicTensor({CosmosNum, DimNum}, false, this->DeviceNum);
+        Mean.Fill(0);
+        DynamicTensor Var = DynamicTensor::CreateUnitTensor({CosmosNum, DimNum, DimNum}, false, this->DeviceNum);
+        DynamicTensor PartialRate = DynamicTensor({CosmosNum}, false, this->DeviceNum);
+        PartialRate.Fill(1./CosmosNum);
+        TargetDistribution.Init(Mean, Var, PartialRate);
     }
 
     /**
@@ -48,7 +59,7 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
      */
     DynamicTensor SampleFromTargetDistribution()
     {
-        DynamicTensor NewSample = DynamicTensor::SampleFromOtherGaussian(DimNum, {SampleNum}, TargetDistribution.Mean, TargetDistribution.Var, -1, this->DeviceNum);
+        DynamicTensor NewSample = DynamicTensor::SampleFromOtherGaussian(DimNum, {SampleNum}, TargetDistribution.Mean, TargetDistribution.Var, TargetDistribution.VarL, -1, this->DeviceNum);
         return NewSample;
     }
 
