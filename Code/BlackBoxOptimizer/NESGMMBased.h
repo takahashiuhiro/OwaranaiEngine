@@ -16,6 +16,18 @@ struct GMM
     }
 };
 
+struct GMMwithSample
+{
+    GMM Distribution;
+    DynamicTensor Samples;
+    DynamicTensor EvalRes;
+};
+
+struct GMMHistory
+{
+    std::deque<GMMwithSample> GMMContent;
+};
+
 
 template<typename TargetType>
 struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
@@ -28,6 +40,8 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
     double LearingRate_Mean; //学习率
 
     GMM TargetDistribution; // 目标分布
+
+    GMMHistory SampleSelector; // 从这里选择最好的样本以及他们对应的分布
 
     bool IsWarmStart = false; // 是不是已经热启动了，如果热启动了就可以跳过随机初始化
 
@@ -67,7 +81,10 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
     {        
         DistributionInit();
         DynamicTensor NewSample = SampleFromTargetDistribution();
+        DynamicTensor EvalRes = this->TargetObj->Eval(NewSample);
         print(NewSample);
+        print("-----");
+        print(EvalRes);
 
         return DynamicTensor(); //暂时返回
     }
