@@ -22,6 +22,14 @@ struct yxx
 
 int main() 
 {
+    DynamicTensor gg = DynamicTensor({2,3,3}, {4,1,1,1,3,0,1,0,2,2,-1,0,-1,2,-1,0,-1,2.});
+    auto ss = gg.Cholesky();
+    print(gg);
+    print(ss);
+    print(ss%ss.Transpose(1,2));
+    print(gg.Det_Symmetric(ss));
+
+    return 0;
     NESGMMBased<yxx> solver;
     he params = he::NewDict();
     params["DimNum"] = 3;

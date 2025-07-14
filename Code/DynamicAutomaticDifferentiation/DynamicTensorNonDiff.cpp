@@ -28,3 +28,22 @@ DynamicTensor DynamicTensor::SampleFromOtherGaussian(int Dim, std::vector<int> I
     InputVec.push_back(1);
     return Mean + (VarL%STDSamples.View(InputVec)).View(OutputVec);
 }
+
+DynamicTensor DynamicTensor::Inverse()
+{
+    auto InverseContent = Ops->TensorPointer->Inverse();
+    using ContentType = std::remove_pointer_t<std::decay_t<decltype(InverseContent)>>;
+    auto ContentPtr = std::shared_ptr<ContentType>(InverseContent);
+    return DynamicTensor(ContentPtr);
+}
+
+DynamicTensor DynamicTensor::Det_Symmetric(DynamicTensor InputL)
+{
+    DynamicTensor UnitTensor = DynamicTensor::CreateUnitTensor(InputL.ShapeInt(), InputL.Ops->RequiresGrad, InputL.GetDeviceNum());
+    DynamicTensor AllOnes = InputL.Copy();
+    AllOnes.Fill(1);
+    DynamicTensor DiagRes = InputL*UnitTensor + AllOnes - UnitTensor;
+    int ShapeLen = InputL.Shape().size();
+    DynamicTensor Res = DiagRes.EleLog().Sum({ShapeLen-2, ShapeLen-1}, true).Eleexp(M_E).Pow(2.);
+    return Res;
+}

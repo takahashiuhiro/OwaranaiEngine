@@ -170,7 +170,8 @@ public:
      */
     DynamicTensor Abs();
 
-    /**不可导函数，包含能导但暂时用不到就没写的. */
+    /**----------------------------不可导函数，包含能导但暂时用不到就没写的.---------------------------- */
+
     /**方阵分解为下三角矩阵 */
     DynamicTensor Cholesky(); //能导
     /**
@@ -191,4 +192,11 @@ public:
      * @param DeviceNum 设备号
      */
     static DynamicTensor SampleFromOtherGaussian(int Dim, std::vector<int> InputVec, DynamicTensor Mean, DynamicTensor Var, DynamicTensor VarL = DynamicTensor(), int Seed = -1,int DeviceNum = 0);
+
+    /**矩阵求逆 理论上是应该可导的,但是现在没有实现成可导的. */
+    DynamicTensor Inverse();
+
+    /**求Det系列应该也是可导的 */
+    /**对称矩阵求行列式，需要先进行LU分解 */
+    DynamicTensor Det_Symmetric(DynamicTensor InputL);
 };
