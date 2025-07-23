@@ -21,12 +21,14 @@ DynamicTensor DynamicTensor::SampleFromStdGaussian(int Dim, std::vector<int> Inp
 DynamicTensor DynamicTensor::SampleFromOtherGaussian(int Dim, std::vector<int> InputVec, DynamicTensor Mean, DynamicTensor Var,DynamicTensor VarL, int Seed,int DeviceNum)
 {
     if(Seed == -1)Seed = std::chrono::system_clock::now().time_since_epoch().count();
-    DynamicTensor STDSamples = DynamicTensor::SampleFromStdGaussian(Dim, InputVec, Seed, DeviceNum);
-    if(VarL.Ops == nullptr)VarL= Var.Cholesky();
-    InputVec.push_back(Dim);
-    auto OutputVec = InputVec;
+    auto GaussianShape = Mean.Shape();
+    for(size_t a = 0;a+1<GaussianShape.size();a++)InputVec.push_back(GaussianShape[a]);
+    auto OutputShape = InputVec;
+    OutputShape.push_back(Dim);
     InputVec.push_back(1);
-    return Mean + (VarL%STDSamples.View(InputVec)).View(OutputVec);
+    DynamicTensor STDSamples = DynamicTensor::SampleFromStdGaussian(Dim, InputVec, Seed, DeviceNum); //(10,2,3)
+    if(VarL.Ops == nullptr)VarL= Var.Cholesky();
+    return Mean + (STDSamples%VarL).View(OutputShape);// mean:(2,3), varl:(2,3,3)
 }
 
 DynamicTensor DynamicTensor::Inverse()
@@ -46,4 +48,25 @@ DynamicTensor DynamicTensor::Det_Symmetric(DynamicTensor InputL)
     int ShapeLen = InputL.Shape().size();
     DynamicTensor Res = DiagRes.EleLog().Sum({ShapeLen-2, ShapeLen-1}, true).Eleexp(M_E).Pow(2.);
     return Res;
+}
+
+DynamicTensor DynamicTensor::ProbabilityDensity_Gaussian(DynamicTensor InputSample, DynamicTensor InputMean, DynamicTensor InputVarInv, DynamicTensor InputVarDet)
+{
+    // sample_num:m, gaussian_num:u, dim_num:n
+    // InputSample:(m, u, n)
+    // InputMean:(u, n)
+    // InputVarInv:(u, n, n)
+    // InputVarDet:(u, 1, 1)
+    auto OutputShape = InputSample.ShapeInt();
+    OutputShape.push_back(1);
+    DynamicTensor XMinusMean = (InputSample - InputMean).View(OutputShape); //(m, u, n, 1)
+    DynamicTensor XMinusMeanT = XMinusMean.Transpose(-1, -2); //(m, u, 1, n)
+    DynamicTensor ExpPartial = (XMinusMeanT % InputVarInv % XMinusMean * (-0.5)).Eleexp(M_E); //(m, u, 1, 1)
+    DynamicTensor CPartial = InputVarDet.Pow(-0.5)*std::pow(2.*M_E, -InputSample.ShapeInt().back()*0.5); //(m, u, 1, 1)
+    DynamicTensor ProtoRes = ExpPartial*CPartial; //(m, u, 1, 1)
+    auto ProtoShape = ProtoRes.ShapeInt(); //(m, u, 1, 1)
+    ProtoShape.pop_back(); //(m, u, 1)
+    ProtoShape.pop_back(); //(m, u)
+    DynamicTensor FinalRes = ProtoRes.View(ProtoShape);//(m, u)
+    return FinalRes;
 }

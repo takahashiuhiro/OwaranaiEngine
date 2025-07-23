@@ -199,4 +199,7 @@ public:
     /**求Det系列应该也是可导的 */
     /**对称矩阵求行列式，需要先进行LU分解 */
     DynamicTensor Det_Symmetric(DynamicTensor InputL);
+
+    /**对采样计算概率密度. */
+    static DynamicTensor ProbabilityDensity_Gaussian(DynamicTensor InputSample, DynamicTensor InputMean, DynamicTensor InputVarInv, DynamicTensor InputVarDet);
 };
