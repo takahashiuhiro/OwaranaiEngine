@@ -19,9 +19,9 @@ struct yxx
     }
 };
 
-
 int main() 
 {
+    // test mac
     NESGMMBased<yxx> solver;
     he params = he::NewDict();
     params["DimNum"] = 3;

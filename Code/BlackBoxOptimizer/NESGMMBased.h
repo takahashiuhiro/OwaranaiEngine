@@ -220,15 +220,16 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
             auto GetF = [&GetBeta, this]()
             {
                 double Beta = GetBeta();
-                DynamicTensor F = SampleSelector.GetSampleEvalRate(Beta);//(Sample, CosmosNum, 1), 对于每个采样而言的直接效用，不考虑采样偏移
-                return F;
+                DynamicTensor F = SampleSelector.GetSampleEvalRate(Beta);//(SampleNum, CosmosNum, 1), 对于每个采样而言的直接效用，不考虑采样偏移
+                return F.View({SampleNum, CosmosNum});
             };
 
             // 按照不同的分块信息更新目标分布里的每个分块高斯
-            auto UpdateBlockWeight = [this](int BlockIndex)
+            auto UpdateBlockWeight = [this,&GetF](int BlockIndex)
             {
-                // 计算所有窗口中的样例每个分块高斯在历史的平均密度
-                print(SampleSelector.GetAllSampleMeanPDF(BlockIndex).Shape());
+                // 计算所有窗口中的样例每个分块高斯在历史的平均密度系数
+                DynamicTensor FinalF = GetF()*SampleSelector.GetAllSampleMeanPDF(BlockIndex);
+                
             };
 
             // 根据前一帧内容采样，把历史已经完成的更新采样加入历史
