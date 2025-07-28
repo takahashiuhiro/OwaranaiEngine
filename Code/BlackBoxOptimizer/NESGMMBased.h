@@ -112,13 +112,21 @@ struct GMMHistory
     }
 
     /**
-     * 计算当前block的所有采样，当前概率密度处以混合历史概率密度修正
+     * 获取一个blcok里所有历史结果的融合结果
      */
-    DynamicTensor GetAllSampleMeanPDF(int BlockIndex)
+    DynamicTensor GetAllSample(int BlockIndex)
     {
         std::vector<DynamicTensor> TMPSample;
         for(auto&it:GMMContent)TMPSample.push_back(it.PartialSample[BlockIndex]);
-        DynamicTensor AllSample = DynamicTensor::Cat(TMPSample); // (HistoryLength, CosmosNum, Dim)
+        return DynamicTensor::Cat(TMPSample);
+    }
+
+    /**
+     * 计算当前block的所有采样，当前概率密度处以混合历史概率密度修正
+     * @param AllSample (HistoryLength, CosmosNum, Dim)
+     */
+    DynamicTensor GetAllSampleMeanPDF(DynamicTensor AllSample, int BlockIndex)
+    {
         DynamicTensor Res;
         for(size_t a = 0;a < GMMContent.size()-1;a++)
         {
@@ -224,12 +232,23 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
                 return F.View({SampleNum, CosmosNum});
             };
 
+            auto GetDeltaMean = [this]()
+            {
+
+            };
+
             // 按照不同的分块信息更新目标分布里的每个分块高斯
             auto UpdateBlockWeight = [this,&GetF](int BlockIndex)
             {
+                auto& ThisBlock = TargetDistribution.PartialBlock[BlockIndex];
+                // 得到所有要用的样例
+                DynamicTensor AllSample = SampleSelector.GetAllSample(BlockIndex);
                 // 计算所有窗口中的样例每个分块高斯在历史的平均密度系数
-                DynamicTensor FinalF = GetF()*SampleSelector.GetAllSampleMeanPDF(BlockIndex);
-                
+                DynamicTensor FinalF = GetF()*SampleSelector.GetAllSampleMeanPDF(AllSample, BlockIndex);
+                //DynamicTensor Delta_Mean = ThisBlock.VarInv; // (CosmosNum,Dim,Dim)
+                print(AllSample);
+                print(ThisBlock.Mean);
+                print(AllSample - ThisBlock.Mean); //(SampleNum,CosmosNum,Dim)
             };
 
             // 根据前一帧内容采样，把历史已经完成的更新采样加入历史
