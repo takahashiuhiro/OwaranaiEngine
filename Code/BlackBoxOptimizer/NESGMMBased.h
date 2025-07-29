@@ -7,7 +7,7 @@
 struct BlockGaussian
 {
     DynamicTensor Mean;// 均值.
-    DynamicTensor Var, VarL, VarInv, VarLDet; // 协方差，协方差的LU分解, 协方差的逆, 协方差的行列式
+    DynamicTensor Var, VarL, VarInv, VarLDet, VarLInv; // 协方差，协方差的LU分解, 协方差的逆, 协方差的行列式
 
     bool IsInit = false; //是否初始化完成.
 
@@ -18,6 +18,7 @@ struct BlockGaussian
         VarL = InputVar.Cholesky();
         VarInv = InputVar.Inverse();
         VarLDet = VarL.Det_Symmetric(VarL);
+        VarLInv = VarL.Inverse();
         IsInit = true;
     }
 };
@@ -232,13 +233,26 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
                 return F.View({SampleNum, CosmosNum});
             };
 
-            auto GetDeltaMean = [this]()
+            auto GetDeltaMean = [this](DynamicTensor& AllSample, int BlockIndex)
             {
+                auto& ThisBlock = TargetDistribution.PartialBlock[BlockIndex];
+                auto TargetVarInv = ThisBlock.VarInv.View({1, CosmosNum, DimNum, DimNum});
+                auto TargetZeroBiasSample = (AllSample - ThisBlock.Mean).View({SampleNum,CosmosNum,DimNum,1}); //(SampleNum,CosmosNum,Dim)
+                DynamicTensor Res = TargetVarInv%TargetZeroBiasSample;
+                return Res.View({SampleNum,CosmosNum,DimNum});
+            };
+
+            auto GetDeltaVar = [this](DynamicTensor& AllSample, int BlockIndex)
+            {
+                auto& ThisBlock = TargetDistribution.PartialBlock[BlockIndex];
+                DynamicTensor Q = ThisBlock.VarLInv;//todo
+
+
 
             };
 
             // 按照不同的分块信息更新目标分布里的每个分块高斯
-            auto UpdateBlockWeight = [this,&GetF](int BlockIndex)
+            auto UpdateBlockWeight = [this,&GetF,&GetDeltaMean,&GetDeltaVar](int BlockIndex)
             {
                 auto& ThisBlock = TargetDistribution.PartialBlock[BlockIndex];
                 // 得到所有要用的样例
@@ -246,9 +260,11 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
                 // 计算所有窗口中的样例每个分块高斯在历史的平均密度系数
                 DynamicTensor FinalF = GetF()*SampleSelector.GetAllSampleMeanPDF(AllSample, BlockIndex);
                 //DynamicTensor Delta_Mean = ThisBlock.VarInv; // (CosmosNum,Dim,Dim)
-                print(AllSample);
-                print(ThisBlock.Mean);
-                print(AllSample - ThisBlock.Mean); //(SampleNum,CosmosNum,Dim)
+                DynamicTensor DeltaMean = (GetDeltaMean(AllSample, BlockIndex)*FinalF.View({SampleNum,CosmosNum,1})).Mean({0});//(CosmosNum,Dim)
+
+                GetDeltaVar(AllSample, BlockIndex);
+
+                //print(DeltaMean.Shape()); //(SampleNum,CosmosNum,Dim)
             };
 
             // 根据前一帧内容采样，把历史已经完成的更新采样加入历史
