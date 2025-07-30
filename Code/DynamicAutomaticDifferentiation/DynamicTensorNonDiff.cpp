@@ -28,7 +28,6 @@ DynamicTensor DynamicTensor::SampleFromOtherGaussian(int Dim, std::vector<int> I
     InputVec.push_back(1);
     DynamicTensor STDSamples = DynamicTensor::SampleFromStdGaussian(Dim, InputVec, Seed, DeviceNum); //(10,2,3)
     if(VarL.Ops == nullptr)VarL= Var.Cholesky();
-    print(VarL.Shape());
     return Mean + (STDSamples%VarL.Transpose(-1,-2)).View(OutputShape);// mean:(2,3), varl:(2,3,3)
 }
 

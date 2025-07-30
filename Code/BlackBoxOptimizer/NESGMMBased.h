@@ -126,7 +126,7 @@ struct GMMHistory
      * 计算当前block的所有采样，当前概率密度处以混合历史概率密度修正
      * @param AllSample (HistoryLength, CosmosNum, Dim)
      */
-    DynamicTensor GetAllSampleMeanPDF(DynamicTensor AllSample, int BlockIndex)
+    DynamicTensor GetAllSampleMeanPDF(DynamicTensor AllSample, int BlockIndex, DynamicTensor& CurPD)
     {
         DynamicTensor Res;
         for(size_t a = 0;a < GMMContent.size()-1;a++)
@@ -137,7 +137,7 @@ struct GMMHistory
         }
         // 当前这一个也是要当成分子的，避免重复计算
         auto& CurGaussian = GMMContent[GMMContent.size()-1].Distribution.PartialBlock[BlockIndex];
-        DynamicTensor CurPD = DynamicTensor::ProbabilityDensity_Gaussian(AllSample, CurGaussian.Mean, CurGaussian.VarInv, CurGaussian.VarLDet);
+        CurPD = DynamicTensor::ProbabilityDensity_Gaussian(AllSample, CurGaussian.Mean, CurGaussian.VarInv, CurGaussian.VarLDet);
         if(GMMContent.size() > 1)Res = Res + CurPD;
         else Res = CurPD;
         return CurPD*Res.Pow(-1.)*(GMMContent.size()*1.);
@@ -244,27 +244,36 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
 
             auto GetDeltaVar = [this](DynamicTensor& AllSample, int BlockIndex)
             {
+                // 理论上这种shape操作在我们的框架里这么操作只有在自动微分关闭的时候才能做，不然会炸
                 auto& ThisBlock = TargetDistribution.PartialBlock[BlockIndex];
-                DynamicTensor Q = ThisBlock.VarLInv;//todo
-
-
-
+                DynamicTensor VarLInvT = ThisBlock.VarLInv.Transpose(-1,-2);//todo
+                DynamicTensor XMinusMean = AllSample - ThisBlock.Mean;
+                XMinusMean.Shape().push_back(1);
+                DynamicTensor Q = VarLInvT%XMinusMean;
+                DynamicTensor Q_T = Q.Transpose(-1,-2);
+                DynamicTensor MatrixQQ = Q%Q_T;
+                DynamicTensor UnitTensor = DynamicTensor::CreateUnitTensor(MatrixQQ.ShapeInt(), 0, this->DeviceNum);
+                DynamicTensor Res = (MatrixQQ*UnitTensor - UnitTensor)*0.5;
+                return Res;
             };
 
             // 按照不同的分块信息更新目标分布里的每个分块高斯
             auto UpdateBlockWeight = [this,&GetF,&GetDeltaMean,&GetDeltaVar](int BlockIndex)
             {
                 auto& ThisBlock = TargetDistribution.PartialBlock[BlockIndex];
+                DynamicTensor AllSampleCurPDF;
                 // 得到所有要用的样例
                 DynamicTensor AllSample = SampleSelector.GetAllSample(BlockIndex);
-                // 计算所有窗口中的样例每个分块高斯在历史的平均密度系数
-                DynamicTensor FinalF = GetF()*SampleSelector.GetAllSampleMeanPDF(AllSample, BlockIndex);
-                //DynamicTensor Delta_Mean = ThisBlock.VarInv; // (CosmosNum,Dim,Dim)
+                // 计算所有窗口中的样例每个分块高斯在历史的平均密度系数，顺便返回他的概率密度后面要用
+                DynamicTensor FinalF = GetF()*SampleSelector.GetAllSampleMeanPDF(AllSample, BlockIndex, AllSampleCurPDF);
+                //计算对均值的导数
                 DynamicTensor DeltaMean = (GetDeltaMean(AllSample, BlockIndex)*FinalF.View({SampleNum,CosmosNum,1})).Mean({0});//(CosmosNum,Dim)
-
-                GetDeltaVar(AllSample, BlockIndex);
-
-                //print(DeltaMean.Shape()); //(SampleNum,CosmosNum,Dim)
+                //计算对斜方差矩阵重参数化后中间的对角阵的导数，这个要乘过去
+                DynamicTensor DeltaVar = (GetDeltaVar(AllSample, BlockIndex)*FinalF.View({SampleNum,CosmosNum,1,1})).Mean({0});//(CosmosNum,Dim,Dim)
+                DynamicTensor NewMean = ThisBlock.Mean + DeltaMean*LearingRate_Mean;
+                DynamicTensor NewVar = ThisBlock.VarL%(DeltaVar.Pow(LearingRate_Var))%ThisBlock.VarL.Transpose(-1,-2);// 这好像不太对
+                print(NewVar);
+                return AllSampleCurPDF;
             };
 
             // 根据前一帧内容采样，把历史已经完成的更新采样加入历史
