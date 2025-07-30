@@ -188,7 +188,7 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
         // 这里只有debug的时候是这样的，正式版这里应该权衡一下吧，怎么并行比较好，因为独立的高斯是串行的，同一个高斯是并行的
         auto Mean = DynamicTensor({(size_t)CosmosNum, (size_t)DimNum}, false, this->DeviceNum);
         Mean.Fill(0);
-        auto Var = DynamicTensor::CreateUnitTensor({(size_t)CosmosNum, (size_t)DimNum, (size_t)DimNum}, false, this->DeviceNum);
+        auto Var = DynamicTensor::CreateUnitTensor({CosmosNum, DimNum, DimNum}, false, this->DeviceNum);
         auto PartialRate = DynamicTensor({(size_t)CosmosNum}, false, this->DeviceNum);
         PartialRate.Fill(1./CosmosNum);
         TargetDistribution.Init({Mean}, {Var}, PartialRate);
