@@ -128,19 +128,36 @@ struct GMMHistory
      */
     DynamicTensor GetAllSampleMeanPDF(DynamicTensor AllSample, int BlockIndex, DynamicTensor& CurPD)
     {
-        DynamicTensor Res;
-        for(size_t a = 0;a < GMMContent.size()-1;a++)
+        std::vector<DynamicTensor>AllLogPDF;
+        DynamicTensor MaxAlpha;
+        for(size_t a = 0;a < GMMContent.size();a++)
         {
             auto& ThisGaussian = GMMContent[a].Distribution.PartialBlock[BlockIndex];
-            if(!a)Res = DynamicTensor::ProbabilityDensity_Gaussian(AllSample, ThisGaussian.Mean, ThisGaussian.VarInv, ThisGaussian.VarLDet);
-            else Res = Res + DynamicTensor::ProbabilityDensity_Gaussian(AllSample, ThisGaussian.Mean, ThisGaussian.VarInv, ThisGaussian.VarLDet);
+            DynamicTensor CurLogPDF = DynamicTensor::ProbabilityDensity_Log_Gaussian(AllSample, ThisGaussian.Mean, ThisGaussian.VarInv, ThisGaussian.VarLDet);
+            if(!a)MaxAlpha = CurLogPDF;
+            else MaxAlpha = MaxAlpha + CurLogPDF;
+            AllLogPDF.push_back(CurLogPDF);
+            if(a + 1 == GMMContent.size())
+            {
+                CurPD = CurLogPDF;
+            }
         }
-        // 当前这一个也是要当成分子的，避免重复计算
-        auto& CurGaussian = GMMContent[GMMContent.size()-1].Distribution.PartialBlock[BlockIndex];
-        CurPD = DynamicTensor::ProbabilityDensity_Gaussian(AllSample, CurGaussian.Mean, CurGaussian.VarInv, CurGaussian.VarLDet);
-        if(GMMContent.size() > 1)Res = Res + CurPD;
-        else Res = CurPD;
-        return CurPD*Res.Pow(-1.)*(GMMContent.size()*1.);
+
+        MaxAlpha = MaxAlpha*(1./GMMContent.size()); 
+
+        // 然后看看求和啥的？
+        DynamicTensor Res;
+        for(size_t a = 0;a < AllLogPDF.size();a++)
+        {
+            if(!a) Res = (AllLogPDF[a] - MaxAlpha).Eleexp(M_E);
+            else Res = Res + (AllLogPDF[a] - MaxAlpha).Eleexp(M_E);
+            print(AllLogPDF[a]);// 考虑一下这个问题哈，两倍的本体确实可能inf，怎么解决
+        }
+        print(CurPD);
+        print(Res.EleLog());
+        print(MaxAlpha);
+        return CurPD - Res.EleLog() - MaxAlpha - std::log(AllLogPDF.size());//通过所有的log pdf求pdf的和的log
+
     }
 
 };
@@ -271,15 +288,23 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
                 //计算对斜方差矩阵重参数化后中间的对角阵的导数，这个要乘过去
                 DynamicTensor DeltaVar = (GetDeltaVar(AllSample, BlockIndex)*FinalF.View({SampleNum,CosmosNum,1,1})).Mean({0});//(CosmosNum,Dim,Dim)
                 DynamicTensor NewMean = ThisBlock.Mean + DeltaMean*LearingRate_Mean;
-                DynamicTensor NewVar = ThisBlock.VarL%(DeltaVar.Pow(LearingRate_Var))%ThisBlock.VarL.Transpose(-1,-2);// 这好像不太对
-                print(NewVar);
-                return AllSampleCurPDF;
+                DynamicTensor NewVar = ThisBlock.VarL%((DeltaVar*LearingRate_Var).Eleexp(M_E))%ThisBlock.VarL.Transpose(-1,-2);//(CosmosNum,Dim,Dim)
+                ThisBlock.Init(NewMean, NewVar);
+                //print(AllSampleCurPDF);
+                //print(AllSampleCurPDF.EleLog());
+                return AllSampleCurPDF.EleLog();
             };
 
             // 根据前一帧内容采样，把历史已经完成的更新采样加入历史
             Add2History();
             // 获取修改采样飘逸以后的更新F(todo)
-            for(int BlockIndex = 0;BlockIndex < TargetDistribution.PartialBlock.size();BlockIndex++)UpdateBlockWeight(BlockIndex);
+            DynamicTensor AllSamplePDF;
+            for(int BlockIndex = 0;BlockIndex < TargetDistribution.PartialBlock.size();BlockIndex++)
+            {
+                if(!BlockIndex)AllSamplePDF = UpdateBlockWeight(BlockIndex);
+                else AllSamplePDF = AllSamplePDF*AllSamplePDF;
+            }
+            //print(AllSamplePDF);
             
         }
         // 挑选历史样本

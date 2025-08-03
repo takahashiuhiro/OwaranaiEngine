@@ -202,4 +202,9 @@ public:
 
     /**对采样计算概率密度. */
     static DynamicTensor ProbabilityDensity_Gaussian(DynamicTensor InputSample, DynamicTensor InputMean, DynamicTensor InputVarInv, DynamicTensor InputVarDet);
+    /**上面的取log. */
+    static DynamicTensor ProbabilityDensity_Log_Gaussian(DynamicTensor InputSample, DynamicTensor InputMean, DynamicTensor InputVarInv, DynamicTensor InputVarDet);
+
+    /**求max, min这种不可导的. */
+    DynamicTensor Max(int InputDim);
 };

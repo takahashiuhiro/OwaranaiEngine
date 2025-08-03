@@ -24,7 +24,7 @@ int main()
     // test mac
     NESGMMBased<yxx> solver;
     he params = he::NewDict();
-    params["DimNum"] = 3;
+    params["DimNum"] = 75;
     params["CosmosNum"] = 2;
     params["SampleNum"] = 4;
     solver.Init(params);

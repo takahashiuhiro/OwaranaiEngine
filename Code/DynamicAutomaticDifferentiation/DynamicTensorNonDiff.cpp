@@ -62,11 +62,39 @@ DynamicTensor DynamicTensor::ProbabilityDensity_Gaussian(DynamicTensor InputSamp
     DynamicTensor XMinusMean = (InputSample - InputMean).View(OutputShape); //(m, u, n, 1)
     DynamicTensor XMinusMeanT = XMinusMean.Transpose(-1, -2); //(m, u, 1, n)
     DynamicTensor ExpPartial = (XMinusMeanT % InputVarInv % XMinusMean * (-0.5)).Eleexp(M_E); //(m, u, 1, 1)
-    DynamicTensor CPartial = InputVarDet.Pow(-0.5)*std::pow(2.*M_E, -InputSample.ShapeInt().back()*0.5); //(m, u, 1, 1)
+    DynamicTensor CPartial = InputVarDet.Pow(-0.5)*std::pow(2.*M_PI, -InputSample.ShapeInt().back()*0.5); //(m, u, 1, 1)
     DynamicTensor ProtoRes = ExpPartial*CPartial; //(m, u, 1, 1)
     auto ProtoShape = ProtoRes.ShapeInt(); //(m, u, 1, 1)
     ProtoShape.pop_back(); //(m, u, 1)
     ProtoShape.pop_back(); //(m, u)
     DynamicTensor FinalRes = ProtoRes.View(ProtoShape);//(m, u)
     return FinalRes;
+}
+
+DynamicTensor DynamicTensor::ProbabilityDensity_Log_Gaussian(DynamicTensor InputSample, DynamicTensor InputMean, DynamicTensor InputVarInv, DynamicTensor InputVarDet)
+{
+    // sample_num:m, gaussian_num:u, dim_num:n
+    // InputSample:(m, u, n)
+    // InputMean:(u, n)
+    // InputVarInv:(u, n, n)
+    // InputVarDet:(u, 1, 1)
+    auto OutputShape = InputSample.ShapeInt();
+    OutputShape.push_back(1);
+    DynamicTensor XMinusMean = (InputSample - InputMean).View(OutputShape); //(m, u, n, 1)
+    DynamicTensor XMinusMeanT = XMinusMean.Transpose(-1, -2); //(m, u, 1, n)
+    DynamicTensor LogExpPartial = XMinusMeanT % InputVarInv % XMinusMean * (-0.5); //(m, u, 1, 1)
+    DynamicTensor LogCPartial = InputVarDet.EleLog()*(-0.5) - InputSample.ShapeInt().back()*0.5*std::log(2.*M_PI) ; //(m, u, 1, 1)
+    DynamicTensor ProtoRes = LogExpPartial + LogCPartial; //(m, u, 1, 1)
+    auto ProtoShape = ProtoRes.ShapeInt(); //(m, u, 1, 1)
+    ProtoShape.pop_back(); //(m, u, 1)
+    ProtoShape.pop_back(); //(m, u)
+    DynamicTensor FinalRes = ProtoRes.View(ProtoShape);//(m, u)
+    return FinalRes;
+}
+
+DynamicTensor DynamicTensor::Max(int InputDim)
+{
+    if(InputDim < 0)InputDim = Shape().size() + InputDim;
+    Tensor* Res = Ops->TensorPointer->Maximum(InputDim);
+    
 }

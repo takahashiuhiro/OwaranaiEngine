@@ -103,6 +103,7 @@ public:
     Tensor* MaximumOrMinimum(size_t InputDim,  bool IsMaximum);
     Tensor* Maximum(size_t InputDim);
     Tensor* Minimum(size_t InputDim);
+    Tensor* Max(std::vector<size_t>InputDims);
     /**对元素求指数函数.*/
     Tensor* EleExp(float BaseNum);
     /**把矩阵广播到输入形状.*/
