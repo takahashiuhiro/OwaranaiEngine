@@ -92,9 +92,31 @@ DynamicTensor DynamicTensor::ProbabilityDensity_Log_Gaussian(DynamicTensor Input
     return FinalRes;
 }
 
-DynamicTensor DynamicTensor::Max(int InputDim)
+DynamicTensor DynamicTensor::Max(std::vector<int>Dims, bool KeepDim)
 {
-    if(InputDim < 0)InputDim = Shape().size() + InputDim;
-    Tensor* Res = Ops->TensorPointer->Maximum(InputDim);
-    
+    if (Dims.size() == 0)
+	{
+		for (size_t a = 0; a < Ops->TensorPointer->shape.size(); a++)
+		{
+			Dims.push_back(a);
+		}
+	}
+    Tensor* Res = Ops->TensorPointer->MaxOrMin(Dims, true);
+    DynamicTensor ReturnRes = DynamicTensor(std::shared_ptr<Tensor>(Res), false);
+    if(KeepDim)return ReturnRes;
+    else
+    {
+        auto OutputPreShape = ShapeInt();
+        for(auto&thisDim:Dims)OutputPreShape[thisDim] = -1;
+        std::vector<size_t> OutputShape;
+        for(auto&thisDim:OutputPreShape)
+        {
+            if(thisDim > 0)
+            {
+                OutputShape.push_back(thisDim);
+            }
+        }
+        ReturnRes.Ops->TensorPointer->shape = OutputShape;
+        return ReturnRes;
+    }
 }

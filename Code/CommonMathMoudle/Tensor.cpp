@@ -675,11 +675,6 @@ Tensor* Tensor::Maximum(size_t InputDim)
     return MaximumOrMinimum(InputDim, true);
 }
 
-Tensor* Tensor::Max(std::vector<size_t>InputDims)
-{
-    
-}   
-
 Tensor* Tensor::Mean(std::vector<size_t>InputDims)
 {
     Tensor* TMPTensor = Sum(InputDims);

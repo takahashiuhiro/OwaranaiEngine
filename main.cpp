@@ -21,6 +21,11 @@ struct yxx
 
 int main() 
 {
+
+    DynamicTensor gg = DynamicTensor({2,3,2}, {1,2,3,4,5,6,7,8,9,100,11,12.}, 0);
+    print(gg);
+    print(gg.Max({0,1},true).Shape());
+    return 0;
     // test mac
     NESGMMBased<yxx> solver;
     he params = he::NewDict();

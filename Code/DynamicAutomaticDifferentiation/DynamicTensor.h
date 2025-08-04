@@ -206,5 +206,5 @@ public:
     static DynamicTensor ProbabilityDensity_Log_Gaussian(DynamicTensor InputSample, DynamicTensor InputMean, DynamicTensor InputVarInv, DynamicTensor InputVarDet);
 
     /**求max, min这种不可导的. */
-    DynamicTensor Max(int InputDim);
+    DynamicTensor Max(std::vector<int>Dims = {}, bool KeepDim = false);
 };
