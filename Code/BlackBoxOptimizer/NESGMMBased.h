@@ -150,13 +150,8 @@ struct GMMHistory
         {
             if(!a) Res = (AllLogPDF[a] - MaxAlpha).Eleexp(M_E);
             else Res = Res + (AllLogPDF[a] - MaxAlpha).Eleexp(M_E);
-            print(AllLogPDF[a]);// 考虑一下这个问题哈，两倍的本体确实可能inf，怎么解决
         }
-        print(CurPD);
-        print(Res.EleLog());
-        print(MaxAlpha.Shape());
-        return CurPD - Res.EleLog() - MaxAlpha - std::log(AllLogPDF.size());//通过所有的log pdf求pdf的和的log
-
+        return CurPD - Res.EleLog() - MaxAlpha + std::log(AllLogPDF.size());//通过所有的log pdf求pdf的和的log
     }
 
 };
@@ -281,17 +276,19 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
                 // 得到所有要用的样例
                 DynamicTensor AllSample = SampleSelector.GetAllSample(BlockIndex);
                 // 计算所有窗口中的样例每个分块高斯在历史的平均密度系数，顺便返回他的概率密度后面要用
-                DynamicTensor FinalF = GetF()*SampleSelector.GetAllSampleMeanPDF(AllSample, BlockIndex, AllSampleCurPDF);
+                DynamicTensor FinalF = GetF()*SampleSelector.GetAllSampleMeanPDF(AllSample, BlockIndex, AllSampleCurPDF).Eleexp(M_E);//不太对啊，这里不是对角阵了
                 //计算对均值的导数
                 DynamicTensor DeltaMean = (GetDeltaMean(AllSample, BlockIndex)*FinalF.View({SampleNum,CosmosNum,1})).Mean({0});//(CosmosNum,Dim)
                 //计算对斜方差矩阵重参数化后中间的对角阵的导数，这个要乘过去
                 DynamicTensor DeltaVar = (GetDeltaVar(AllSample, BlockIndex)*FinalF.View({SampleNum,CosmosNum,1,1})).Mean({0});//(CosmosNum,Dim,Dim)
                 DynamicTensor NewMean = ThisBlock.Mean + DeltaMean*LearingRate_Mean;
                 DynamicTensor NewVar = ThisBlock.VarL%((DeltaVar*LearingRate_Var).Eleexp(M_E))%ThisBlock.VarL.Transpose(-1,-2);//(CosmosNum,Dim,Dim)
+                print(ThisBlock.Mean);
+                print(NewMean);
+                print(ThisBlock.Var);
+                print(NewVar);
                 ThisBlock.Init(NewMean, NewVar);
-                //print(AllSampleCurPDF);
-                //print(AllSampleCurPDF.EleLog());
-                return AllSampleCurPDF.EleLog();
+                return AllSampleCurPDF;
             };
 
             // 根据前一帧内容采样，把历史已经完成的更新采样加入历史
@@ -301,9 +298,9 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
             for(int BlockIndex = 0;BlockIndex < TargetDistribution.PartialBlock.size();BlockIndex++)
             {
                 if(!BlockIndex)AllSamplePDF = UpdateBlockWeight(BlockIndex);
-                else AllSamplePDF = AllSamplePDF*AllSamplePDF;
+                else AllSamplePDF = AllSamplePDF+UpdateBlockWeight(BlockIndex);
             }
-            //print(AllSamplePDF);
+            print(AllSamplePDF);
             
         }
         // 挑选历史样本
