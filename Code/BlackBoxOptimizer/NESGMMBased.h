@@ -143,9 +143,8 @@ struct GMMHistory
             }
         }
 
-        MaxAlpha = MaxAlpha*(1./GMMContent.size()); 
+        MaxAlpha = DynamicTensor::Cat(AllLogPDF).Max({0},true);
 
-        // 然后看看求和啥的？
         DynamicTensor Res;
         for(size_t a = 0;a < AllLogPDF.size();a++)
         {
@@ -155,7 +154,7 @@ struct GMMHistory
         }
         print(CurPD);
         print(Res.EleLog());
-        print(MaxAlpha);
+        print(MaxAlpha.Shape());
         return CurPD - Res.EleLog() - MaxAlpha - std::log(AllLogPDF.size());//通过所有的log pdf求pdf的和的log
 
     }
