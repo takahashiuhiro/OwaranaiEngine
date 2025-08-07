@@ -129,13 +129,10 @@ struct GMMHistory
     DynamicTensor GetAllSampleMeanPDF(DynamicTensor AllSample, int BlockIndex, DynamicTensor& CurPD)
     {
         std::vector<DynamicTensor>AllLogPDF;
-        DynamicTensor MaxAlpha;
         for(size_t a = 0;a < GMMContent.size();a++)
         {
             auto& ThisGaussian = GMMContent[a].Distribution.PartialBlock[BlockIndex];
             DynamicTensor CurLogPDF = DynamicTensor::ProbabilityDensity_Log_Gaussian(AllSample, ThisGaussian.Mean, ThisGaussian.VarInv, ThisGaussian.VarLDet);
-            if(!a)MaxAlpha = CurLogPDF;
-            else MaxAlpha = MaxAlpha + CurLogPDF;
             AllLogPDF.push_back(CurLogPDF);
             if(a + 1 == GMMContent.size())
             {
@@ -143,7 +140,7 @@ struct GMMHistory
             }
         }
 
-        MaxAlpha = DynamicTensor::Cat(AllLogPDF).Max({0},true);
+        DynamicTensor MaxAlpha = DynamicTensor::Cat(AllLogPDF).Max({0},true);
 
         DynamicTensor Res;
         for(size_t a = 0;a < AllLogPDF.size();a++)
@@ -272,35 +269,32 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
             auto UpdateBlockWeight = [this,&GetF,&GetDeltaMean,&GetDeltaVar](int BlockIndex)
             {
                 auto& ThisBlock = TargetDistribution.PartialBlock[BlockIndex];
-                DynamicTensor AllSampleCurPDF;
+                DynamicTensor AllSampleCurLogPDF;
                 // 得到所有要用的样例
                 DynamicTensor AllSample = SampleSelector.GetAllSample(BlockIndex);
                 // 计算所有窗口中的样例每个分块高斯在历史的平均密度系数，顺便返回他的概率密度后面要用
-                DynamicTensor FinalF = GetF()*SampleSelector.GetAllSampleMeanPDF(AllSample, BlockIndex, AllSampleCurPDF).Eleexp(M_E);//不太对啊，这里不是对角阵了
+                DynamicTensor FinalF = GetF()*SampleSelector.GetAllSampleMeanPDF(AllSample, BlockIndex, AllSampleCurLogPDF).Eleexp(M_E);
                 //计算对均值的导数
                 DynamicTensor DeltaMean = (GetDeltaMean(AllSample, BlockIndex)*FinalF.View({SampleNum,CosmosNum,1})).Mean({0});//(CosmosNum,Dim)
                 //计算对斜方差矩阵重参数化后中间的对角阵的导数，这个要乘过去
                 DynamicTensor DeltaVar = (GetDeltaVar(AllSample, BlockIndex)*FinalF.View({SampleNum,CosmosNum,1,1})).Mean({0});//(CosmosNum,Dim,Dim)
                 DynamicTensor NewMean = ThisBlock.Mean + DeltaMean*LearingRate_Mean;
-                DynamicTensor NewVar = ThisBlock.VarL%((DeltaVar*LearingRate_Var).Eleexp(M_E))%ThisBlock.VarL.Transpose(-1,-2);//(CosmosNum,Dim,Dim)
-                print(ThisBlock.Mean);
-                print(NewMean);
-                print(ThisBlock.Var);
-                print(NewVar);
+                DynamicTensor UnitVarShape = DynamicTensor::CreateUnitTensor(DeltaVar.ShapeInt(), false, this->DeviceNum);
+                DynamicTensor NewVar = ThisBlock.VarL%((DeltaVar*LearingRate_Var).Eleexp(M_E)*UnitVarShape)%ThisBlock.VarL.Transpose(-1,-2);//(CosmosNum,Dim,Dim)
                 ThisBlock.Init(NewMean, NewVar);
-                return AllSampleCurPDF;
+                return AllSampleCurLogPDF;
             };
 
             // 根据前一帧内容采样，把历史已经完成的更新采样加入历史
             Add2History();
-            // 获取修改采样飘逸以后的更新F(todo)
-            DynamicTensor AllSamplePDF;
+            // 获取修改采样漂移以后的更新F(todo)
+            DynamicTensor AllSampleLogPDF; //所有block的高斯密度的log
             for(int BlockIndex = 0;BlockIndex < TargetDistribution.PartialBlock.size();BlockIndex++)
             {
-                if(!BlockIndex)AllSamplePDF = UpdateBlockWeight(BlockIndex);
-                else AllSamplePDF = AllSamplePDF+UpdateBlockWeight(BlockIndex);
+                if(!BlockIndex)AllSampleLogPDF = UpdateBlockWeight(BlockIndex);
+                else AllSampleLogPDF = AllSampleLogPDF+UpdateBlockWeight(BlockIndex);
             }
-            print(AllSamplePDF);
+            //print(AllSamplePDF);
             
         }
         // 挑选历史样本
