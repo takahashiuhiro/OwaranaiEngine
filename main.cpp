@@ -25,9 +25,9 @@ int main()
     he params = he::NewDict();
     params["DimNum"] = 1;
     params["CosmosNum"] = 1;
-    params["SampleNum"] = 50;
-    params["MaxItNum"] = 1500;
-    params["HistoryLength"] = 5;
+    params["SampleNum"] = 5;
+    params["MaxItNum"] = 2000;
+    params["HistoryLength"] = 2;
     params["LearingRate_Mean"] = 0.3;
     params["LearingRate_Var"] = 0.2;
     solver.Init(params);

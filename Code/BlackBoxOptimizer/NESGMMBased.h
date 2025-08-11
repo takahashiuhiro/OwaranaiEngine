@@ -246,10 +246,12 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
             auto GetDeltaMean = [this](DynamicTensor& AllSample, int BlockIndex)
             {
                 auto& ThisBlock = TargetDistribution.PartialBlock[BlockIndex];
-                auto TargetVarInv = ThisBlock.VarInv.View({1, CosmosNum, DimNum, DimNum});
-                auto TargetZeroBiasSample = (AllSample - ThisBlock.Mean).View({-1,CosmosNum,DimNum,1}); //(SampleNum,CosmosNum,Dim)
-                DynamicTensor Res = TargetVarInv%TargetZeroBiasSample;
-                return Res.View({-1,CosmosNum,DimNum});
+                return AllSample - ThisBlock.Mean;
+                //auto TargetVarInv = ThisBlock.VarInv.View({1, CosmosNum, DimNum, DimNum});
+                //auto TargetZeroBiasSample = (AllSample - ThisBlock.Mean).View({-1,CosmosNum,DimNum,1}); //(SampleNum,CosmosNum,Dim)
+                //DynamicTensor Res = TargetVarInv%TargetZeroBiasSample;
+                //print((AllSample - ThisBlock.Mean).Shape());
+                //return Res.View({-1,CosmosNum,DimNum});
             };
 
             auto GetDeltaVar = [this](DynamicTensor& AllSample, int BlockIndex)
