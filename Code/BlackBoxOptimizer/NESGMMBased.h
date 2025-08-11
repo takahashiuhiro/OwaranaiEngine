@@ -165,6 +165,7 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
     int MaxItNum; // 最大的迭代次数
     double LearingRate_Mean; //学习率
     double LearingRate_Var; //学习率
+    double LearingRate_B;//学习率
     double EvalScoreInitRate; // 把零阶cost映射到对梯度效应的时候的初始值
     double EvalScoreMaxRate; // 把零阶cost映射到对梯度效应的时候的最大值
 
@@ -179,10 +180,11 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
         DimNum = this->Params["DimNum"].i();
         SampleNum = this->Params.DictGet("SampleNum", 30).i();
         CosmosNum = this->Params.DictGet("CosmosNum", 1).i();
-        HistoryLength = this->Params.DictGet("HistoryLength", 1).i();
-        MaxItNum = this->Params.DictGet("MaxItNum", 1).i();
+        HistoryLength = this->Params.DictGet("HistoryLength", 2).i();
+        MaxItNum = this->Params.DictGet("MaxItNum", 5000).i();
         LearingRate_Mean = this->Params.DictGet("LearingRate_Mean", 0.1).f();
         LearingRate_Var = this->Params.DictGet("LearingRate_Var", 0.02).f();
+        LearingRate_B = this->Params.DictGet("LearingRate_B", 0.02).f();
         EvalScoreInitRate = this->Params.DictGet("EvalScoreInitRate", 0.1).f();
         EvalScoreMaxRate = this->Params.DictGet("EvalScoreMaxRate", 0.8).f();
     }
@@ -238,16 +240,16 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
             {
                 double Beta = GetBeta();
                 DynamicTensor F = SampleSelector.GetSampleEvalRate(Beta);//(SampleNum, CosmosNum, 1), 对于每个采样而言的直接效用，不考虑采样偏移
-                return F.View({SampleNum, CosmosNum});
+                return F.View({-1, CosmosNum});
             };
 
             auto GetDeltaMean = [this](DynamicTensor& AllSample, int BlockIndex)
             {
                 auto& ThisBlock = TargetDistribution.PartialBlock[BlockIndex];
                 auto TargetVarInv = ThisBlock.VarInv.View({1, CosmosNum, DimNum, DimNum});
-                auto TargetZeroBiasSample = (AllSample - ThisBlock.Mean).View({SampleNum,CosmosNum,DimNum,1}); //(SampleNum,CosmosNum,Dim)
+                auto TargetZeroBiasSample = (AllSample - ThisBlock.Mean).View({-1,CosmosNum,DimNum,1}); //(SampleNum,CosmosNum,Dim)
                 DynamicTensor Res = TargetVarInv%TargetZeroBiasSample;
-                return Res.View({SampleNum,CosmosNum,DimNum});
+                return Res.View({-1,CosmosNum,DimNum});
             };
 
             auto GetDeltaVar = [this](DynamicTensor& AllSample, int BlockIndex)
@@ -275,35 +277,32 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
                 // 计算所有窗口中的样例每个分块高斯在历史的平均密度系数，顺便返回他的概率密度后面要用
                 DynamicTensor FinalF = GetF()*SampleSelector.GetAllSampleMeanPDF(AllSample, BlockIndex, AllSampleCurLogPDF).Eleexp(M_E);
                 //计算对均值的导数
-                DynamicTensor DeltaMean = (GetDeltaMean(AllSample, BlockIndex)*FinalF.View({SampleNum,CosmosNum,1})).Mean({0});//(CosmosNum,Dim)
+                DynamicTensor DeltaMean = (GetDeltaMean(AllSample, BlockIndex)*FinalF.View({-1,CosmosNum,1})).Mean({0});//(CosmosNum,Dim)
                 //计算对斜方差矩阵重参数化后中间的对角阵的导数，这个要乘过去
-                DynamicTensor DeltaVar = (GetDeltaVar(AllSample, BlockIndex)*FinalF.View({SampleNum,CosmosNum,1,1})).Mean({0});//(CosmosNum,Dim,Dim)
+                DynamicTensor DeltaVar = (GetDeltaVar(AllSample, BlockIndex)*FinalF.View({-1,CosmosNum,1,1})).Mean({0});//(CosmosNum,Dim,Dim)
                 DynamicTensor NewMean = ThisBlock.Mean + DeltaMean*LearingRate_Mean;
                 DynamicTensor UnitVarShape = DynamicTensor::CreateUnitTensor(DeltaVar.ShapeInt(), false, this->DeviceNum);
                 DynamicTensor NewVar = ThisBlock.VarL%((DeltaVar*LearingRate_Var).Eleexp(M_E)*UnitVarShape)%ThisBlock.VarL.Transpose(-1,-2);//(CosmosNum,Dim,Dim)
                 ThisBlock.Init(NewMean, NewVar);
                 return AllSampleCurLogPDF;
             };
-
+            
             // 根据前一帧内容采样，把历史已经完成的更新采样加入历史
             Add2History();
             // 获取修改采样漂移以后的更新F(todo)
             DynamicTensor AllSampleLogPDF; //所有block的高斯密度的log
             for(int BlockIndex = 0;BlockIndex < TargetDistribution.PartialBlock.size();BlockIndex++)
             {
-                if(!BlockIndex)AllSampleLogPDF = UpdateBlockWeight(BlockIndex);
-                else AllSampleLogPDF = AllSampleLogPDF+UpdateBlockWeight(BlockIndex);
+                auto tmp_res = UpdateBlockWeight(BlockIndex);
+                if(!BlockIndex)AllSampleLogPDF = tmp_res;
+                else AllSampleLogPDF = AllSampleLogPDF+tmp_res;
             }
-            //print(AllSamplePDF);
-            
+            DynamicTensor AllSampleMean = AllSampleLogPDF.Mean({0});
+            TargetDistribution.PartialRate = (TargetDistribution.PartialRate + AllSampleMean.Softmax(0)*LearingRate_B).Softmax(0);
+
+            print(TargetDistribution.PartialBlock[0].Mean);
+            //print(TargetDistribution.PartialBlock[0].Var);
         }
-        // 挑选历史样本
-        // 计算各种重要性
-        // 计算梯度
-
-
-
         return DynamicTensor(); //暂时返回
     }
-    
 };

@@ -7,7 +7,7 @@ struct yxx
     DynamicTensor Forward(DynamicTensor x)
     {
         // 输出模型的结果
-        return x*10;
+        return x*(-10);
     }
 
     DynamicTensor Eval(DynamicTensor x)
@@ -23,9 +23,9 @@ int main()
 {
     NESGMMBased<yxx> solver;
     he params = he::NewDict();
-    params["DimNum"] = 3;
-    params["CosmosNum"] = 2;
-    params["SampleNum"] = 4;
+    params["DimNum"] = 1;
+    params["CosmosNum"] = 1;
+    params["SampleNum"] = 50;
     solver.Init(params);
     solver.Solve();
 }
