@@ -276,8 +276,6 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
                 DynamicTensor AllSample = SampleSelector.GetAllSample(BlockIndex);
                 // 计算所有窗口中的样例每个分块高斯在历史的平均密度系数，顺便返回他的概率密度后面要用
                 DynamicTensor FinalF = GetF()*SampleSelector.GetAllSampleMeanPDF(AllSample, BlockIndex, AllSampleCurLogPDF).Eleexp(M_E);
-                print("final_f::start");
-                print(FinalF);
                 //计算对均值的导数
                 DynamicTensor DeltaMean = (GetDeltaMean(AllSample, BlockIndex)*FinalF.View({-1,CosmosNum,1})).Mean({0});//(CosmosNum,Dim)
                 //计算对斜方差矩阵重参数化后中间的对角阵的导数，这个要乘过去
