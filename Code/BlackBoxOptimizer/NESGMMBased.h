@@ -100,7 +100,7 @@ struct GMMHistory
      * 通过Eval的结果评测整个窗口里每个样例的影响
      * @param Beta 把每个Eval评测结果先进行归一化, 然后再乘以beta进行softmax
      */
-    DynamicTensor GetSampleEvalRate(double Beta)
+    DynamicTensor GetSampleEvalRate(int BlockIndex, double Beta)
     {
         std::vector<DynamicTensor> Res;
         for(auto&it:GMMContent)Res.push_back(it.EvalRes);
@@ -110,6 +110,47 @@ struct GMMHistory
         DynamicTensor NormEval = (CatEval - CatMeanEval)*(CatVarEval + 1e-6).Pow(-0.5);// (SampleNum, CosmosNum, 1)
         DynamicTensor FinalRes = (NormEval*Beta).Softmax(0);// (SampleNum, CosmosNum, 1)
         return FinalRes;
+    }
+
+    /**
+     * 返回前beta的样例以及评测结果
+     */
+    std::pair<DynamicTensor, DynamicTensor> SampleEvalRankRate(int BlockIndex, double Beta)
+    {
+        int SingleTimeSampleNum = GMMContent[0].PartialSample[0].Shape()[0];
+        int CosmosNum = GMMContent[0].PartialSample[0].Shape()[1];
+        int DimNum = GMMContent[0].PartialSample[0].Shape()[2];
+        int ContentNum = GMMContent.size();
+        int MaxSampleNum = ContentNum*SingleTimeSampleNum;
+
+        
+        std::vector<std::vector<std::pair<std::vector<double>, double>>> SamplePairs;
+        SamplePairs.resize(CosmosNum);
+        for(auto&it:GMMContent)
+        {
+            auto& ThisSample = it.PartialSample[BlockIndex];
+            auto& ThisEvalRes = it.EvalRes;
+
+            int ThisSampleNum = ThisSample.Shape()[0];
+
+            auto SampleContent = ThisSample.Ops->TensorPointer->GetDevicePointer();
+            auto EvalContent = ThisEvalRes.Ops->TensorPointer->GetDevicePointer();
+
+            for(int CosmosIdx = 0;CosmosIdx < CosmosNum;CosmosIdx++)
+            {
+                for(int CurSampleIdx = 0;CurSampleIdx < ThisSampleNum;CurSampleIdx++)
+                {
+                    int ThisVecIdx = CurSampleIdx*CosmosNum + CosmosIdx;
+                    SamplePairs[CosmosIdx].emplace_back(std::vector<double>{}, EvalContent[ThisVecIdx]);
+                    for(int DimIndex = 0;DimIndex < DimNum;DimIndex++)
+                    {
+                        SamplePairs[CosmosIdx][CurSampleIdx].first.push_back(SampleContent[ThisVecIdx*DimNum + DimIndex]);
+                    }
+                }
+            }
+            //todo::priority
+        }
+
     }
 
     /**
@@ -236,10 +277,12 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
             };
             
             // 把Eval的结果的修正，这个无需按照分块来确认
-            auto GetF = [&GetBeta, this]()
+            auto GetF = [&GetBeta, this](int BlockIndex)
             {
                 double Beta = GetBeta();
-                DynamicTensor F = SampleSelector.GetSampleEvalRate(Beta);//(SampleNum, CosmosNum, 1), 对于每个采样而言的直接效用，不考虑采样偏移
+                SampleSelector.SampleEvalRankRate(BlockIndex, Beta);
+                print("--testend--");
+                DynamicTensor F = SampleSelector.GetSampleEvalRate(BlockIndex, Beta);//(SampleNum, CosmosNum, 1), 对于每个采样而言的直接效用，不考虑采样偏移
                 return F.View({-1, CosmosNum});
             };
 
@@ -277,7 +320,7 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
                 // 得到所有要用的样例
                 DynamicTensor AllSample = SampleSelector.GetAllSample(BlockIndex);
                 // 计算所有窗口中的样例每个分块高斯在历史的平均密度系数，顺便返回他的概率密度后面要用
-                DynamicTensor FinalF = GetF()*SampleSelector.GetAllSampleMeanPDF(AllSample, BlockIndex, AllSampleCurLogPDF).Eleexp(M_E);
+                DynamicTensor FinalF = GetF(BlockIndex)*SampleSelector.GetAllSampleMeanPDF(AllSample, BlockIndex, AllSampleCurLogPDF).Eleexp(M_E);
                 //计算对均值的导数
                 DynamicTensor DeltaMean = (GetDeltaMean(AllSample, BlockIndex)*FinalF.View({-1,CosmosNum,1})).Mean({0});//(CosmosNum,Dim)
                 //计算对斜方差矩阵重参数化后中间的对角阵的导数，这个要乘过去

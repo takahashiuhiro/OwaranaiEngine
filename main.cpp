@@ -23,10 +23,10 @@ int main()
 {
     NESGMMBased<yxx> solver;
     he params = he::NewDict();
-    params["DimNum"] = 1;
-    params["CosmosNum"] = 1;
+    params["DimNum"] = 3;
+    params["CosmosNum"] = 2;
     params["SampleNum"] = 5;
-    params["MaxItNum"] = 2000;
+    params["MaxItNum"] = 1;
     params["HistoryLength"] = 2;
     params["LearingRate_Mean"] = 0.3;
     params["LearingRate_Var"] = 0.2;
