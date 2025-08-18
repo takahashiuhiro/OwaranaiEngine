@@ -122,10 +122,15 @@ struct GMMHistory
         int DimNum = GMMContent[0].PartialSample[0].Shape()[2];
         int ContentNum = GMMContent.size();
         int MaxSampleNum = ContentNum*SingleTimeSampleNum;
-
         
-        std::vector<std::vector<std::pair<std::vector<double>, double>>> SamplePairs;
-        SamplePairs.resize(CosmosNum);
+        auto SamplePairCMP = [](auto& Input_1, auto& Input_2)
+        {
+            return Input_1.second > Input_2.second;
+        };
+        
+        std::vector<std::priority_queue<std::pair<std::vector<double>, double>,std::vector<std::pair<std::vector<double>, double>>,decltype(SamplePairCMP)>> SampleQueue;
+        //std::vector<std::priority_queue<std::pair<std::vector<double>, double>,std::vector<std::pair<std::vector<double>, double>>,decltype(SecondDescCmp)>> SampleQueues;
+        for (int i = 0; i < CosmosNum; ++i) SampleQueue.emplace_back(SamplePairCMP);
         for(auto&it:GMMContent)
         {
             auto& ThisSample = it.PartialSample[BlockIndex];
@@ -141,14 +146,24 @@ struct GMMHistory
                 for(int CurSampleIdx = 0;CurSampleIdx < ThisSampleNum;CurSampleIdx++)
                 {
                     int ThisVecIdx = CurSampleIdx*CosmosNum + CosmosIdx;
-                    SamplePairs[CosmosIdx].emplace_back(std::vector<double>{}, EvalContent[ThisVecIdx]);
+                    std::vector<double>ThisSampleV;
                     for(int DimIndex = 0;DimIndex < DimNum;DimIndex++)
                     {
-                        SamplePairs[CosmosIdx][CurSampleIdx].first.push_back(SampleContent[ThisVecIdx*DimNum + DimIndex]);
+                        ThisSampleV.push_back(SampleContent[ThisVecIdx*DimNum + DimIndex]);
                     }
+                    SampleQueue[CosmosIdx].emplace(std::move(ThisSampleV), EvalContent[ThisVecIdx]);
+
+                    while(SampleQueue[CosmosIdx].size()>MaxSampleNum*Beta)SampleQueue[CosmosIdx].pop();
                 }
             }
-            //todo::priority
+            //这里会输出一个莫名其妙的东西
+            while(!SampleQueue[0].empty())
+            {
+                print(SampleQueue[0].top().second);
+                SampleQueue[0].pop();
+            }
+            print("--");
+            print(it.EvalRes);
         }
 
     }
@@ -269,20 +284,13 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
                 CurrentGMM.Init(TargetDistribution, SampleRes, CurrentEvalRes);
                 SampleSelector.Add(CurrentGMM);
             };
-
-            // 根据迭代轮数来调f(x)的影响
-            auto GetBeta = [&ItIdx, this]()
-            {
-                return EvalScoreInitRate* (MaxItNum - ItIdx*1.)/MaxItNum + EvalScoreMaxRate*(ItIdx*1.)/MaxItNum;
-            };
             
             // 把Eval的结果的修正，这个无需按照分块来确认
-            auto GetF = [&GetBeta, this](int BlockIndex)
+            auto GetF = [this](int BlockIndex)
             {
-                double Beta = GetBeta();
-                SampleSelector.SampleEvalRankRate(BlockIndex, Beta);
+                SampleSelector.SampleEvalRankRate(BlockIndex, 0.2);
                 print("--testend--");
-                DynamicTensor F = SampleSelector.GetSampleEvalRate(BlockIndex, Beta);//(SampleNum, CosmosNum, 1), 对于每个采样而言的直接效用，不考虑采样偏移
+                DynamicTensor F = SampleSelector.GetSampleEvalRate(BlockIndex, 0.2);//(SampleNum, CosmosNum, 1), 对于每个采样而言的直接效用，不考虑采样偏移
                 return F.View({-1, CosmosNum});
             };
 
