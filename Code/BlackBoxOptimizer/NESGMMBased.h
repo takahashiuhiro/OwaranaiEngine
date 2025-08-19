@@ -176,7 +176,7 @@ struct GMMHistory
         DynamicTensor ResSample = DynamicTensor({ResMaxSampleNum, CosmosNum, DimNum}, SampleResContent, false ,DeviceNum);
         DynamicTensor ResEval = DynamicTensor({ResMaxSampleNum, CosmosNum, 1}, EvalResContent, false ,DeviceNum);
 
-        print()
+
     }
 
     /**
