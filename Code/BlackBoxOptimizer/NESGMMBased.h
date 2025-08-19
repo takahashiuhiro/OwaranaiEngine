@@ -117,19 +117,17 @@ struct GMMHistory
      */
     std::pair<DynamicTensor, DynamicTensor> SampleEvalRankRate(int BlockIndex, double Beta)
     {
-        int SingleTimeSampleNum = GMMContent[0].PartialSample[0].Shape()[0];
-        int CosmosNum = GMMContent[0].PartialSample[0].Shape()[1];
-        int DimNum = GMMContent[0].PartialSample[0].Shape()[2];
+        int SingleTimeSampleNum = GMMContent[0].PartialSample[BlockIndex].Shape()[0];
+        int CosmosNum = GMMContent[0].PartialSample[BlockIndex].Shape()[1];
+        int DimNum = GMMContent[0].PartialSample[BlockIndex].Shape()[2];
         int ContentNum = GMMContent.size();
         int MaxSampleNum = ContentNum*SingleTimeSampleNum;
+        int ResMaxSampleNum = MaxSampleNum*Beta;
+        int DeviceNum =  GMMContent[0].PartialSample[BlockIndex].GetDeviceNum();
         
-        auto SamplePairCMP = [](auto& Input_1, auto& Input_2)
-        {
-            return Input_1.second > Input_2.second;
-        };
+        auto SamplePairCMP = [](auto& Input_1, auto& Input_2){return Input_1.second > Input_2.second;};
         
         std::vector<std::priority_queue<std::pair<std::vector<double>, double>,std::vector<std::pair<std::vector<double>, double>>,decltype(SamplePairCMP)>> SampleQueue;
-        //std::vector<std::priority_queue<std::pair<std::vector<double>, double>,std::vector<std::pair<std::vector<double>, double>>,decltype(SecondDescCmp)>> SampleQueues;
         for (int i = 0; i < CosmosNum; ++i) SampleQueue.emplace_back(SamplePairCMP);
         for(auto&it:GMMContent)
         {
@@ -153,19 +151,32 @@ struct GMMHistory
                     }
                     SampleQueue[CosmosIdx].emplace(std::move(ThisSampleV), EvalContent[ThisVecIdx]);
 
-                    while(SampleQueue[CosmosIdx].size()>MaxSampleNum*Beta)SampleQueue[CosmosIdx].pop();
+                    while(SampleQueue[CosmosIdx].size()>ResMaxSampleNum)SampleQueue[CosmosIdx].pop();
                 }
             }
-            //这里会输出一个莫名其妙的东西
-            while(!SampleQueue[0].empty())
+        }
+        // 以下还没测试
+
+        std::vector<double>SampleResContent;
+        std::vector<double>EvalResContent;
+
+        for(int a = 0;a < ResMaxSampleNum;a++)
+        {
+            for(int b = 0;b < CosmosNum;b++)
             {
-                print(SampleQueue[0].top().second);
-                SampleQueue[0].pop();
+                for(int c = 0;c < DimNum; c++)
+                {
+                    SampleResContent.push_back(SampleQueue[b].top().first[c]);
+                }
+                SampleQueue[b].pop();
+                EvalResContent.push_back(std::log(1 + std::max(0.,Beta - a*1.0/MaxSampleNum)));
             }
-            print("--");
-            print(it.EvalRes);
         }
 
+        DynamicTensor ResSample = DynamicTensor({ResMaxSampleNum, CosmosNum, DimNum}, SampleResContent, false ,DeviceNum);
+        DynamicTensor ResEval = DynamicTensor({ResMaxSampleNum, CosmosNum, 1}, EvalResContent, false ,DeviceNum);
+
+        print()
     }
 
     /**
@@ -288,7 +299,7 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
             // 把Eval的结果的修正，这个无需按照分块来确认
             auto GetF = [this](int BlockIndex)
             {
-                SampleSelector.SampleEvalRankRate(BlockIndex, 0.2);
+                SampleSelector.SampleEvalRankRate(BlockIndex, 0.5);
                 print("--testend--");
                 DynamicTensor F = SampleSelector.GetSampleEvalRate(BlockIndex, 0.2);//(SampleNum, CosmosNum, 1), 对于每个采样而言的直接效用，不考虑采样偏移
                 return F.View({-1, CosmosNum});
