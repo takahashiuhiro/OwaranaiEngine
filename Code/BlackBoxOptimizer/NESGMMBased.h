@@ -172,8 +172,8 @@ struct GMMHistory
             }
         }
 
-        DynamicTensor ResSample = DynamicTensor({ResMaxSampleNum, CosmosNum, DimNum}, SampleResContent, false ,DeviceNum);
-        DynamicTensor ResEval = DynamicTensor({ResMaxSampleNum, CosmosNum, 1}, EvalResContent, false ,DeviceNum);
+        DynamicTensor ResSample = DynamicTensor({(size_t)ResMaxSampleNum, (size_t)CosmosNum, (size_t)DimNum}, SampleResContent, false ,DeviceNum);
+        DynamicTensor ResEval = DynamicTensor({(size_t)ResMaxSampleNum, (size_t)CosmosNum, 1}, EvalResContent, false ,DeviceNum);
         return std::make_pair(ResSample,ResEval);
     }
 
@@ -360,7 +360,7 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
             //debug--
             print("mean----------");
             print(TargetDistribution.PartialBlock[0].Mean);
-            DynamicTensor gg = DynamicTensor({CosmosNum,1,DimNum},0);
+            DynamicTensor gg = DynamicTensor({(size_t)CosmosNum,1,(size_t)DimNum},0);
             gg.Fill(1);
             print("varr----------");
             print(gg%TargetDistribution.PartialBlock[0].Var);
