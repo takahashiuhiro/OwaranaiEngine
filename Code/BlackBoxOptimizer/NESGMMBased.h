@@ -155,10 +155,9 @@ struct GMMHistory
                 }
             }
         }
-        // 以下还没测试
 
-        std::vector<double>SampleResContent;
-        std::vector<double>EvalResContent;
+        std::vector<float>SampleResContent;
+        std::vector<float>EvalResContent;
 
         for(int a = 0;a < ResMaxSampleNum;a++)
         {
@@ -169,14 +168,13 @@ struct GMMHistory
                     SampleResContent.push_back(SampleQueue[b].top().first[c]);
                 }
                 SampleQueue[b].pop();
-                EvalResContent.push_back(std::log(1 + std::max(0.,Beta - a*1.0/MaxSampleNum)));
+                EvalResContent.push_back(std::log(1 + std::max(0.,(a+1)*1.0/MaxSampleNum)));
             }
         }
 
         DynamicTensor ResSample = DynamicTensor({ResMaxSampleNum, CosmosNum, DimNum}, SampleResContent, false ,DeviceNum);
         DynamicTensor ResEval = DynamicTensor({ResMaxSampleNum, CosmosNum, 1}, EvalResContent, false ,DeviceNum);
-
-
+        return std::make_pair(ResSample,ResEval);
     }
 
     /**
@@ -295,15 +293,6 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
                 CurrentGMM.Init(TargetDistribution, SampleRes, CurrentEvalRes);
                 SampleSelector.Add(CurrentGMM);
             };
-            
-            // 把Eval的结果的修正，这个无需按照分块来确认
-            auto GetF = [this](int BlockIndex)
-            {
-                SampleSelector.SampleEvalRankRate(BlockIndex, 0.5);
-                print("--testend--");
-                DynamicTensor F = SampleSelector.GetSampleEvalRate(BlockIndex, 0.2);//(SampleNum, CosmosNum, 1), 对于每个采样而言的直接效用，不考虑采样偏移
-                return F.View({-1, CosmosNum});
-            };
 
             auto GetDeltaMean = [this](DynamicTensor& AllSample, int BlockIndex)
             {
@@ -332,14 +321,18 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
             };
 
             // 按照不同的分块信息更新目标分布里的每个分块高斯
-            auto UpdateBlockWeight = [this,&GetF,&GetDeltaMean,&GetDeltaVar](int BlockIndex)
+            auto UpdateBlockWeight = [this,&GetDeltaMean,&GetDeltaVar](int BlockIndex)
             {
                 auto& ThisBlock = TargetDistribution.PartialBlock[BlockIndex];
                 DynamicTensor AllSampleCurLogPDF;
+                // 得到筛选后的样例以及他们的效用
+                auto RankSampleResPair = SampleSelector.SampleEvalRankRate(BlockIndex, 0.5);
                 // 得到所有要用的样例
-                DynamicTensor AllSample = SampleSelector.GetAllSample(BlockIndex);
+                DynamicTensor AllSample = RankSampleResPair.first;
+                DynamicTensor F = RankSampleResPair.second.View({-1, CosmosNum});
+
                 // 计算所有窗口中的样例每个分块高斯在历史的平均密度系数，顺便返回他的概率密度后面要用
-                DynamicTensor FinalF = GetF(BlockIndex)*SampleSelector.GetAllSampleMeanPDF(AllSample, BlockIndex, AllSampleCurLogPDF).Eleexp(M_E);
+                DynamicTensor FinalF = F*SampleSelector.GetAllSampleMeanPDF(AllSample, BlockIndex, AllSampleCurLogPDF).Eleexp(M_E);
                 //计算对均值的导数
                 DynamicTensor DeltaMean = (GetDeltaMean(AllSample, BlockIndex)*FinalF.View({-1,CosmosNum,1})).Mean({0});//(CosmosNum,Dim)
                 //计算对斜方差矩阵重参数化后中间的对角阵的导数，这个要乘过去
