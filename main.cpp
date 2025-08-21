@@ -7,13 +7,13 @@ struct yxx
     DynamicTensor Forward(DynamicTensor x)
     {
         // 输出模型的结果
-        return x*(-10);
+        return x.Sum({2}, true);
     }
 
     DynamicTensor Eval(DynamicTensor x)
     {
         DynamicTensor ForwardRes = Forward(x);
-        double TrueRes = 144;
+        double TrueRes = 14.4;
         DynamicTensor cost = (ForwardRes + TrueRes*(-1)).Abs()*(-1); // cost计算
         return cost.Sum({2}, true);
     }
@@ -25,11 +25,12 @@ int main()
     he params = he::NewDict();
     params["DimNum"] = 3;
     params["CosmosNum"] = 2;
-    params["SampleNum"] = 20;
-    params["MaxItNum"] = 400;
-    params["HistoryLength"] = 5;
+    params["SampleNum"] = 30;
+    params["MaxItNum"] = 120;
+    params["HistoryLength"] = 10;
     params["LearingRate_Mean"] = 0.3;
     params["LearingRate_Var"] = 0.2;
+    params["Beta"] = 0.6;
     solver.Init(params);
     solver.Solve();
 }

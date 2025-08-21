@@ -233,6 +233,7 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
     double LearingRate_B;//学习率
     double EvalScoreInitRate; // 把零阶cost映射到对梯度效应的时候的初始值
     double EvalScoreMaxRate; // 把零阶cost映射到对梯度效应的时候的最大值
+    double Beta; // 每次采样取的百分比
 
     GMM TargetDistribution; // 目标分布
 
@@ -252,6 +253,7 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
         LearingRate_B = this->Params.DictGet("LearingRate_B", 0.02).f();
         EvalScoreInitRate = this->Params.DictGet("EvalScoreInitRate", 0.1).f();
         EvalScoreMaxRate = this->Params.DictGet("EvalScoreMaxRate", 0.8).f();
+        Beta = this->Params.DictGet("Beta", 0.5).f();
     }
 
     /**
@@ -326,7 +328,7 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
                 auto& ThisBlock = TargetDistribution.PartialBlock[BlockIndex];
                 DynamicTensor AllSampleCurLogPDF;
                 // 得到筛选后的样例以及他们的效用
-                auto RankSampleResPair = SampleSelector.SampleEvalRankRate(BlockIndex, 0.5);
+                auto RankSampleResPair = SampleSelector.SampleEvalRankRate(BlockIndex, Beta);
                 // 得到所有要用的样例
                 DynamicTensor AllSample = RankSampleResPair.first;
                 DynamicTensor F = RankSampleResPair.second.View({-1, CosmosNum});
