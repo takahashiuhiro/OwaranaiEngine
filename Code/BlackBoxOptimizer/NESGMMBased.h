@@ -80,12 +80,24 @@ struct GMMwithSample
     }
 };
 
+struct GMMHisToryIndex
+{
+    int GMMIdx;
+    int CosmosIdx;
+    int SampleIdx;
+};
+
 struct GMMHistory
 {
 
-    int HistoryLength;
+    int HistoryLength;//历史窗口长度
 
-    std::deque<GMMwithSample> GMMContent;
+    std::deque<GMMwithSample> GMMContent;//历史窗口
+
+    std::pair<std::vector<float>, float> BestPair = {{}, -1e7}; // 历代最好的样本
+
+    std::vector<std::vector<GMMHisToryIndex>> CurHistory; // 本历史窗口内最好的样本们，排序为从差到好
+    
 
     void Add(GMMwithSample InputGMMContent)
     {
@@ -124,56 +136,91 @@ struct GMMHistory
         int MaxSampleNum = ContentNum*SingleTimeSampleNum;
         int ResMaxSampleNum = MaxSampleNum*Beta;
         int DeviceNum =  GMMContent[0].PartialSample[BlockIndex].GetDeviceNum();
-        
-        auto SamplePairCMP = [](auto& Input_1, auto& Input_2){return Input_1.second > Input_2.second;};
-        
-        std::vector<std::priority_queue<std::pair<std::vector<double>, double>,std::vector<std::pair<std::vector<double>, double>>,decltype(SamplePairCMP)>> SampleQueue;
-        for (int i = 0; i < CosmosNum; ++i) SampleQueue.emplace_back(SamplePairCMP);
-        for(auto&it:GMMContent)
+
+        if(BlockIndex == 0)
         {
-            auto& ThisSample = it.PartialSample[BlockIndex];
-            auto& ThisEvalRes = it.EvalRes;
-
-            int ThisSampleNum = ThisSample.Shape()[0];
-
-            auto SampleContent = ThisSample.Ops->TensorPointer->GetDevicePointer();
-            auto EvalContent = ThisEvalRes.Ops->TensorPointer->GetDevicePointer();
-
-            for(int CosmosIdx = 0;CosmosIdx < CosmosNum;CosmosIdx++)
+            auto SamplePairCMP = [](auto& Input_1, auto& Input_2){return Input_1.second > Input_2.second;};
+            std::vector<std::priority_queue<std::pair<GMMHisToryIndex, double>,std::vector<std::pair<GMMHisToryIndex, double>>,decltype(SamplePairCMP)>> SampleQueue;
+            CurHistory.clear();
+            for (int i = 0; i < CosmosNum; ++i) 
             {
-                for(int CurSampleIdx = 0;CurSampleIdx < ThisSampleNum;CurSampleIdx++)
+                SampleQueue.emplace_back(SamplePairCMP);
+                CurHistory.push_back({});
+            }
+            for(int ItIndex = 0;ItIndex < GMMContent.size();ItIndex++)
+            {
+                auto&it = GMMContent[ItIndex];
+                auto& ThisSample = it.PartialSample[BlockIndex];
+                auto& ThisEvalRes = it.EvalRes;
+                int ThisSampleNum = ThisSample.Shape()[0];
+                auto EvalContent = ThisEvalRes.Ops->TensorPointer->GetDevicePointer();
+                for(int CosmosIdx = 0;CosmosIdx < CosmosNum;CosmosIdx++)
                 {
-                    int ThisVecIdx = CurSampleIdx*CosmosNum + CosmosIdx;
-                    std::vector<double>ThisSampleV;
-                    for(int DimIndex = 0;DimIndex < DimNum;DimIndex++)
+                    for(int CurSampleIdx = 0;CurSampleIdx < ThisSampleNum;CurSampleIdx++)
                     {
-                        ThisSampleV.push_back(SampleContent[ThisVecIdx*DimNum + DimIndex]);
+                        int ThisVecIdx = CurSampleIdx*CosmosNum + CosmosIdx;
+                        SampleQueue[CosmosIdx].emplace(GMMHisToryIndex{ItIndex,CosmosIdx,CurSampleIdx}, EvalContent[ThisVecIdx]);
+                        while(SampleQueue[CosmosIdx].size()>ResMaxSampleNum)SampleQueue[CosmosIdx].pop();
                     }
-                    SampleQueue[CosmosIdx].emplace(std::move(ThisSampleV), EvalContent[ThisVecIdx]);
+                }
+            }
 
-                    while(SampleQueue[CosmosIdx].size()>ResMaxSampleNum)SampleQueue[CosmosIdx].pop();
+            GMMHisToryIndex BestIdx;
+            bool IsUpdateFlag = false;
+            for(int a = 0;a < ResMaxSampleNum;a++)
+            {
+                for(int b = 0;b < CosmosNum;b++)
+                {
+                    CurHistory[b].push_back(SampleQueue[b].top().first);
+                    if(SampleQueue[b].top().second > BestPair.second)
+                    {
+                        IsUpdateFlag = true;
+                        BestPair.second = SampleQueue[b].top().second;
+                        BestIdx = SampleQueue[b].top().first;
+                    }
+
+                    SampleQueue[b].pop();
+                }
+            }
+
+            if(IsUpdateFlag)
+            {
+                BestPair.first.clear();
+                auto& BestContent = GMMContent[BestIdx.GMMIdx];
+                for(auto& ThisPartial:BestContent.PartialSample)
+                {
+                    auto* ThisTensorPointer = ThisPartial.Ops->TensorPointer->GetDevicePointer();
+                    auto TensorArrayIndexStart = ThisPartial.Shape()[2]*ThisPartial.Shape()[1]*BestIdx.SampleIdx + ThisPartial.Shape()[2]*BestIdx.CosmosIdx;
+                    for(int a = 0;a < ThisPartial.Shape().back();a++)
+                    {
+                        BestPair.first.push_back(ThisTensorPointer[TensorArrayIndexStart+a]);
+                    }
                 }
             }
         }
 
-        std::vector<float>SampleResContent;
-        std::vector<float>EvalResContent;
+        std::vector<float> SampleResContent,EvalResContent;
 
-        for(int a = 0;a < ResMaxSampleNum;a++)
+        for(int ThisSampleNum = 0;ThisSampleNum < ResMaxSampleNum;ThisSampleNum++)
         {
-            for(int b = 0;b < CosmosNum;b++)
+            for(int ThisCosmosNum = 0;ThisCosmosNum < CosmosNum;ThisCosmosNum++)
             {
-                for(int c = 0;c < DimNum; c++)
+                auto& ThisIndex = CurHistory[ThisCosmosNum][ThisSampleNum];
+                auto& ThisBlock = GMMContent[ThisIndex.GMMIdx].PartialSample[BlockIndex];
+                auto& BlockShape = ThisBlock.Shape();
+                auto* ThisTensorPointer = ThisBlock.Ops->TensorPointer->GetDevicePointer();
+                int TensorArrayIndexStart = BlockShape[2]*BlockShape[1]*ThisIndex.SampleIdx + BlockShape[2]*ThisIndex.CosmosIdx;
+                for(int a = 0;a < BlockShape.back();a++)
                 {
-                    SampleResContent.push_back(SampleQueue[b].top().first[c]);
+                    SampleResContent.push_back(ThisTensorPointer[TensorArrayIndexStart+a]);
                 }
-                SampleQueue[b].pop();
-                EvalResContent.push_back(std::log(1 + std::max(0.,(a+1)*1.0/MaxSampleNum)));
+                EvalResContent.push_back(std::log(1 + std::max(0.,(ThisSampleNum+1)*1.0/MaxSampleNum)));
             }
         }
 
         DynamicTensor ResSample = DynamicTensor({(size_t)ResMaxSampleNum, (size_t)CosmosNum, (size_t)DimNum}, SampleResContent, false ,DeviceNum);
         DynamicTensor ResEval = DynamicTensor({(size_t)ResMaxSampleNum, (size_t)CosmosNum, 1}, EvalResContent, false ,DeviceNum);
+
         return std::make_pair(ResSample,ResEval);
     }
 
@@ -300,11 +347,6 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
             {
                 auto& ThisBlock = TargetDistribution.PartialBlock[BlockIndex];
                 return AllSample - ThisBlock.Mean;
-                //auto TargetVarInv = ThisBlock.VarInv.View({1, CosmosNum, DimNum, DimNum});
-                //auto TargetZeroBiasSample = (AllSample - ThisBlock.Mean).View({-1,CosmosNum,DimNum,1}); //(SampleNum,CosmosNum,Dim)
-                //DynamicTensor Res = TargetVarInv%TargetZeroBiasSample;
-                //print((AllSample - ThisBlock.Mean).Shape());
-                //return Res.View({-1,CosmosNum,DimNum});
             };
 
             auto GetDeltaVar = [this](DynamicTensor& AllSample, int BlockIndex)
@@ -360,15 +402,15 @@ struct NESGMMBased: public BaseBlackBoxOptimizer<TargetType>
             TargetDistribution.PartialRate = (TargetDistribution.PartialRate + AllSampleMean.Softmax(0)*LearingRate_B).Softmax(0);
             
             //debug--
+            /*
             print("mean----------");
             print(TargetDistribution.PartialBlock[0].Mean);
             DynamicTensor gg = DynamicTensor({(size_t)CosmosNum,1,(size_t)DimNum},0);
             gg.Fill(1);
             print("varr----------");
             print(gg%TargetDistribution.PartialBlock[0].Var);
-
-            //print(TargetDistribution.PartialBlock[0].Var);
+            */
         }
-        return DynamicTensor(); //暂时返回
+        return DynamicTensor({(size_t)DimNum}, SampleSelector.BestPair.first, false, this->DeviceNum);
     }
 };
