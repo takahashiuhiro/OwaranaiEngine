@@ -7,9 +7,10 @@ It has **no external dependencies** other than optional **CUDA** and **OpenGL** 
 
 ## Overview  
 
-**OwaranaiEngine** is a research-oriented framework for experimental development of automatic differentiation, tensor computation, and information-geometric black-box optimization — all written in modern C++.  
+**OwaranaiEngine** is a research-oriented framework for experimental development of automatic differentiation, tensor computation, and black-box optimization — all written in modern C++.   
 
-The framework is entirely **header-only**, requiring no additional build steps beyond `#include`.  
+The framework is entirely **header-only**, requiring no additional build steps beyond `#include`.   
+
 It also supports **interactive C++ interpreters** (such as **Cling**) for rapid prototyping and experimentation.  
 
 ---
