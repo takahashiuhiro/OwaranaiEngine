@@ -26,6 +26,11 @@ struct BaseBlackBoxOptimizer
         ParamsInit();
     }
 
+    void SetTargetObject(TargetType* InputObject)
+    {
+        TargetObj = InputObject;
+    }
+
     virtual DynamicTensor Solve() = 0;
 };
 

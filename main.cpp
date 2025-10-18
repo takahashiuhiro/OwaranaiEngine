@@ -22,6 +22,8 @@ struct yxx
 int main() 
 {
     OwaranaiEngine::NESGMMBased<yxx> solver;
+    yxx test;
+    solver.SetTargetObject(&test);
     OwaranaiEngine::he params = OwaranaiEngine::he::NewDict();
     params["DimNum"] = 3;
     params["CosmosNum"] = 2;
