@@ -1,0 +1,1 @@
+#include "../CommonInfo/ForPlatforms.h"
