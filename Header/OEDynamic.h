@@ -5,3 +5,4 @@
 #include "CommonDataStructure/BaseDataLoader.h"
 #include "CommonMathMoudle/BaseBlackBoxOptimizer.h"
 #include "CommonMathMoudle/NESGMMBased.h"
+#include "Application/GPTX/GPTX.h"

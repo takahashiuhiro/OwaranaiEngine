@@ -41,6 +41,24 @@ Special thanks to [karpathy/nanoGPT](https://github.com/karpathy/nanoGPT/tree/ma
 
 ---
 
+##  How to Use in Your Project  
+
+OwaranaiEngine is designed to be **plug-and-play**.  
+Simply include the main header file in your project and start using the framework immediately — no linking or additional setup required.
+
+### Minimal Example
+```cpp
+#include "Header/OEDynamic.h"
+
+int main() {
+    OwaranaiEngine::DynamicTensor s = OwaranaiEngine::DynamicTensor({2,3});
+    s.Fill(4);
+    OwaranaiEngine::DynamicTensor d = OwaranaiEngine::DynamicTensor({3,2});
+    d.Fill(6);
+    print(s%d);
+}
+```
+
 ## Build & Run  
 
 ###  Common Setup  

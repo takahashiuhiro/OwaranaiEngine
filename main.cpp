@@ -1,5 +1,4 @@
 #include "Header/OEDynamic.h"
-#include "Header/Application/GPTX/GPTX.h"
 
 struct yxx
 {
@@ -22,9 +21,16 @@ struct yxx
 
 int main() 
 {
+    OwaranaiEngine::DynamicTensor s = OwaranaiEngine::DynamicTensor({2,3});
+    s.Fill(4);
+    OwaranaiEngine::DynamicTensor d = OwaranaiEngine::DynamicTensor({3,2});
+    d.Fill(6);
+    print(s%d);
+    /*
     OwaranaiEngine::DynamicTensor s = OwaranaiEngine::DynamicTensor({2,2},{1,2,3,4.},1,1);
     OwaranaiEngine::DynamicTensor d = OwaranaiEngine::DynamicTensor({2,2},{1,2,3,4.},1,1);
     print(s+d);
+    */
     /*
     OwaranaiEngine::NESGMMBased<yxx> solver;
     yxx test;
