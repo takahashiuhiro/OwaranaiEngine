@@ -1,9 +1,9 @@
-#include "Code/OEDynamic.h"
-#include "Application/GPTX/GPTX.h"
+#include "Header/OEDynamic.h"
+#include "Header/Application/GPTX/GPTX.h"
 
 int main() 
 {
-    he Params = he::NewDict();
+    OwaranaiEngine::he Params = OwaranaiEngine::he::NewDict();
     Params["BlockSize"] = 500;
     Params["VocabSize"] = 200;
     Params["NLayers"] = 1;
@@ -13,8 +13,8 @@ int main()
     Params["Bias"] = 1;
     Params["DeviceNum"] = 1;
 
-    GPTX a;
-    a.Init<GPT2Model>(Params);
+    OwaranaiEngine::GPTX a;
+    a.Init<OwaranaiEngine::GPT2Model>(Params);
 
     std::cout<<"参数量: "<<a.LanguageModel->GetNumParams()<<" m"<<std::endl;
 
@@ -25,9 +25,9 @@ int main()
     //加载词表
     a.LoadTokenIdxTable("../DataSet/pkduck/pkduck.table.oe");
     //加载权重
-    a.LanguageModel->Load("../Application/GPTX/test_res/GPT2_l1_nh32_ne1536.weight.oe");
+    //a.LanguageModel->Load("../Application/GPTX/test_res/GPT2_l1_nh32_ne1536.weight.oe");
     //训练
-    //a.TrainConversation("../DataSet/pkduck/pkduck.data.oe");
+    a.TrainConversation("../DataSet/pkduck/pkduck.data.oe");
     //生成
     a.GenConversation("他们的烤鸭香味也很浓郁。");
 }

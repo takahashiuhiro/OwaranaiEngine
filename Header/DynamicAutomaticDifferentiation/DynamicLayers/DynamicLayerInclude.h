@@ -1,0 +1,10 @@
+#pragma once
+#include "BaseDynamicLayer.h"
+#include "Linear.h"
+#include "LayerNorm.h"
+#include "BatchNorm.h"
+#include "MLP.h"
+#include "CausalSelfAttention.h"
+#include "TransformerBlock.h"
+#include "Embedding.h"
+#include "GPT2Model.h"

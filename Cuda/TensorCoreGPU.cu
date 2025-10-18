@@ -1,4 +1,4 @@
-#include "TensorCoreCudaHead.cuh"
+#include "../Header/CommonMathMoudle/Cuda/TensorCoreCudaHead.cuh"
 #include <math.h>
 
 __global__ void AddArrayKernel(float* Output, float* InputFirst, float* InputSecond,size_t Size) 

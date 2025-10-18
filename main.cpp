@@ -1,4 +1,5 @@
-#include "Header/CommonMathMoudle/NESGMMBased.h"
+#include "Header/OEDynamic.h"
+#include "Header/Application/GPTX/GPTX.h"
 
 struct yxx
 {
@@ -21,6 +22,10 @@ struct yxx
 
 int main() 
 {
+    OwaranaiEngine::DynamicTensor s = OwaranaiEngine::DynamicTensor({2,2},{1,2,3,4.},1,1);
+    OwaranaiEngine::DynamicTensor d = OwaranaiEngine::DynamicTensor({2,2},{1,2,3,4.},1,1);
+    print(s+d);
+    /*
     OwaranaiEngine::NESGMMBased<yxx> solver;
     yxx test;
     solver.SetTargetObject(&test);
@@ -35,5 +40,5 @@ int main()
     params["Beta"] = 0.4;
     solver.Init(params);
     print(solver.Solve());
-    
+    */
 }

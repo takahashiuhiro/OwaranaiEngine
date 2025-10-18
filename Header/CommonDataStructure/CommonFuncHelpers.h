@@ -11,6 +11,30 @@
 #include <iterator>
 #include "InputInclude.h"
 
+// 辅助函数模板，用于替换元组中的第 h 个元素
+template<std::size_t H, typename NewType, typename Tuple, std::size_t... I, std::size_t... J>
+auto ReplaceElementImpl(Tuple&& TupleIns, NewType&& NewValue, std::index_sequence<I...>, std::index_sequence<J...>) 
+{
+    return std::make_tuple(
+        std::get<I>(std::forward<Tuple>(TupleIns))...,       // 前面的元素
+        std::forward<NewType>(NewValue),                 // 新元素
+        std::get<H + 1 + J>(std::forward<Tuple>(TupleIns))... // 后面的元素
+    );
+}
+
+// 主函数模板，用于替换元组中的第 h 个元素
+template<std::size_t H, typename NewType, typename... Args>
+auto ReplaceElement(const std::tuple<Args...>& TupleIns, NewType&& NewValue) {
+    constexpr auto size = sizeof...(Args);
+    static_assert(H < size, "Index out of bounds");
+    return ReplaceElementImpl<H>(
+        TupleIns,
+        std::forward<NewType>(NewValue),
+        std::make_index_sequence<H>{},               // 前面元素的索引
+        std::make_index_sequence<size - H - 1>{}     // 后面元素的索引
+    );
+}
+
 /**把数字变成字符串.*/
 template<typename T>
 std::string NumberToString(T Input)
@@ -154,4 +178,14 @@ void SaveStringToFile(std::vector<std::string> StringVec,std::string InputName)
 }
 
 //生成start到end的num个不重复整型
-std::vector<int> GenerateUniqueRandomNumbers(int Num, int Start, int End);
+std::vector<int> GenerateUniqueRandomNumbers(int Num, int Start, int End)
+{
+    int n = End - Start + 1;
+    std::vector<int> Numbers(n);
+    for(int a=0;a<n;a++)Numbers[a] = Start+a;
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(Numbers.begin(), Numbers.end(), g);
+    Numbers.resize(Num);
+    return Numbers;
+}
