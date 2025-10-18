@@ -42,7 +42,7 @@ Special thanks to [karpathy/nanoGPT](https://github.com/karpathy/nanoGPT/tree/ma
 
 ## Build & Run  
 
-### 🔹 Common Setup  
+###  Common Setup  
 git clone https://github.com/takahashiuhiro/OwaranaiEngine.git  
 cd build  
 
@@ -74,6 +74,8 @@ g++ -std=c++17 -DCUDA_USEFUL ../main.cpp tensorcuda.o -o main -L/usr/local/cuda/
 ##  Documentation  
 
 **TODO**  
+
+## TODO
 
 - `Hyperelement` splay structure not yet implemented  
 - CUDA version of multivariate Gaussian distribution pending  
