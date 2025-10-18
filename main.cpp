@@ -1,28 +1,28 @@
-#include "Code/OEDynamic.h"
-#include <chrono>
+#include "Header/CommonMathMoudle/NESGMMBased.h"
 
 struct yxx
 {
 
-    DynamicTensor Forward(DynamicTensor x)
+    OwaranaiEngine::DynamicTensor Forward(OwaranaiEngine::DynamicTensor x)
     {
         // 输出模型的结果
         return x.Sum({2}, true);
     }
 
-    DynamicTensor Eval(DynamicTensor x)
+    OwaranaiEngine::DynamicTensor Eval(OwaranaiEngine::DynamicTensor x)
     {
-        DynamicTensor ForwardRes = Forward(x);
+        OwaranaiEngine::DynamicTensor ForwardRes = Forward(x);
         double TrueRes = 15;
-        DynamicTensor cost = (ForwardRes + TrueRes*(-1)).Abs()*(-1); // cost计算
+        OwaranaiEngine::DynamicTensor cost = (ForwardRes + TrueRes*(-1)).Abs()*(-1); // cost计算
         return cost.Sum({2}, true);
     }
 };
 
+
 int main() 
 {
-    NESGMMBased<yxx> solver;
-    he params = he::NewDict();
+    OwaranaiEngine::NESGMMBased<yxx> solver;
+    OwaranaiEngine::he params = OwaranaiEngine::he::NewDict();
     params["DimNum"] = 3;
     params["CosmosNum"] = 2;
     params["SampleNum"] = 20;
@@ -33,4 +33,5 @@ int main()
     params["Beta"] = 0.4;
     solver.Init(params);
     print(solver.Solve());
+    
 }
