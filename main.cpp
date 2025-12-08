@@ -21,18 +21,6 @@ struct yxx
 
 int main() 
 {
-    OwaranaiEngine::DynamicTensor s = OwaranaiEngine::DynamicTensor({2,3});
-    s.Fill(4);
-    OwaranaiEngine::DynamicTensor d = OwaranaiEngine::DynamicTensor({3,2});
-    d.Fill(6);
-    print(s%d);
-    print(6);
-    /*
-    OwaranaiEngine::DynamicTensor s = OwaranaiEngine::DynamicTensor({2,2},{1,2,3,4.},1,1);
-    OwaranaiEngine::DynamicTensor d = OwaranaiEngine::DynamicTensor({2,2},{1,2,3,4.},1,1);
-    print(s+d);
-    */
-    /*
     OwaranaiEngine::NESGMMBased<yxx> solver;
     yxx test;
     solver.SetTargetObject(&test);
@@ -47,5 +35,4 @@ int main()
     params["Beta"] = 0.4;
     solver.Init(params);
     print(solver.Solve());
-    */
 }
