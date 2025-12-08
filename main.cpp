@@ -26,6 +26,7 @@ int main()
     OwaranaiEngine::DynamicTensor d = OwaranaiEngine::DynamicTensor({3,2});
     d.Fill(6);
     print(s%d);
+    print(6);
     /*
     OwaranaiEngine::DynamicTensor s = OwaranaiEngine::DynamicTensor({2,2},{1,2,3,4.},1,1);
     OwaranaiEngine::DynamicTensor d = OwaranaiEngine::DynamicTensor({2,2},{1,2,3,4.},1,1);
